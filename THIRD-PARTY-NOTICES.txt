@@ -1,0 +1,12 @@
+Third-Party Notices
+
+This project uses the Boost C++ Libraries (Boost.Math) via a C bridge.
+
+Name: Boost C++ Libraries (Boost.Math)
+Homepage: https://www.boost.org/
+License: Boost Software License 1.0
+License Text: See LICENSE-BOOST.txt in this repository or https://www.boost.org/LICENSE_1_0.txt
+
+Notes:
+- The project links to and/or uses APIs from Boost.Math through the CBoostBridge target.
+- If any Boost source/header files are redistributed within this repository, those files should retain the Boost Software License header.
