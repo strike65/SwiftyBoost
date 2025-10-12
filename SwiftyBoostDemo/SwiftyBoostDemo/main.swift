@@ -24,6 +24,5 @@
 import Foundation
 import SwiftyBoost
 
-print("\(try incompleteEllipticIntegralE(0.5, phi: 0.4))")
-
+print("\(try SpecialFunctions.hypergeometric1F1(a: 55.0, b: 1.0, z: 66.0))")
 

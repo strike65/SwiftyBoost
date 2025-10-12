@@ -1,7 +1,6 @@
 //
 //  Created by VT on 11.10.25.
-//  Copyright © 2025 Volker Thieme. All rights reserved.
-//
+//  Copyright © 2025 Volker Thieme.
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
 //  in the Software without restriction, including without limitation the rights
@@ -53,6 +52,14 @@
 #include <boost/math/special_functions/ellint_rg.hpp>
 #include <boost/math/special_functions/lambert_w.hpp>
 #include <boost/math/constants/constants.hpp>
+
+// Hypergeometric
+#include <boost/math/special_functions/hypergeometric_1F0.hpp>
+#include <boost/math/special_functions/hypergeometric_0F1.hpp>
+#include <boost/math/special_functions/hypergeometric_2F0.hpp>
+#include <boost/math/special_functions/hypergeometric_1F1.hpp>
+#include <boost/math/special_functions/hypergeometric_pFq.hpp>
+#include <vector>
 
 extern "C" {
 
@@ -165,6 +172,37 @@ long double bs_lgamma_l(long double x)  { return boost::math::lgamma(x); }
 long double bs_erf_l(long double x)     { return boost::math::erf(x); }
 long double bs_erfc_l(long double x)    { return boost::math::erfc(x); }
 
+// Incomplete gamma (lower/upper, regularized, and inverses)
+double bs_tgamma_lower(double a, double x)      { return boost::math::tgamma_lower(a, x); }
+double bs_tgamma_upper(double a, double x)      { return boost::math::tgamma(a, x); }
+double bs_gamma_p(double a, double x)           { return boost::math::gamma_p(a, x); }
+double bs_gamma_q(double a, double x)           { return boost::math::gamma_q(a, x); }
+double bs_gamma_p_inv(double a, double p)       { return boost::math::gamma_p_inv(a, p); }
+double bs_gamma_q_inv(double a, double q)       { return boost::math::gamma_q_inv(a, q); }
+
+// Derivatives of regularized incomplete gamma functions
+double bs_gamma_p_derivative(double a, double x) { return boost::math::gamma_p_derivative(a, x); }
+
+float bs_tgamma_lower_f(float a, float x)       { return boost::math::tgamma_lower(a, x); }
+float bs_tgamma_upper_f(float a, float x)       { return boost::math::tgamma(a, x); }
+float bs_gamma_p_f(float a, float x)            { return boost::math::gamma_p(a, x); }
+float bs_gamma_q_f(float a, float x)            { return boost::math::gamma_q(a, x); }
+float bs_gamma_p_inv_f(float a, float p)        { return boost::math::gamma_p_inv(a, p); }
+float bs_gamma_q_inv_f(float a, float q)        { return boost::math::gamma_q_inv(a, q); }
+
+// Derivatives (float)
+float bs_gamma_p_derivative_f(float a, float x) { return boost::math::gamma_p_derivative(a, x); }
+
+long double bs_tgamma_lower_l(long double a, long double x) { return boost::math::tgamma_lower(a, x); }
+long double bs_tgamma_upper_l(long double a, long double x) { return boost::math::tgamma(a, x); }
+long double bs_gamma_p_l(long double a, long double x)      { return boost::math::gamma_p(a, x); }
+long double bs_gamma_q_l(long double a, long double x)      { return boost::math::gamma_q(a, x); }
+long double bs_gamma_p_inv_l(long double a, long double p)  { return boost::math::gamma_p_inv(a, p); }
+long double bs_gamma_q_inv_l(long double a, long double q)  { return boost::math::gamma_q_inv(a, q); }
+
+// Derivatives (long double)
+long double bs_gamma_p_derivative_l(long double a, long double x) { return boost::math::gamma_p_derivative(a, x); }
+
 // Beta family
 double bs_beta(double a, double b)                     { return boost::math::beta(a, b); }
 double bs_fullBeta(double a, double b, double x)       { return boost::math::beta(a, b, x); }
@@ -174,6 +212,8 @@ double bs_ibeta_inv(double a, double b, double p)      { return boost::math::ibe
 double bs_ibetac_inv(double a, double b, double p)     { return boost::math::ibetac_inv(a, b, p); }
 double bs_ibeta_inva(double b, double x, double p)     { return boost::math::ibeta_inva(b, x, p); }
 double bs_ibeta_invb(double a, double x, double p)     { return boost::math::ibeta_invb(a, x, p); }
+// Derivative of regularized incomplete Beta
+double bs_ibeta_derivative(double a, double b, double x) { return boost::math::ibeta_derivative(a, b, x); }
 
 float bs_beta_f(float a, float b)                      { return boost::math::beta(a, b); }
 float bs_fullBeta_f(float a, float b, float x)         { return boost::math::beta(a, b, x); }
@@ -183,6 +223,8 @@ float bs_ibeta_inv_f(float a, float b, float p)        { return boost::math::ibe
 float bs_ibetac_inv_f(float a, float b, float p)       { return boost::math::ibetac_inv(a, b, p); }
 float bs_ibeta_inva_f(float b, float x, float p)       { return boost::math::ibeta_inva(b, x, p); }
 float bs_ibeta_invb_f(float a, float x, float p)       { return boost::math::ibeta_invb(a, x, p); }
+// Derivative (float)
+float bs_ibeta_derivative_f(float a, float b, float x) { return boost::math::ibeta_derivative(a, b, x); }
 
 long double bs_beta_l(long double a, long double b)                      { return boost::math::beta(a, b); }
 long double bs_fullBeta_l(long double a, long double b, long double x)   { return boost::math::beta(a, b, x); }
@@ -192,6 +234,8 @@ long double bs_ibeta_inv_l(long double a, long double b, long double p)  { retur
 long double bs_ibetac_inv_l(long double a, long double b, long double p) { return boost::math::ibetac_inv(a, b, p); }
 long double bs_ibeta_inva_l(long double b, long double x, long double p) { return boost::math::ibeta_inva(b, x, p); }
 long double bs_ibeta_invb_l(long double a, long double x, long double p) { return boost::math::ibeta_invb(a, x, p); }
+// Derivative (long double)
+long double bs_ibeta_derivative_l(long double a, long double b, long double x) { return boost::math::ibeta_derivative(a, b, x); }
 
 // Digamma / Polygamma / Zeta
 double bs_digamma(double x)            { return boost::math::digamma(x); }
@@ -215,20 +259,24 @@ float bs_owens_t_f(float h, float a)            { return boost::math::owens_t(h,
 long double bs_owens_t_l(long double h, long double a) { return boost::math::owens_t(h, a); }
 
 // Exponential integrals and related
-double bs_expint_En(int n, double x)   { return boost::math::expint(n, x); }
-double bs_expm1(double x)              { return boost::math::expm1(x); }
-double bs_log1p(double x)              { return boost::math::log1p(x); }
-double bs_log1pmx(double x)            { return boost::math::log1pmx(x); }
-double bs_powm1(double x, double y)    { return boost::math::powm1(x, y); }
-double bs_cbrt(double x)               { return boost::math::cbrt(x); }
+// Ei(x) = exponential integral (principal value) — Boost.Math overload expint(x)
+double bs_expint_Ei(double x)        { return boost::math::expint(x); }
+double bs_expint_En(int n, double x) { return boost::math::expint(n, x); }
+double bs_expm1(double x)            { return boost::math::expm1(x); }
+double bs_log1p(double x)            { return boost::math::log1p(x); }
+double bs_log1pmx(double x)          { return boost::math::log1pmx(x); }
+double bs_powm1(double x, double y)  { return boost::math::powm1(x, y); }
+double bs_cbrt(double x)             { return boost::math::cbrt(x); }
 
-float bs_expint_En_f(int n, float x)   { return boost::math::expint(n, x); }
-float bs_expm1_f(float x)              { return boost::math::expm1(x); }
-float bs_log1p_f(float x)              { return boost::math::log1p(x); }
-float bs_log1pmx_f(float x)            { return boost::math::log1pmx(x); }
-float bs_powm1_f(float x, float y)     { return boost::math::powm1(x, y); }
-float bs_cbrt_f(float x)               { return boost::math::cbrt(x); }
+float bs_expint_Ei_f(float x)        { return boost::math::expint(x); }
+float bs_expint_En_f(int n, float x) { return boost::math::expint(n, x); }
+float bs_expm1_f(float x)            { return boost::math::expm1(x); }
+float bs_log1p_f(float x)            { return boost::math::log1p(x); }
+float bs_log1pmx_f(float x)          { return boost::math::log1pmx(x); }
+float bs_powm1_f(float x, float y)   { return boost::math::powm1(x, y); }
+float bs_cbrt_f(float x)             { return boost::math::cbrt(x); }
 
+long double bs_expint_Ei_l(long double x)          { return boost::math::expint(x); }
 long double bs_expint_En_l(int n, long double x)   { return boost::math::expint(n, x); }
 long double bs_expm1_l(long double x)              { return boost::math::expm1(x); }
 long double bs_log1p_l(long double x)              { return boost::math::log1p(x); }
@@ -338,5 +386,52 @@ float bs_lambert_wm1_f(float x)       { return boost::math::lambert_wm1(x); }
 
 long double bs_lambert_w0_l(long double x)  { return boost::math::lambert_w0(x); }
 long double bs_lambert_wm1_l(long double x) { return boost::math::lambert_wm1(x); }
+
+// Γ(a) / Γ(b)
+double bs_tgamma_ratio(double a, double b) {return boost::math::tgamma_ratio(a, b); }
+
+float bs_tgamma_ratio_f(float a, float b) { return  boost::math::tgamma_ratio(a, b); }
+
+long double bs_tgamma_ratio_l(long double a, long double b) {return  boost::math::tgamma_ratio(a, b);}
+
+// Γ(a) / Γ(a + delta)
+double bs_tgamma_delta_ratio(double a, double delta)  { return boost::math::tgamma_delta_ratio(a, delta);}
+
+float bs_tgamma_delta_ratio_f(float a, float delta)  { return  boost::math::tgamma_delta_ratio(a, delta);}
+
+long double bs_tgamma_delta_ratio_l(long double a, long double delta)  { return  boost::math::tgamma_delta_ratio(a, delta);}
+
+// Hypergeometric functions (Gauss/confluent/general)
+double bs_hypergeometric_1F0(double a, double z) { return boost::math::hypergeometric_1F0(a, z); }
+float  bs_hypergeometric_1F0_f(float a, float z) { return boost::math::hypergeometric_1F0(a, z); }
+long double bs_hypergeometric_1F0_l(long double a, long double z) { return boost::math::hypergeometric_1F0(a, z); }
+
+double bs_hypergeometric_0F1(double b, double z) { return boost::math::hypergeometric_0F1(b, z); }
+float  bs_hypergeometric_0F1_f(float b, float z) { return boost::math::hypergeometric_0F1(b, z); }
+long double bs_hypergeometric_0F1_l(long double b, long double z) { return boost::math::hypergeometric_0F1(b, z); }
+
+double bs_hypergeometric_2F0(double a, double b, double z) { return boost::math::hypergeometric_2F0(a, b, z); }
+float  bs_hypergeometric_2F0_f(float a, float b, float z)  { return boost::math::hypergeometric_2F0(a, b, z); }
+long double bs_hypergeometric_2F0_l(long double a, long double b, long double z) { return boost::math::hypergeometric_2F0(a, b, z); }
+
+double bs_hypergeometric_1F1(double a, double b, double z) { return boost::math::hypergeometric_1F1(a, b, z); }
+float  bs_hypergeometric_1F1_f(float a, float b, float z)  { return boost::math::hypergeometric_1F1(a, b, z); }
+long double bs_hypergeometric_1F1_l(long double a, long double b, long double z) { return boost::math::hypergeometric_1F1(a, b, z); }
+
+double bs_hypergeometric_pFq(const double* a, size_t p, const double* b, size_t q, double z) {
+    std::vector<double> va(a, a + p);
+    std::vector<double> vb(b, b + q);
+    return boost::math::hypergeometric_pFq(va, vb, z);
+}
+float bs_hypergeometric_pFq_f(const float* a, size_t p, const float* b, size_t q, float z) {
+    std::vector<float> va(a, a + p);
+    std::vector<float> vb(b, b + q);
+    return boost::math::hypergeometric_pFq(va, vb, z);
+}
+long double bs_hypergeometric_pFq_l(const long double* a, size_t p, const long double* b, size_t q, long double z) {
+    std::vector<long double> va(a, a + p);
+    std::vector<long double> vb(b, b + q);
+    return boost::math::hypergeometric_pFq(va, vb, z);
+}
 
 } // extern "C"

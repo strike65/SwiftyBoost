@@ -1,7 +1,6 @@
 //
 //  Created by VT on 11.10.25.
-//  Copyright © 2025 Volker Thieme. All rights reserved.
-//
+//  Copyright © 2025 Volker Thieme.
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
 //  in the Software without restriction, including without limitation the rights
@@ -22,6 +21,7 @@
 //  
 
 #pragma once
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -125,6 +125,15 @@ double bs_tgamma(double x);
 double bs_lgamma(double x);
 double bs_erf(double x);
 double bs_erfc(double x);
+// Γ(a) / Γ(b)
+double      bs_tgamma_ratio(double a, double b);
+float       bs_tgamma_ratio_f(float a, float b);
+long double bs_tgamma_ratio_l(long double a, long double b);
+
+// Γ(a) / Γ(a + delta)
+double      bs_tgamma_delta_ratio(double a, double delta);
+float       bs_tgamma_delta_ratio_f(float a, float delta);
+long double bs_tgamma_delta_ratio_l(long double a, long double delta);
 
 float bs_tgamma_f(float x);
 float bs_lgamma_f(float x);
@@ -136,6 +145,37 @@ long double bs_lgamma_l(long double x);
 long double bs_erf_l(long double x);
 long double bs_erfc_l(long double x);
 
+// Incomplete gamma (lower/upper, regularized, and inverses)
+double bs_tgamma_lower(double a, double x);
+double bs_tgamma_upper(double a, double x);
+double bs_gamma_p(double a, double x);
+double bs_gamma_q(double a, double x);
+double bs_gamma_p_inv(double a, double p);
+double bs_gamma_q_inv(double a, double q);
+
+// Derivatives of regularized incomplete gamma (w.r.t. x)
+double bs_gamma_p_derivative(double a, double x);
+
+float bs_tgamma_lower_f(float a, float x);
+float bs_tgamma_upper_f(float a, float x);
+float bs_gamma_p_f(float a, float x);
+float bs_gamma_q_f(float a, float x);
+float bs_gamma_p_inv_f(float a, float p);
+float bs_gamma_q_inv_f(float a, float q);
+
+// Derivatives (float)
+float bs_gamma_p_derivative_f(float a, float x);
+
+long double bs_tgamma_lower_l(long double a, long double x);
+long double bs_tgamma_upper_l(long double a, long double x);
+long double bs_gamma_p_l(long double a, long double x);
+long double bs_gamma_q_l(long double a, long double x);
+long double bs_gamma_p_inv_l(long double a, long double p);
+long double bs_gamma_q_inv_l(long double a, long double q);
+
+// Derivatives (long double)
+long double bs_gamma_p_derivative_l(long double a, long double x);
+
 // Beta family
 double bs_beta(double a, double b);
 double bs_fullBeta(double a, double b, double x);
@@ -145,6 +185,8 @@ double bs_ibeta_inv(double a, double b, double p);
 double bs_ibetac_inv(double a, double b, double p);
 double bs_ibeta_inva(double b, double x, double p);
 double bs_ibeta_invb(double a, double x, double p);
+// Derivative of regularized incomplete Beta I_x(a, b) w.r.t. x
+double bs_ibeta_derivative(double a, double b, double x);
 
 float bs_beta_f(float a, float b);
 float bs_fullBeta_f(float a, float b, float x);
@@ -154,6 +196,8 @@ float bs_ibeta_inv_f(float a, float b, float p);
 float bs_ibetac_inv_f(float a, float b, float p);
 float bs_ibeta_inva_f(float b, float x, float p);
 float bs_ibeta_invb_f(float a, float x, float p);
+// Derivative (float)
+float bs_ibeta_derivative_f(float a, float b, float x);
 
 long double bs_beta_l(long double a, long double b);
 long double bs_fullBeta_l(long double a, long double b, long double x);
@@ -163,6 +207,8 @@ long double bs_ibeta_inv_l(long double a, long double b, long double p);
 long double bs_ibetac_inv_l(long double a, long double b, long double p);
 long double bs_ibeta_inva_l(long double b, long double x, long double p);
 long double bs_ibeta_invb_l(long double a, long double x, long double p);
+// Derivative (long double)
+long double bs_ibeta_derivative_l(long double a, long double b, long double x);
 
 // Digamma / Polygamma / Zeta
 double bs_digamma(double x);
@@ -186,6 +232,8 @@ float bs_owens_t_f(float h, float a);
 long double bs_owens_t_l(long double h, long double a);
 
 // Exponential integrals and related
+// Ei(x) and En(n, x)
+double bs_expint_Ei(double x);
 double bs_expint_En(int n, double x);
 double bs_expm1(double x);
 double bs_log1p(double x);
@@ -193,6 +241,7 @@ double bs_log1pmx(double x);
 double bs_powm1(double x, double y);
 double bs_cbrt(double x);
 
+float bs_expint_Ei_f(float x);
 float bs_expint_En_f(int n, float x);
 float bs_expm1_f(float x);
 float bs_log1p_f(float x);
@@ -200,6 +249,7 @@ float bs_log1pmx_f(float x);
 float bs_powm1_f(float x, float y);
 float bs_cbrt_f(float x);
 
+long double bs_expint_Ei_l(long double x);
 long double bs_expint_En_l(int n, long double x);
 long double bs_expm1_l(long double x);
 long double bs_log1p_l(long double x);
@@ -309,6 +359,32 @@ float bs_lambert_wm1_f(float x);
 
 long double bs_lambert_w0_l(long double x);
 long double bs_lambert_wm1_l(long double x);
+
+// Hypergeometric functions (Gauss/confluent/general)
+// 1F0(a; ; z)
+double bs_hypergeometric_1F0(double a, double z);
+float  bs_hypergeometric_1F0_f(float a, float z);
+long double bs_hypergeometric_1F0_l(long double a, long double z);
+
+// 0F1(; b; z)
+double bs_hypergeometric_0F1(double b, double z);
+float  bs_hypergeometric_0F1_f(float b, float z);
+long double bs_hypergeometric_0F1_l(long double b, long double z);
+
+// 2F0(a, b; ; z)
+double bs_hypergeometric_2F0(double a, double b, double z);
+float  bs_hypergeometric_2F0_f(float a, float b, float z);
+long double bs_hypergeometric_2F0_l(long double a, long double b, long double z);
+
+// 1F1(a; b; z)
+double bs_hypergeometric_1F1(double a, double b, double z);
+float  bs_hypergeometric_1F1_f(float a, float b, float z);
+long double bs_hypergeometric_1F1_l(long double a, long double b, long double z);
+
+// General pFq with arrays of parameters
+double bs_hypergeometric_pFq(const double* a, size_t p, const double* b, size_t q, double z);
+float  bs_hypergeometric_pFq_f(const float* a, size_t p, const float* b, size_t q, float z);
+long double bs_hypergeometric_pFq_l(const long double* a, size_t p, const long double* b, size_t q, long double z);
 
 #ifdef __cplusplus
 }
