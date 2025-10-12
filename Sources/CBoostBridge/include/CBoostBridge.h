@@ -89,7 +89,7 @@ float bs_const_catalan_f(void);
 float bs_const_zeta_three_f(void);
 float bs_const_phi_f(void);
 
-// Boost.Math constants (long double) — only meaningful where Swift Float80 is available.
+// Boost.Math constants (long double)
 long double bs_const_e_l(void);
 long double bs_const_pi_l(void);
 long double bs_const_two_pi_l(void);
@@ -232,7 +232,6 @@ float bs_owens_t_f(float h, float a);
 long double bs_owens_t_l(long double h, long double a);
 
 // Exponential integrals and related
-// Ei(x) and En(n, x)
 double bs_expint_Ei(double x);
 double bs_expint_En(int n, double x);
 double bs_expm1(double x);
@@ -361,22 +360,18 @@ long double bs_lambert_w0_l(long double x);
 long double bs_lambert_wm1_l(long double x);
 
 // Hypergeometric functions (Gauss/confluent/general)
-// 1F0(a; ; z)
 double bs_hypergeometric_1F0(double a, double z);
 float  bs_hypergeometric_1F0_f(float a, float z);
 long double bs_hypergeometric_1F0_l(long double a, long double z);
 
-// 0F1(; b; z)
 double bs_hypergeometric_0F1(double b, double z);
 float  bs_hypergeometric_0F1_f(float b, float z);
 long double bs_hypergeometric_0F1_l(long double b, long double z);
 
-// 2F0(a, b; ; z)
 double bs_hypergeometric_2F0(double a, double b, double z);
 float  bs_hypergeometric_2F0_f(float a, float b, float z);
 long double bs_hypergeometric_2F0_l(long double a, long double b, long double z);
 
-// 1F1(a; b; z)
 double bs_hypergeometric_1F1(double a, double b, double z);
 float  bs_hypergeometric_1F1_f(float a, float b, float z);
 long double bs_hypergeometric_1F1_l(long double a, long double b, long double z);
@@ -386,6 +381,51 @@ double bs_hypergeometric_pFq(const double* a, size_t p, const double* b, size_t 
 float  bs_hypergeometric_pFq_f(const float* a, size_t p, const float* b, size_t q, float z);
 long double bs_hypergeometric_pFq_l(const long double* a, size_t p, const long double* b, size_t q, long double z);
 
+// Bernoulli Numbers
+double bs_bernoulli_b2n(const int n);
+float  bs_bernoulli_b2n_f(const int n);
+long double bs_bernoulli_b2n_l(const int n);
+
+// Tangent Numbers (scalar)
+double bs_tangent_t2n(const int n);
+float  bs_tangent_t2n_f(const int n);
+long double bs_tangent_t2n_l(const int n);
+
+// Tangent Numbers (bulk sequence)
+// Fills out[count] with T_{2(start_index)}, T_{2(start_index+1)}, ..., count values.
+void bs_tangent_t2n_seq(int start_index, unsigned int count, double* out);
+void bs_tangent_t2n_seq_f(int start_index, unsigned int count, float* out);
+// long double; // keep C header valid for long double type in prototypes below
+void bs_tangent_t2n_seq_l(int start_index, unsigned int count, long double* out);
+
+// prime numbers up to 10000th
+unsigned int bs_prime(unsigned int n);
+
+// Fibonacci numbers
+// Returns the nth Fibonacci number as unsigned long long (F(0)=0, F(1)=1).
+unsigned long long bs_fibonacci_ull(unsigned long long n);
+
+// Factorials
+double bs_factorial(unsigned int i);
+float bs_factorial_f(unsigned int i);
+long double bs_factorial_l(unsigned int i);
+
+// Pochhammer
+double bs_rising_factorial(double x, unsigned int i);
+float bs_rising_factorial_f(float x, unsigned int i);
+long double bs_rising_factorial_l(long double x, unsigned int i);
+
+// binomial coefficients
+double bs_binomial_coefficient( unsigned int n, unsigned int k);
+float bs_binomial_coefficient_f( unsigned int n, unsigned int k);
+long double bs_binomial_coefficient_l( unsigned int n, unsigned int k);
+
+// double factorial
+double bs_double_factorial(unsigned int i);
+float bs_double_factorial_f(unsigned int i);
+long double bs_double_factorial_l(unsigned int i);
+
 #ifdef __cplusplus
 }
 #endif
+

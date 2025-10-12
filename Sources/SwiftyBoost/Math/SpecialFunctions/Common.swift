@@ -24,7 +24,7 @@ import CBoostBridge
     /// Use these errors to understand why a computation failed (e.g., argument is
     /// not finite, argument violates domain restrictions, or the function has a
     /// mathematical pole at the requested input).
-    public enum SpecialFunctionError: Error {
+    public enum SpecialFunctionError: Error & Equatable {
         /// Parameter must be strictly positive (e.g., `n >= 0`).
         case parameterNotPositive(name: String)
         /// Parameter is outside the valid range [min, max].
@@ -35,6 +35,8 @@ import CBoostBridge
         case poleAtNonPositiveInteger(name: String)
         /// Inputs form an invalid combination for the real-valued function.
         case invalidCombination(message: String)
+        /// Parameter is greater than max allowed
+        case parameterExceedsMaximumIntegerValue(name: String, max: Int)
     }
     
     // MARK: - Helper casts

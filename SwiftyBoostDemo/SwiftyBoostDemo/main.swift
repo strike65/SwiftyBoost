@@ -24,5 +24,7 @@
 import Foundation
 import SwiftyBoost
 
-print("\(try SpecialFunctions.hypergeometric1F1(a: 55.0, b: 1.0, z: 66.0))")
-
+print("\(try SpecialFunctions.besselJ_f(v: 0, x: 1.0))")
+print("\(SpecialFunctions.bernoulli_b2n(100))")
+print("\(SpecialFunctions.tangent_t2n(count: 10, startIndex: 22))")
+print("\(try SpecialFunctions.factorial(170  ))")

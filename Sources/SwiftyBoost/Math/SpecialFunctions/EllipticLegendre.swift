@@ -64,7 +64,7 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "k")` if `k` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1)` if `|k| > 1`.
-    @inlinable public static func completeEllipticIntegralK<T: BinaryFloatingPoint>(_ k: T) throws -> T {
+    @inlinable static func completeEllipticIntegralK<T: BinaryFloatingPoint>(_ k: T) throws -> T {
         let dk = D(k)
         guard dk.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard abs(dk) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
@@ -90,7 +90,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterNotFinite(name: "k")` if `k` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterNotFinite(name: "phi")` if `phi` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1)` if `|k| > 1`.
-    @inlinable public static func incompleteEllipticIntegralF<T: BinaryFloatingPoint>(_ k: T, phi: T) throws -> T {
+    @inlinable static func incompleteEllipticIntegralF<T: BinaryFloatingPoint>(_ k: T, phi: T) throws -> T {
         let dk = D(k), dphi = D(phi)
         guard dk.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard dphi.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "phi") }
@@ -115,7 +115,7 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "k")` if `k` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1)` if `|k| > 1`.
-    @inlinable public static func completeEllipticIntegralE<T: BinaryFloatingPoint>(_ k: T) throws -> T {
+    @inlinable static func completeEllipticIntegralE<T: BinaryFloatingPoint>(_ k: T) throws -> T {
         let dk = D(k)
         guard dk.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard abs(dk) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
@@ -141,7 +141,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterNotFinite(name: "k")` if `k` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterNotFinite(name: "phi")` if `phi` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1)` if `|k| > 1`.
-    @inlinable public static func incompleteEllipticIntegralE<T: BinaryFloatingPoint>(_ k: T, phi: T) throws -> T {
+    @inlinable static func incompleteEllipticIntegralE<T: BinaryFloatingPoint>(_ k: T, phi: T) throws -> T {
         let dk = D(k), dphi = D(phi)
         guard dk.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard dphi.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "phi") }
@@ -170,7 +170,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterNotFinite(name: "k")` if `k` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterNotFinite(name: "n")` if `n` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1)` if `|k| > 1`.
-    @inlinable public static func completeEllipticIntegralPi<T: BinaryFloatingPoint>(_ k: T, characteristic n: T) throws -> T {
+    @inlinable static func completeEllipticIntegralPi<T: BinaryFloatingPoint>(_ k: T, characteristic n: T) throws -> T {
         let dk = D(k), dn = D(n)
         guard dk.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard dn.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "n") }
@@ -201,12 +201,13 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterNotFinite(name: "n")` if `n` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterNotFinite(name: "phi")` if `phi` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1)` if `|k| > 1`.
-    @inlinable public static func incompleteEllipticIntegralPi<T: BinaryFloatingPoint>(_ k: T, characteristic n: T, phi: T) throws -> T {
+    @inlinable static func incompleteEllipticIntegralPi<T: BinaryFloatingPoint>(_ k: T, characteristic n: T, phi: T) throws -> T {
         let dk = D(k), dn = D(n), dphi = D(phi)
         guard dk.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard dn.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "n") }
         guard dphi.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "phi") }
         guard abs(dk) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
+        // Boost/C bridge signature is ellint_3(k, n, phi): pass (k, n, phi) in that order.
         return T(bs_ellint_3(dk, dn, dphi))
     }
     
@@ -215,14 +216,14 @@ public extension SpecialFunctions {
     // the corresponding C implementations.
     
     /// K(k) for `Float`. Requires |k| ≤ 1.
-    @inlinable public static func completeEllipticIntegralK(_ k: Float) throws -> Float {
+    @inlinable static func completeEllipticIntegralK(_ k: Float) throws -> Float {
         guard k.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
         return bs_ellint_1_complete_f(k)
     }
     
     /// F(φ | k) for `Float`. Requires |k| ≤ 1 and finite φ.
-    @inlinable public static func incompleteEllipticIntegralF(_ k: Float, phi: Float) throws -> Float {
+    @inlinable static func incompleteEllipticIntegralF(_ k: Float, phi: Float) throws -> Float {
         guard k.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard phi.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "phi") }
         guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
@@ -230,14 +231,14 @@ public extension SpecialFunctions {
     }
     
     /// E(k) for `Float`. Requires |k| ≤ 1.
-    @inlinable public static func completeEllipticIntegralE(_ k: Float) throws -> Float {
+    @inlinable static func completeEllipticIntegralE(_ k: Float) throws -> Float {
         guard k.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
         return bs_ellint_2_complete_f(k)
     }
     
     /// E(φ | k) for `Float`. Requires |k| ≤ 1 and finite φ.
-    @inlinable public static func incompleteEllipticIntegralE(_ k: Float, phi: Float) throws -> Float {
+    @inlinable static func incompleteEllipticIntegralE(_ k: Float, phi: Float) throws -> Float {
         guard k.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard phi.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "phi") }
         guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
@@ -245,7 +246,7 @@ public extension SpecialFunctions {
     }
     
     /// Π(n | k) for `Float`. Requires |k| ≤ 1 and finite n.
-    @inlinable public static func completeEllipticIntegralPi(_ k: Float, characteristic n: Float) throws -> Float {
+    @inlinable static func completeEllipticIntegralPi(_ k: Float, characteristic n: Float) throws -> Float {
         guard k.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard n.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "n") }
         guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
@@ -253,11 +254,12 @@ public extension SpecialFunctions {
     }
     
     /// Π(n; φ | k) for `Float`. Requires |k| ≤ 1 and finite n, φ.
-    @inlinable public static func incompleteEllipticIntegralPi(_ k: Float, characteristic n: Float, phi: Float) throws -> Float {
+    @inlinable static func incompleteEllipticIntegralPi(_ k: Float, characteristic n: Float, phi: Float) throws -> Float {
         guard k.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard n.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "n") }
         guard phi.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "phi") }
         guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
+        // Pass (k, n, phi)
         return bs_ellint_3_f(k, n, phi)
     }
     
@@ -266,14 +268,14 @@ public extension SpecialFunctions {
     
 #if arch(x86_64)
     /// K(k) for `Float80` (x86_64 only). Requires |k| ≤ 1.
-    @inlinable public static func completeEllipticIntegralK(_ k: Float80) throws -> Float80 {
+    @inlinable static func completeEllipticIntegralK(_ k: Float80) throws -> Float80 {
         guard k.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
         return bs_ellint_1_complete_l(k)
     }
     
     /// F(φ | k) for `Float80` (x86_64 only). Requires |k| ≤ 1 and finite φ.
-    @inlinable public static func incompleteEllipticIntegralF(_ k: Float80, phi: Float80) throws -> Float80 {
+    @inlinable static func incompleteEllipticIntegralF(_ k: Float80, phi: Float80) throws -> Float80 {
         guard k.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard phi.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "phi") }
         guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
@@ -281,14 +283,14 @@ public extension SpecialFunctions {
     }
     
     /// E(k) for `Float80` (x86_64 only). Requires |k| ≤ 1.
-    @inlinable public static func completeEllipticIntegralE(_ k: Float80) throws -> Float80 {
+    @inlinable static func completeEllipticIntegralE(_ k: Float80) throws -> Float80 {
         guard k.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
         return bs_ellint_2_complete_l(k)
     }
     
     /// E(φ | k) for `Float80` (x86_64 only). Requires |k| ≤ 1 and finite φ.
-    @inlinable public static func incompleteEllipticIntegralE(_ k: Float80, phi: Float80) throws -> Float80 {
+    @inlinable static func incompleteEllipticIntegralE(_ k: Float80, phi: Float80) throws -> Float80 {
         guard k.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard phi.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "phi") }
         guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
@@ -296,7 +298,7 @@ public extension SpecialFunctions {
     }
     
     /// Π(n | k) for `Float80` (x86_64 only). Requires |k| ≤ 1 and finite n.
-    @inlinable public static func completeEllipticIntegralPi(_ k: Float80, characteristic n: Float80) throws -> Float80 {
+    @inlinable static func completeEllipticIntegralPi(_ k: Float80, characteristic n: Float80) throws -> Float80 {
         guard k.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard n.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "n") }
         guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
@@ -304,11 +306,12 @@ public extension SpecialFunctions {
     }
     
     /// Π(n; φ | k) for `Float80` (x86_64 only). Requires |k| ≤ 1 and finite n, φ.
-    @inlinable public static func incompleteEllipticIntegralPi(_ k: Float80, characteristic n: Float80, phi: Float80) throws -> Float80 {
+    @inlinable static func incompleteEllipticIntegralPi(_ k: Float80, characteristic n: Float80, phi: Float80) throws -> Float80 {
         guard k.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard n.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "n") }
         guard phi.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "phi") }
         guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
+        // Pass (k, n, phi)
         return bs_ellint_3_l(k, n, phi)
     }
 #endif

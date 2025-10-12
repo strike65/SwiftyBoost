@@ -33,7 +33,7 @@ let package = Package(
         ),
         .testTarget(
             name: "SwiftyBoostTests",
-            dependencies: ["SwiftyBoost"]
+            dependencies: ["SwiftyBoost", "CBoostBridge"]
         ),
     ]
 )

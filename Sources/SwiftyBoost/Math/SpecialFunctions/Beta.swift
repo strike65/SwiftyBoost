@@ -72,7 +72,7 @@ public extension SpecialFunctions {
     ///
     /// See also:
     /// - NIST DLMF §8.1–8.4.
-    @inlinable public static func beta<T: BinaryFloatingPoint>(_ a: T, _ b: T) throws -> T {
+    @inlinable static func beta<T: BinaryFloatingPoint>(_ a: T, _ b: T) throws -> T {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         return T(bs_beta(D(a), D(b)))
@@ -101,7 +101,7 @@ public extension SpecialFunctions {
     ///
     /// See also:
     /// - NIST DLMF §8.17(i).
-    @inlinable public static func incompleteBetaUnnormalized<T: BinaryFloatingPoint>(_ a: T, _ b: T, x: T) throws -> T {
+    @inlinable static func incompleteBetaUnnormalized<T: BinaryFloatingPoint>(_ a: T, _ b: T, x: T) throws -> T {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
@@ -131,7 +131,7 @@ public extension SpecialFunctions {
     ///
     /// See also:
     /// - NIST DLMF §8.17(ii).
-    @inlinable public static func regularizedIncompleteBeta<T: BinaryFloatingPoint>(_ a: T, _ b: T, x: T) throws -> T {
+    @inlinable static func regularizedIncompleteBeta<T: BinaryFloatingPoint>(_ a: T, _ b: T, x: T) throws -> T {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
@@ -155,7 +155,7 @@ public extension SpecialFunctions {
     /// - SpecialFunctionError.parameterNotPositive(name: "a") if a ≤ 0.
     /// - SpecialFunctionError.parameterNotPositive(name: "b") if b ≤ 0.
     /// - SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: 1) if x ∉ [0, 1].
-    @inlinable public static func complementaryRegularizedIncompleteBeta<T: BinaryFloatingPoint>(_ a: T, _ b: T, x: T) throws -> T {
+    @inlinable static func complementaryRegularizedIncompleteBeta<T: BinaryFloatingPoint>(_ a: T, _ b: T, x: T) throws -> T {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
@@ -179,7 +179,7 @@ public extension SpecialFunctions {
     /// - SpecialFunctionError.parameterNotPositive(name: "a") if a ≤ 0.
     /// - SpecialFunctionError.parameterNotPositive(name: "b") if b ≤ 0.
     /// - SpecialFunctionError.parameterOutOfRange(name: "p", min: 0, max: 1) if p ∉ [0, 1].
-    @inlinable public static func inverseRegularizedIncompleteBeta<T: BinaryFloatingPoint>(_ a: T, _ b: T, p: T) throws -> T {
+    @inlinable static func inverseRegularizedIncompleteBeta<T: BinaryFloatingPoint>(_ a: T, _ b: T, p: T) throws -> T {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard p >= 0 && p <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
@@ -203,7 +203,7 @@ public extension SpecialFunctions {
     /// - SpecialFunctionError.parameterNotPositive(name: "a") if a ≤ 0.
     /// - SpecialFunctionError.parameterNotPositive(name: "b") if b ≤ 0.
     /// - SpecialFunctionError.parameterOutOfRange(name: "p", min: 0, max: 1) if p ∉ [0, 1].
-    @inlinable public static func inverseComplementaryRegularizedIncompleteBeta<T: BinaryFloatingPoint>(_ a: T, _ b: T, p: T) throws -> T {
+    @inlinable static func inverseComplementaryRegularizedIncompleteBeta<T: BinaryFloatingPoint>(_ a: T, _ b: T, p: T) throws -> T {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard p >= 0 && p <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
@@ -224,7 +224,7 @@ public extension SpecialFunctions {
     ///
     /// Returns:
     /// - The solved a as T (may be NaN if inputs are invalid or the solver fails).
-    @inlinable public static func solveAForRegularizedIncompleteBeta<T: BinaryFloatingPoint>(b: T, x: T, p: T) -> T {
+    @inlinable static func solveAForRegularizedIncompleteBeta<T: BinaryFloatingPoint>(b: T, x: T, p: T) -> T {
         T(bs_ibeta_inva(D(b), D(x), D(p)))
     }
     
@@ -242,7 +242,7 @@ public extension SpecialFunctions {
     ///
     /// Returns:
     /// - The solved b as T (may be NaN if inputs are invalid or the solver fails).
-    @inlinable public static func solveBForRegularizedIncompleteBeta<T: BinaryFloatingPoint>(a: T, x: T, p: T) -> T {
+    @inlinable static func solveBForRegularizedIncompleteBeta<T: BinaryFloatingPoint>(a: T, x: T, p: T) -> T {
         T(bs_ibeta_invb(D(a), D(x), D(p)))
     }
     
@@ -283,7 +283,7 @@ public extension SpecialFunctions {
     /// SeeAlso:
     /// - regularizedIncompleteBeta(_:_:x:) for I_x(a, b).
     /// - beta(_:_) for B(a, b).
-    @inlinable public static func regularizedIncompleteBetaDerivative<T: BinaryFloatingPoint>(_ a: T, _ b: T, x: T) throws -> T {
+    @inlinable static func regularizedIncompleteBetaDerivative<T: BinaryFloatingPoint>(_ a: T, _ b: T, x: T) throws -> T {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
@@ -295,14 +295,14 @@ public extension SpecialFunctions {
     // the corresponding C implementations for speed.
     
     /// Complete Beta B(a, b) for Float. Requires a > 0 and b > 0.
-    @inlinable public static func beta(_ a: Float, _ b: Float) throws -> Float {
+    @inlinable static func beta(_ a: Float, _ b: Float) throws -> Float {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         return bs_beta_f(a, b)
     }
     
     /// Unnormalized incomplete Beta B_x(a, b) for Float. Requires a > 0, b > 0, x ∈ [0, 1].
-    @inlinable public static func incompleteBetaUnnormalized(_ a: Float, _ b: Float, x: Float) throws -> Float {
+    @inlinable static func incompleteBetaUnnormalized(_ a: Float, _ b: Float, x: Float) throws -> Float {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
@@ -310,7 +310,7 @@ public extension SpecialFunctions {
     }
     
     /// Regularized incomplete Beta I_x(a, b) for Float. Requires a > 0, b > 0, x ∈ [0, 1].
-    @inlinable public static func regularizedIncompleteBeta(_ a: Float, _ b: Float, x: Float) throws -> Float {
+    @inlinable static func regularizedIncompleteBeta(_ a: Float, _ b: Float, x: Float) throws -> Float {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
@@ -318,7 +318,7 @@ public extension SpecialFunctions {
     }
     
     /// Complementary regularized incomplete Beta 1 − I_x(a, b) for Float. Requires a > 0, b > 0, x ∈ [0, 1].
-    @inlinable public static func complementaryRegularizedIncompleteBeta(_ a: Float, _ b: Float, x: Float) throws -> Float {
+    @inlinable static func complementaryRegularizedIncompleteBeta(_ a: Float, _ b: Float, x: Float) throws -> Float {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
@@ -326,7 +326,7 @@ public extension SpecialFunctions {
     }
     
     /// Inverse regularized incomplete Beta for Float: solve x in I_x(a, b) = p. Requires a > 0, b > 0, p ∈ [0, 1].
-    @inlinable public static func inverseRegularizedIncompleteBeta(_ a: Float, _ b: Float, p: Float) throws -> Float {
+    @inlinable static func inverseRegularizedIncompleteBeta(_ a: Float, _ b: Float, p: Float) throws -> Float {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard p >= 0 && p <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
@@ -334,7 +334,7 @@ public extension SpecialFunctions {
     }
     
     /// Inverse complementary regularized incomplete Beta for Float: solve x in 1 − I_x(a, b) = p. Requires a > 0, b > 0, p ∈ [0, 1].
-    @inlinable public static func inverseComplementaryRegularizedIncompleteBeta(_ a: Float, _ b: Float, p: Float) throws -> Float {
+    @inlinable static func inverseComplementaryRegularizedIncompleteBeta(_ a: Float, _ b: Float, p: Float) throws -> Float {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard p >= 0 && p <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
@@ -342,19 +342,19 @@ public extension SpecialFunctions {
     }
     
     /// Solve for a in I_x(a, b) = p for Float. No throws; see notes above for expected domains.
-    @inlinable public static func solveAForRegularizedIncompleteBeta(b: Float, x: Float, p: Float) -> Float {
+    @inlinable static func solveAForRegularizedIncompleteBeta(b: Float, x: Float, p: Float) -> Float {
         bs_ibeta_inva_f(b, x, p)
     }
     
     /// Solve for b in I_x(a, b) = p for Float. No throws; see notes above for expected domains.
-    @inlinable public static func solveBForRegularizedIncompleteBeta(a: Float, x: Float, p: Float) -> Float {
+    @inlinable static func solveBForRegularizedIncompleteBeta(a: Float, x: Float, p: Float) -> Float {
         bs_ibeta_invb_f(a, x, p)
     }
     
     /// Derivative d/dx I_x(a, b) for Float.
     ///
     /// See regularizedIncompleteBetaDerivative(_:_:x:) for definition, domain, and discussion.
-    @inlinable public static func regularizedIncompleteBetaDerivative(_ a: Float, _ b: Float, x: Float) throws -> Float {
+    @inlinable static func regularizedIncompleteBetaDerivative(_ a: Float, _ b: Float, x: Float) throws -> Float {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
@@ -366,14 +366,14 @@ public extension SpecialFunctions {
     
 #if arch(x86_64)
     /// Complete Beta B(a, b) for Float80 (x86_64 only). Requires a > 0 and b > 0.
-    @inlinable public static func beta(_ a: Float80, _ b: Float80) throws -> Float80 {
+    @inlinable static func beta(_ a: Float80, _ b: Float80) throws -> Float80 {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         return bs_beta_l(a, b)
     }
     
     /// Unnormalized incomplete Beta B_x(a, b) for Float80 (x86_64 only). Requires a > 0, b > 0, x ∈ [0, 1].
-    @inlinable public static func incompleteBetaUnnormalized(_ a: Float80, _ b: Float80, x: Float80) throws -> Float80 {
+    @inlinable static func incompleteBetaUnnormalized(_ a: Float80, _ b: Float80, x: Float80) throws -> Float80 {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
@@ -381,7 +381,7 @@ public extension SpecialFunctions {
     }
     
     /// Regularized incomplete Beta I_x(a, b) for Float80 (x86_64 only). Requires a > 0, b > 0, x ∈ [0, 1].
-    @inlinable public static func regularizedIncompleteBeta(_ a: Float80, _ b: Float80, x: Float80) throws -> Float80 {
+    @inlinable static func regularizedIncompleteBeta(_ a: Float80, _ b: Float80, x: Float80) throws -> Float80 {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
@@ -389,7 +389,7 @@ public extension SpecialFunctions {
     }
     
     /// Complementary regularized incomplete Beta 1 − I_x(a, b) for Float80 (x86_64 only). Requires a > 0, b > 0, x ∈ [0, 1].
-    @inlinable public static func complementaryRegularizedIncompleteBeta(_ a: Float80, _ b: Float80, x: Float80) throws -> Float80 {
+    @inlinable static func complementaryRegularizedIncompleteBeta(_ a: Float80, _ b: Float80, x: Float80) throws -> Float80 {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
@@ -397,7 +397,7 @@ public extension SpecialFunctions {
     }
     
     /// Inverse regularized incomplete Beta for Float80 (x86_64 only): solve x in I_x(a, b) = p. Requires a > 0, b > 0, p ∈ [0, 1].
-    @inlinable public static func inverseRegularizedIncompleteBeta(_ a: Float80, _ b: Float80, p: Float80) throws -> Float80 {
+    @inlinable static func inverseRegularizedIncompleteBeta(_ a: Float80, _ b: Float80, p: Float80) throws -> Float80 {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard p >= 0 && p <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
@@ -405,7 +405,7 @@ public extension SpecialFunctions {
     }
     
     /// Inverse complementary regularized incomplete Beta for Float80 (x86_64 only): solve x in 1 − I_x(a, b) = p. Requires a > 0, b > 0, p ∈ [0, 1].
-    @inlinable public static func inverseComplementaryRegularizedIncompleteBeta(_ a: Float80, _ b: Float80, p: Float80) throws -> Float80 {
+    @inlinable static func inverseComplementaryRegularizedIncompleteBeta(_ a: Float80, _ b: Float80, p: Float80) throws -> Float80 {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard p >= 0 && p <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
@@ -413,19 +413,19 @@ public extension SpecialFunctions {
     }
     
     /// Solve for a in I_x(a, b) = p for Float80 (x86_64 only). No throws; see notes above for expected domains.
-    @inlinable public static func solveAForRegularizedIncompleteBeta(b: Float80, x: Float80, p: Float80) -> Float80 {
+    @inlinable static func solveAForRegularizedIncompleteBeta(b: Float80, x: Float80, p: Float80) -> Float80 {
         bs_ibeta_inva_l(b, x, p)
     }
     
     /// Solve for b in I_x(a, b) = p for Float80 (x86_64 only). No throws; see notes above for expected domains.
-    @inlinable public static func solveBForRegularizedIncompleteBeta(a: Float80, x: Float80, p: Float80) -> Float80 {
+    @inlinable static func solveBForRegularizedIncompleteBeta(a: Float80, x: Float80, p: Float80) -> Float80 {
         bs_ibeta_invb_l(a, x, p)
     }
     
     /// Derivative d/dx I_x(a, b) for Float80 (x86_64 only).
     ///
     /// See regularizedIncompleteBetaDerivative(_:_:x:) for definition, domain, and discussion.
-    @inlinable public static func regularizedIncompleteBetaDerivative(_ a: Float80, _ b: Float80, x: Float80) throws -> Float80 {
+    @inlinable static func regularizedIncompleteBetaDerivative(_ a: Float80, _ b: Float80, x: Float80) throws -> Float80 {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }

@@ -71,7 +71,7 @@ public extension SpecialFunctions {
     /// ```swift
     /// let p3: Double = try legendreP(3, 0.5) // P3(0.5) = (5x^3 − 3x)/2 at x=0.5
     /// ```
-    @inlinable public static func legendreP<T: BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
+    @inlinable static func legendreP<T: BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
         // Degree must be non-negative.
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         // Convert to Double for the C backend. Keep a single conversion point to minimize rounding steps.
@@ -126,7 +126,7 @@ public extension SpecialFunctions {
     /// ```swift
     /// let p32: Double = try associatedLegendreP(3, 2, 0.3) // P3^2(0.3)
     /// ```
-    @inlinable public static func associatedLegendreP<T: BinaryFloatingPoint>(_ n: Int, _ m: Int, _ x: T) throws -> T {
+    @inlinable static func associatedLegendreP<T: BinaryFloatingPoint>(_ n: Int, _ m: Int, _ x: T) throws -> T {
         // Degree/order constraints.
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         guard abs(m) <= n else { throw SpecialFunctionError.parameterOutOfRange(name: "m", min: Double(-n), max: Double(n)) }
@@ -159,7 +159,7 @@ public extension SpecialFunctions {
     /// ```swift
     /// let pf = try legendreP(2, 0.1 as Float)
     /// ```
-    @inlinable public static func legendreP(_ n: Int, _ x: Float) throws -> Float {
+    @inlinable static func legendreP(_ n: Int, _ x: Float) throws -> Float {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_legendre_p_f(Int32(n), x)
@@ -184,7 +184,7 @@ public extension SpecialFunctions {
     /// ```swift
     /// let paf = try associatedLegendreP(4, 1, 0.25 as Float)
     /// ```
-    @inlinable public static func associatedLegendreP(_ n: Int, _ m: Int, _ x: Float) throws -> Float {
+    @inlinable static func associatedLegendreP(_ n: Int, _ m: Int, _ x: Float) throws -> Float {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         guard abs(m) <= n else { throw SpecialFunctionError.parameterOutOfRange(name: "m", min: Double(-n), max: Double(n)) }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -212,7 +212,7 @@ public extension SpecialFunctions {
     ///
     /// Availability:
     /// - Only on x86_64 architectures where `Float80` is available.
-    @inlinable public static func legendreP(_ n: Int, _ x: Float80) throws -> Float80 {
+    @inlinable static func legendreP(_ n: Int, _ x: Float80) throws -> Float80 {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_legendre_p_l(Int32(n), x)
@@ -237,7 +237,7 @@ public extension SpecialFunctions {
     ///
     /// Availability:
     /// - Only on x86_64 architectures where `Float80` is available.
-    @inlinable public static func associatedLegendreP(_ n: Int, _ m: Int, _ x: Float80) throws -> Float80 {
+    @inlinable static func associatedLegendreP(_ n: Int, _ m: Int, _ x: Float80) throws -> Float80 {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         guard abs(m) <= n else { throw SpecialFunctionError.parameterOutOfRange(name: "m", min: Double(-n), max: Double(n)) }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }

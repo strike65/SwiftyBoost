@@ -70,7 +70,7 @@ public extension SpecialFunctions {
     ///
     /// See also:
     /// - NIST DLMF §10.2–10.4 for properties and series/recurrence relations.
-    @inlinable public static func besselJ<T: BinaryFloatingPoint>(v: T, x: T) throws -> T {
+    @inlinable static func besselJ<T: BinaryFloatingPoint>(v: T, x: T) throws -> T {
         let dv = D(v), dx = D(x)
         guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -105,7 +105,7 @@ public extension SpecialFunctions {
     ///
     /// See also:
     /// - NIST DLMF §10.2–10.4 and §10.7 for behavior and relations.
-    @inlinable public static func besselY<T: BinaryFloatingPoint>(v: T, x: T) throws -> T {
+    @inlinable static func besselY<T: BinaryFloatingPoint>(v: T, x: T) throws -> T {
         let dv = D(v), dx = D(x)
         guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -136,7 +136,7 @@ public extension SpecialFunctions {
     ///
     /// See also:
     /// - NIST DLMF §10.25–10.27.
-    @inlinable public static func modifiedBesselI<T: BinaryFloatingPoint>(v: T, x: T) throws -> T {
+    @inlinable static func modifiedBesselI<T: BinaryFloatingPoint>(v: T, x: T) throws -> T {
         let dv = D(v), dx = D(x)
         guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -170,7 +170,7 @@ public extension SpecialFunctions {
     ///
     /// See also:
     /// - NIST DLMF §10.25–10.31.
-    @inlinable public static func modifiedBesselK<T: BinaryFloatingPoint>(v: T, x: T) throws -> T {
+    @inlinable static func modifiedBesselK<T: BinaryFloatingPoint>(v: T, x: T) throws -> T {
         let dv = D(v), dx = D(x)
         guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -181,7 +181,7 @@ public extension SpecialFunctions {
     // MARK: - Float overloads
     
     /// Cylindrical Bessel function of the first kind J_v(x) for Float.
-    @inlinable public static func besselJ(v: Float, x: Float) throws -> Float {
+    @inlinable static func besselJ_f(v: Float, x: Float) throws -> Float {
         guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_cyl_bessel_j_f(v, x)
@@ -190,7 +190,7 @@ public extension SpecialFunctions {
     /// Cylindrical Bessel function of the second kind Y_v(x) for Float.
     ///
     /// Domain: requires x > 0.
-    @inlinable public static func besselY(v: Float, x: Float) throws -> Float {
+    @inlinable static func besselY_f(v: Float, x: Float) throws -> Float {
         guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
@@ -198,7 +198,7 @@ public extension SpecialFunctions {
     }
     
     /// Modified Bessel function of the first kind I_v(x) for Float.
-    @inlinable public static func modifiedBesselI(v: Float, x: Float) throws -> Float {
+    @inlinable static func modifiedBessel0I_f(v: Float, x: Float) throws -> Float {
         guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_cyl_bessel_i_f(v, x)
@@ -207,7 +207,7 @@ public extension SpecialFunctions {
     /// Modified Bessel function of the second kind K_v(x) for Float.
     ///
     /// Domain: requires x > 0.
-    @inlinable public static func modifiedBesselK(v: Float, x: Float) throws -> Float {
+    @inlinable static func modifiedBesselK_f(v: Float, x: Float) throws -> Float {
         guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
@@ -218,7 +218,7 @@ public extension SpecialFunctions {
     
 #if arch(x86_64)
     /// Cylindrical Bessel function of the first kind J_v(x) for Float80 (x86_64 only).
-    @inlinable public static func besselJ(v: Float80, x: Float80) throws -> Float80 {
+    @inlinable static func besselJ_l(v: Float80, x: Float80) throws -> Float80 {
         guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_cyl_bessel_j_l(v, x)
@@ -227,7 +227,7 @@ public extension SpecialFunctions {
     /// Cylindrical Bessel function of the second kind Y_v(x) for Float80 (x86_64 only).
     ///
     /// Domain: requires x > 0.
-    @inlinable public static func besselY(v: Float80, x: Float80) throws -> Float80 {
+    @inlinable static func besselY_l(v: Float80, x: Float80) throws -> Float80 {
         guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
@@ -235,7 +235,7 @@ public extension SpecialFunctions {
     }
     
     /// Modified Bessel function of the first kind I_v(x) for Float80 (x86_64 only).
-    @inlinable public static func modifiedBesselI(v: Float80, x: Float80) throws -> Float80 {
+    @inlinable static func modifiedBesselI_l(v: Float80, x: Float80) throws -> Float80 {
         guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_cyl_bessel_i_l(v, x)
@@ -244,7 +244,7 @@ public extension SpecialFunctions {
     /// Modified Bessel function of the second kind K_v(x) for Float80 (x86_64 only).
     ///
     /// Domain: requires x > 0.
-    @inlinable public static func modifiedBesselK(v: Float80, x: Float80) throws -> Float80 {
+    @inlinable static func modifiedBesselK_l(v: Float80, x: Float80) throws -> Float80 {
         guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }

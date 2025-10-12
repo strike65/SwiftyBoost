@@ -62,7 +62,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterNotFinite(name: "y")` if `y` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterNotPositive(name: "y")` if `y ≤ 0`.
-    @inlinable public static func carlsonRC<T: BinaryFloatingPoint>(_ x: T, _ y: T) throws -> T {
+    @inlinable static func carlsonRC<T: BinaryFloatingPoint>(_ x: T, _ y: T) throws -> T {
         let dx = D(x), dy = D(y)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dy.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
@@ -88,7 +88,7 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x"|"y"|"z")` if any is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: +∞)` if any < 0.
-    @inlinable public static func carlsonRF<T: BinaryFloatingPoint>(_ x: T, _ y: T, _ z: T) throws -> T {
+    @inlinable static func carlsonRF<T: BinaryFloatingPoint>(_ x: T, _ y: T, _ z: T) throws -> T {
         let dx = D(x), dy = D(y), dz = D(z)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dy.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
@@ -117,7 +117,7 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x"|"y"|"z")` if any is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: +∞)` if any < 0.
-    @inlinable public static func carlsonRD<T: BinaryFloatingPoint>(_ x: T, _ y: T, _ z: T) throws -> T {
+    @inlinable static func carlsonRD<T: BinaryFloatingPoint>(_ x: T, _ y: T, _ z: T) throws -> T {
         let dx = D(x), dy = D(y), dz = D(z)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dy.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
@@ -146,7 +146,7 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x"|"y"|"z"|"p")` if any is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x/y/z/p", min: 0, max: +∞)` if any < 0.
-    @inlinable public static func carlsonRJ<T: BinaryFloatingPoint>(_ x: T, _ y: T, _ z: T, _ p: T) throws -> T {
+    @inlinable static func carlsonRJ<T: BinaryFloatingPoint>(_ x: T, _ y: T, _ z: T, _ p: T) throws -> T {
         let dx = D(x), dy = D(y), dz = D(z), dp = D(p)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dy.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
@@ -174,7 +174,7 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x"|"y"|"z")` if any is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: +∞)` if any < 0.
-    @inlinable public static func carlsonRG<T: BinaryFloatingPoint>(_ x: T, _ y: T, _ z: T) throws -> T {
+    @inlinable static func carlsonRG<T: BinaryFloatingPoint>(_ x: T, _ y: T, _ z: T) throws -> T {
         let dx = D(x), dy = D(y), dz = D(z)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dy.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
@@ -190,7 +190,7 @@ public extension SpecialFunctions {
     // performance and avoid intermediate conversions. Domain checks are streamlined.
     
     /// RC(x, y) for `Float`. Requires y > 0.
-    @inlinable public static func carlsonRC(_ x: Float, _ y: Float) throws -> Float {
+    @inlinable static func carlsonRC(_ x: Float, _ y: Float) throws -> Float {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard y.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
         guard y > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "y") }
@@ -198,28 +198,28 @@ public extension SpecialFunctions {
     }
     
     /// RF(x, y, z) for `Float`. Requires x, y, z ≥ 0 and finite.
-    @inlinable public static func carlsonRF(_ x: Float, _ y: Float, _ z: Float) throws -> Float {
+    @inlinable static func carlsonRF(_ x: Float, _ y: Float, _ z: Float) throws -> Float {
         guard x.isFinite, y.isFinite, z.isFinite else { throw SpecialFunctionError.invalidCombination(message: "non-finite inputs") }
         guard x >= 0, y >= 0, z >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: Double.infinity) }
         return bs_ellint_rf_f(x, y, z)
     }
     
     /// RD(x, y, z) for `Float`. Requires x, y, z ≥ 0 and finite.
-    @inlinable public static func carlsonRD(_ x: Float, _ y: Float, _ z: Float) throws -> Float {
+    @inlinable static func carlsonRD(_ x: Float, _ y: Float, _ z: Float) throws -> Float {
         guard x.isFinite, y.isFinite, z.isFinite else { throw SpecialFunctionError.invalidCombination(message: "non-finite inputs") }
         guard x >= 0, y >= 0, z >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: Double.infinity) }
         return bs_ellint_rd_f(x, y, z)
     }
     
     /// RJ(x, y, z, p) for `Float`. Requires x, y, z, p ≥ 0 and finite.
-    @inlinable public static func carlsonRJ(_ x: Float, _ y: Float, _ z: Float, _ p: Float) throws -> Float {
+    @inlinable static func carlsonRJ(_ x: Float, _ y: Float, _ z: Float, _ p: Float) throws -> Float {
         guard x.isFinite, y.isFinite, z.isFinite, p.isFinite else { throw SpecialFunctionError.invalidCombination(message: "non-finite inputs") }
         guard x >= 0, y >= 0, z >= 0, p >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x/y/z/p", min: 0, max: Double.infinity) }
         return bs_ellint_rj_f(x, y, z, p)
     }
     
     /// RG(x, y, z) for `Float`. Requires x, y, z ≥ 0 and finite.
-    @inlinable public static func carlsonRG(_ x: Float, _ y: Float, _ z: Float) throws -> Float {
+    @inlinable static func carlsonRG(_ x: Float, _ y: Float, _ z: Float) throws -> Float {
         guard x.isFinite, y.isFinite, z.isFinite else { throw SpecialFunctionError.invalidCombination(message: "non-finite inputs") }
         guard x >= 0, y >= 0, z >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: Double.infinity) }
         return bs_ellint_rg_f(x, y, z)
@@ -230,7 +230,7 @@ public extension SpecialFunctions {
     
 #if arch(x86_64)
     /// RC(x, y) for `Float80` (x86_64 only). Requires y > 0.
-    @inlinable public static func carlsonRC(_ x: Float80, _ y: Float80) throws -> Float80 {
+    @inlinable static func carlsonRC(_ x: Float80, _ y: Float80) throws -> Float80 {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard y.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
         guard y > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "y") }
@@ -238,28 +238,28 @@ public extension SpecialFunctions {
     }
     
     /// RF(x, y, z) for `Float80` (x86_64 only). Requires x, y, z ≥ 0 and finite.
-    @inlinable public static func carlsonRF(_ x: Float80, _ y: Float80, _ z: Float80) throws -> Float80 {
+    @inlinable static func carlsonRF(_ x: Float80, _ y: Float80, _ z: Float80) throws -> Float80 {
         guard x.isFinite, y.isFinite, z.isFinite else { throw SpecialFunctionError.invalidCombination(message: "non-finite inputs") }
         guard x >= 0, y >= 0, z >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: Double.infinity) }
         return bs_ellint_rf_l(x, y, z)
     }
     
     /// RD(x, y, z) for `Float80` (x86_64 only). Requires x, y, z ≥ 0 and finite.
-    @inlinable public static func carlsonRD(_ x: Float80, _ y: Float80, _ z: Float80) throws -> Float80 {
+    @inlinable static func carlsonRD(_ x: Float80, _ y: Float80, _ z: Float80) throws -> Float80 {
         guard x.isFinite, y.isFinite, z.isFinite else { throw SpecialFunctionError.invalidCombination(message: "non-finite inputs") }
         guard x >= 0, y >= 0, z >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: Double.infinity) }
         return bs_ellint_rd_l(x, y, z)
     }
     
     /// RJ(x, y, z, p) for `Float80` (x86_64 only). Requires x, y, z, p ≥ 0 and finite.
-    @inlinable public static func carlsonRJ(_ x: Float80, _ y: Float80, _ z: Float80, _ p: Float80) throws -> Float80 {
+    @inlinable static func carlsonRJ(_ x: Float80, _ y: Float80, _ z: Float80, _ p: Float80) throws -> Float80 {
         guard x.isFinite, y.isFinite, z.isFinite, p.isFinite else { throw SpecialFunctionError.invalidCombination(message: "non-finite inputs") }
         guard x >= 0, y >= 0, z >= 0, p >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x/y/z/p", min: 0, max: Double.infinity) }
         return bs_ellint_rj_l(x, y, z, p)
     }
     
     /// RG(x, y, z) for `Float80` (x86_64 only). Requires x, y, z ≥ 0 and finite.
-    @inlinable public static func carlsonRG(_ x: Float80, _ y: Float80, _ z: Float80) throws -> Float80 {
+    @inlinable static func carlsonRG(_ x: Float80, _ y: Float80, _ z: Float80) throws -> Float80 {
         guard x.isFinite, y.isFinite, z.isFinite else { throw SpecialFunctionError.invalidCombination(message: "non-finite inputs") }
         guard x >= 0, y >= 0, z >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: Double.infinity) }
         return bs_ellint_rg_l(x, y, z)

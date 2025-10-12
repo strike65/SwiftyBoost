@@ -65,7 +65,7 @@ public extension SpecialFunctions {
     ///     // Handle invalid inputs
     /// }
     /// ```
-    @inlinable public static func owensT<T: BinaryFloatingPoint>(h: T, a: T) throws -> T {
+    @inlinable static func owensT<T: BinaryFloatingPoint>(h: T, a: T) throws -> T {
         // Convert to Double for the C backend. Keep a single conversion point to
         // minimize rounding steps.
         let dh = D(h), da = D(a)
@@ -97,7 +97,7 @@ public extension SpecialFunctions {
     /// ```swift
     /// let tf = try owensT(h: 0.5 as Float, a: 1.0 as Float)
     /// ```
-    @inlinable public static func owensT(h: Float, a: Float) throws -> Float {
+    @inlinable static func owensT(h: Float, a: Float) throws -> Float {
         guard h.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "h") }
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         return bs_owens_t_f(h, a)
@@ -131,7 +131,7 @@ public extension SpecialFunctions {
     /// let tl = try owensT(h: 0.5 as Float80, a: 1.0 as Float80)
     /// #endif
     /// ```
-    @inlinable public static func owensT(h: Float80, a: Float80) throws -> Float80 {
+    @inlinable static func owensT(h: Float80, a: Float80) throws -> Float80 {
         guard h.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "h") }
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         return bs_owens_t_l(h, a)

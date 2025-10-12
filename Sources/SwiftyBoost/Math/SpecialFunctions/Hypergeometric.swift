@@ -50,7 +50,7 @@ public extension SpecialFunctions {
     /// References:
     /// - NIST DLMF §16.2 (Generalized Hypergeometric Function)
     /// - Boost.Math hypergeometric_1F0
-    @inlinable public static func hypergeometric1F0<T: BinaryFloatingPoint>(a: T, z: T) throws -> T {
+    @inlinable static func hypergeometric1F0<T: BinaryFloatingPoint>(a: T, z: T) throws -> T {
         let da = D(a), dz = D(z)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard dz.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
@@ -58,7 +58,7 @@ public extension SpecialFunctions {
     }
     
     /// 1F0(a; ; z) for `Float`.
-    @inlinable public static func hypergeometric1F0(a: Float, z: Float) throws -> Float {
+    @inlinable static func hypergeometric1F0(a: Float, z: Float) throws -> Float {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard z.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
         return bs_hypergeometric_1F0_f(a, z)
@@ -66,7 +66,7 @@ public extension SpecialFunctions {
     
 #if arch(x86_64)
     /// 1F0(a; ; z) for `Float80` (x86_64 only).
-    @inlinable public static func hypergeometric1F0(a: Float80, z: Float80) throws -> Float80 {
+    @inlinable static func hypergeometric1F0(a: Float80, z: Float80) throws -> Float80 {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard z.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
         return bs_hypergeometric_1F0_l(a, z)
@@ -99,7 +99,7 @@ public extension SpecialFunctions {
     /// References:
     /// - NIST DLMF §13 (Bessel connections), §16.2
     /// - Boost.Math hypergeometric_0F1
-    @inlinable public static func hypergeometric0F1<T: BinaryFloatingPoint>(b: T, z: T) throws -> T {
+    @inlinable static func hypergeometric0F1<T: BinaryFloatingPoint>(b: T, z: T) throws -> T {
         let db = D(b), dz = D(z)
         guard db.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
         guard dz.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
@@ -107,7 +107,7 @@ public extension SpecialFunctions {
     }
     
     /// 0F1(; b; z) for `Float`.
-    @inlinable public static func hypergeometric0F1(b: Float, z: Float) throws -> Float {
+    @inlinable static func hypergeometric0F1(b: Float, z: Float) throws -> Float {
         guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
         guard z.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
         return bs_hypergeometric_0F1_f(b, z)
@@ -115,7 +115,7 @@ public extension SpecialFunctions {
     
 #if arch(x86_64)
     /// 0F1(; b; z) for `Float80` (x86_64 only).
-    @inlinable public static func hypergeometric0F1(b: Float80, z: Float80) throws -> Float80 {
+    @inlinable static func hypergeometric0F1(b: Float80, z: Float80) throws -> Float80 {
         guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
         guard z.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
         return bs_hypergeometric_0F1_l(b, z)
@@ -149,7 +149,7 @@ public extension SpecialFunctions {
     /// References:
     /// - NIST DLMF §16.11
     /// - Boost.Math hypergeometric_2F0
-    @inlinable public static func hypergeometric2F0<T: BinaryFloatingPoint>(a: T, b: T, z: T) throws -> T {
+    @inlinable static func hypergeometric2F0<T: BinaryFloatingPoint>(a: T, b: T, z: T) throws -> T {
         let da = D(a), db = D(b), dz = D(z)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard db.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
@@ -158,7 +158,7 @@ public extension SpecialFunctions {
     }
     
     /// 2F0(a, b; ; z) for `Float`.
-    @inlinable public static func hypergeometric2F0(a: Float, b: Float, z: Float) throws -> Float {
+    @inlinable static func hypergeometric2F0(a: Float, b: Float, z: Float) throws -> Float {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
         guard z.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
@@ -167,7 +167,7 @@ public extension SpecialFunctions {
     
 #if arch(x86_64)
     /// 2F0(a, b; ; z) for `Float80` (x86_64 only).
-    @inlinable public static func hypergeometric2F0(a: Float80, b: Float80, z: Float80) throws -> Float80 {
+    @inlinable static func hypergeometric2F0(a: Float80, b: Float80, z: Float80) throws -> Float80 {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
         guard z.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
@@ -201,7 +201,7 @@ public extension SpecialFunctions {
     /// References:
     /// - NIST DLMF §13, §16.2
     /// - Boost.Math hypergeometric_1F1
-    @inlinable public static func hypergeometric1F1<T: BinaryFloatingPoint>(a: T, b: T, z: T) throws -> T {
+    @inlinable static func hypergeometric1F1<T: BinaryFloatingPoint>(a: T, b: T, z: T) throws -> T {
         let da = D(a), db = D(b), dz = D(z)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard db.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
@@ -210,7 +210,7 @@ public extension SpecialFunctions {
     }
     
     /// 1F1(a; b; z) for `Float`.
-    @inlinable public static func hypergeometric1F1(a: Float, b: Float, z: Float) throws -> Float {
+    @inlinable static func hypergeometric1F1(a: Float, b: Float, z: Float) throws -> Float {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
         guard z.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
@@ -219,7 +219,7 @@ public extension SpecialFunctions {
     
 #if arch(x86_64)
     /// 1F1(a; b; z) for `Float80` (x86_64 only).
-    @inlinable public static func hypergeometric1F1(a: Float80, b: Float80, z: Float80) throws -> Float80 {
+    @inlinable static func hypergeometric1F1(a: Float80, b: Float80, z: Float80) throws -> Float80 {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
         guard z.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
@@ -251,7 +251,7 @@ public extension SpecialFunctions {
     ///
     /// Returns:
     /// - pFq(a; b; z) as `Double`.
-    @inlinable public static func hypergeometricPFQ(a: [Double], b: [Double], z: Double) -> Double {
+    @inlinable static func hypergeometricPFQ(a: [Double], b: [Double], z: Double) -> Double {
         a.withUnsafeBufferPointer { ap in
             b.withUnsafeBufferPointer { bp in
                 bs_hypergeometric_pFq(ap.baseAddress, ap.count, bp.baseAddress, bp.count, z)
@@ -260,7 +260,7 @@ public extension SpecialFunctions {
     }
     
     /// Generalized hypergeometric function pFq(a; b; z) with Float parameters.
-    @inlinable public static func hypergeometricPFQ(a: [Float], b: [Float], z: Float) -> Float {
+    @inlinable static func hypergeometricPFQ(a: [Float], b: [Float], z: Float) -> Float {
         a.withUnsafeBufferPointer { ap in
             b.withUnsafeBufferPointer { bp in
                 bs_hypergeometric_pFq_f(ap.baseAddress, ap.count, bp.baseAddress, bp.count, z)
@@ -270,7 +270,7 @@ public extension SpecialFunctions {
     
 #if arch(x86_64)
     /// Generalized hypergeometric function pFq(a; b; z) with Float80 parameters (x86_64 only).
-    @inlinable public static func hypergeometricPFQ(a: [Float80], b: [Float80], z: Float80) -> Float80 {
+    @inlinable static func hypergeometricPFQ(a: [Float80], b: [Float80], z: Float80) -> Float80 {
         a.withUnsafeBufferPointer { ap in
             b.withUnsafeBufferPointer { bp in
                 bs_hypergeometric_pFq_l(ap.baseAddress, ap.count, bp.baseAddress, bp.count, z)

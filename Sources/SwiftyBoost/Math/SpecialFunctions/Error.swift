@@ -51,7 +51,7 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    @inlinable public static func errorFunction<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func errorFunction<T: BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return T(bs_erf(dx))
@@ -70,7 +70,7 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    @inlinable public static func complementaryErrorFunction<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func complementaryErrorFunction<T: BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return T(bs_erfc(dx))
@@ -81,7 +81,7 @@ public extension SpecialFunctions {
     /// erf(x) for `Float`.
     ///
     /// Throws if `x` is not finite.
-    @inlinable public static func errorFunction(_ x: Float) throws -> Float {
+    @inlinable static func errorFunction(_ x: Float) throws -> Float {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_erf_f(x)
     }
@@ -89,7 +89,7 @@ public extension SpecialFunctions {
     /// erfc(x) for `Float`.
     ///
     /// Throws if `x` is not finite.
-    @inlinable public static func complementaryErrorFunction(_ x: Float) throws -> Float {
+    @inlinable static func complementaryErrorFunction(_ x: Float) throws -> Float {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_erfc_f(x)
     }
@@ -100,7 +100,7 @@ public extension SpecialFunctions {
     /// erf(x) for `Float80` (x86_64 only).
     ///
     /// Throws if `x` is not finite.
-    @inlinable public static func errorFunction(_ x: Float80) throws -> Float80 {
+    @inlinable static func errorFunction(_ x: Float80) throws -> Float80 {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_erf_l(x)
     }
@@ -108,7 +108,7 @@ public extension SpecialFunctions {
     /// erfc(x) for `Float80` (x86_64 only).
     ///
     /// Throws if `x` is not finite.
-    @inlinable public static func complementaryErrorFunction(_ x: Float80) throws -> Float80 {
+    @inlinable static func complementaryErrorFunction(_ x: Float80) throws -> Float80 {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_erfc_l(x)
     }
