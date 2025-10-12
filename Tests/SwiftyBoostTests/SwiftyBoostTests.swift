@@ -449,6 +449,49 @@ struct EllipticAndLambertWTests {
     }
 
     @Test
+    func ellipticPi_Double() throws {
+        let ks: [Double] = [-0.9, 0.0, 0.5, 0.9]
+        let nus: [Double] = [-0.5, 0.0, 0.2, 0.8]
+        let phis: [Double] = [-1.2, -0.3, 0.0, 0.7, 1.3]
+        for k in ks {
+            for nu in nus {
+                for phi in phis {
+                    let got = SpecialFunctions.incompleteEllipticIntegralPi(k, nu, phi)
+                    let expected = bs_ellint_3(k, nu, phi)
+                    #expect(got == expected, "Π mismatch at k=\(k), nu=\(nu), phi=\(phi)")
+                }
+            }
+            // Identity check: Π(0; φ | k) = F(φ | k)
+            for phi in phis {
+                let pi0 = SpecialFunctions.incompleteEllipticIntegralPi(k, 0.0, phi)
+                let f = try SpecialFunctions.incompleteEllipticIntegralF(k, phi: phi)
+                let diff = abs(pi0 - f)
+                #expect(diff <= 1e-15, "Identity Π(0; φ | k) = F(φ|k) failed at k=\(k), phi=\(phi); diff=\(diff)")
+            }
+        }
+    }
+
+    @Test
+    func ellipticPiComplete_Double() throws {
+        let ks: [Double] = [-0.9, 0.0, 0.5, 0.9]
+        let nus: [Double] = [-0.5, 0.0, 0.2, 0.8]
+        let halfPi = Double.pi / 2
+        for k in ks {
+            for nu in nus {
+                // Backend comparison
+                let got = SpecialFunctions.completeEllipticIntegralPi(k, nu)
+                let expected = bs_ellint_3_complete(k, nu)
+                #expect(got == expected, "Π_complete mismatch at k=\(k), nu=\(nu)")
+
+                // Identity: Π(n | k) = Π(n; π/2 | k)
+                let incAtHalfPi = SpecialFunctions.incompleteEllipticIntegralPi(k, nu, halfPi)
+                let diff = abs(got - incAtHalfPi)
+                #expect(diff <= 1e-15, "Identity Π(n|k) = Π(n; π/2 | k) failed at k=\(k), nu=\(nu); diff=\(diff)")
+            }
+        }
+    }
+
+    @Test
     func lambertW_Double() throws {
         let e = bs_const_e()
         let minX = -1.0 / e

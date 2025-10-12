@@ -132,7 +132,6 @@ public extension SpecialFunctions {
     ///
     /// Numeric behavior:
     /// - Stable across a wide range of inputs.
-    /// - May still overflow for extremely large magnitudes depending on `T`.
     ///
     /// Parameters:
     /// - a: Numerator argument to Γ(·).
@@ -148,8 +147,8 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.poleAtNonPositiveInteger(name: "b")` if `b` is a non‑positive integer.
     ///
     /// SeeAlso:
-    /// - ``gammaDeltaRatio(_:delta:)`` for Γ(a)/Γ(a+δ).
-    /// - ``gamma(_:)`` and ``logGamma(_:)`` for base functions.
+    /// - ``SpecialFunctions/gammaDeltaRatio(_:delta:)->T`` for Γ(a)/Γ(a+δ).
+    /// - ``SpecialFunctions/gamma(_:)->T`` and ``SpecialFunctions/logGamma(_:)->T`` for base functions.
     ///
     /// References:
     /// - Boost.Math `tgamma_ratio`
@@ -191,7 +190,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.poleAtNonPositiveInteger(name: "a + delta")` if `a + δ` is a non‑positive integer.
     ///
     /// SeeAlso:
-    /// - ``gammaRatio(_:_: )`` for Γ(a)/Γ(b) with independent parameters.
+    /// - ``SpecialFunctions/gammaRatio(_:_:)`` for Γ(a)/Γ(b) with independent parameters.
     ///
     /// References:
     /// - Boost.Math `tgamma_delta_ratio`
@@ -235,8 +234,8 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞)` if `x < 0`.
     ///
     /// SeeAlso:
-    /// - ``incompleteGammaUpper(_:x:)``
-    /// - ``regularizedGammaP(_:x:)`` and ``regularizedGammaQ(_:x:)``
+    /// - ``SpecialFunctions/incompleteGammaUpper(_:x:)->T``
+    /// - ``SpecialFunctions/regularizedGammaP(_:x:)->T`` and ``SpecialFunctions/regularizedGammaQ(_:x:)->T``
     @inlinable static func incompleteGammaLower<T: BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
         let da = D(a), dx = D(x)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
@@ -273,8 +272,8 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞)` if `x < 0`.
     ///
     /// SeeAlso:
-    /// - ``incompleteGammaLower(_:x:)``
-    /// - ``regularizedGammaP(_:x:)`` and ``regularizedGammaQ(_:x:)``
+    /// - ``SpecialFunctions/incompleteGammaLower(_:x:)->T``
+    /// - ``SpecialFunctions/regularizedGammaP(_:x:)->T`` and ``SpecialFunctions/regularizedGammaQ(_:x:)->T``
     @inlinable static func incompleteGammaUpper<T: BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
         let da = D(a), dx = D(x)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
@@ -312,8 +311,8 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞)` if `x < 0`.
     ///
     /// SeeAlso:
-    /// - ``regularizedGammaQ(_:x:)``
-    /// - ``regularizedGammaPInv(_:p:)``
+    /// - ``SpecialFunctions/regularizedGammaQ(_:x:)->T``
+    /// - ``SpecialFunctions/regularizedGammaPInv(_:p:)->T``
     @inlinable static func regularizedGammaP<T: BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
         let da = D(a), dx = D(x)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
@@ -350,8 +349,8 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞)` if `x < 0`.
     ///
     /// SeeAlso:
-    /// - ``regularizedGammaP(_:x:)``
-    /// - ``regularizedGammaQInv(_:q:)``
+    /// - ``SpecialFunctions/regularizedGammaP(_:x:)->T``
+    /// - ``SpecialFunctions/regularizedGammaQInv(_:q:)->T``
     @inlinable static func regularizedGammaQ<T: BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
         let da = D(a), dx = D(x)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
@@ -382,7 +381,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterOutOfRange(name: "p", min: 0, max: 1)` if `p ∉ [0, 1]`.
     ///
     /// SeeAlso:
-    /// - ``regularizedGammaP(_:x:)``
+    /// - ``SpecialFunctions/regularizedGammaP(_:x:)->T``
     @inlinable static func regularizedGammaPInv<T: BinaryFloatingPoint>(_ a: T, p: T) throws -> T {
         let da = D(a), dp = D(p)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
@@ -413,7 +412,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterOutOfRange(name: "q", min: 0, max: 1)` if `q ∉ [0, 1]`.
     ///
     /// SeeAlso:
-    /// - ``regularizedGammaQ(_:x:)``
+    /// - ``SpecialFunctions/regularizedGammaQ(_:x:)->T``
     @inlinable static func regularizedGammaQInv<T: BinaryFloatingPoint>(_ a: T, q: T) throws -> T {
         let da = D(a), dq = D(q)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
@@ -456,8 +455,8 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞)` if `x < 0`.
     ///
     /// SeeAlso:
-    /// - ``regularizedGammaP(_:x:)``
-    /// - ``regularizedGammaQ(_:x:)``
+    /// - ``SpecialFunctions/regularizedGammaP(_:x:)->T``
+    /// - ``SpecialFunctions/regularizedGammaQ(_:x:)->T``
     @inlinable static func regularizedGammaPDerivative<T: BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
         let da = D(a), dx = D(x)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
@@ -524,7 +523,7 @@ public extension SpecialFunctions {
     /// - Direct `gamma(a)/gamma(b)` is unstable; this wrapper calls the Boost routine
     ///   designed for stable evaluation.
     ///
-    /// See ``gammaRatio(_:_: )`` for domain, behavior, and references.
+    /// See ``SpecialFunctions/gammaRatio(_:_:)`` for domain, behavior, and references.
     @inlinable static func gammaRatio(_ a: Float, _ b: Float) throws -> Float {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
@@ -538,7 +537,7 @@ public extension SpecialFunctions {
     /// Discussion:
     /// - Specialized Boost routine for the delta ratio.
     ///
-    /// See ``gammaDeltaRatio(_:delta:)`` for domain, behavior, and references.
+    /// See ``SpecialFunctions/gammaDeltaRatio(_:delta:)->T`` for domain, behavior, and references.
     @inlinable static func gammaDeltaRatio(_ a: Float, delta: Float) throws -> Float {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard delta.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "delta") }
@@ -550,7 +549,7 @@ public extension SpecialFunctions {
     
     /// Lower incomplete gamma γ(a, x) for `Float`.
     ///
-    /// See ``incompleteGammaLower(_:x:)`` for definition, domain, and discussion.
+    /// See ``SpecialFunctions/incompleteGammaLower(_:x:)->T`` for definition, domain, and discussion.
     @inlinable static func incompleteGammaLower(_ a: Float, x: Float) throws -> Float {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -561,7 +560,7 @@ public extension SpecialFunctions {
     
     /// Upper incomplete gamma Γ(a, x) for `Float`.
     ///
-    /// See ``incompleteGammaUpper(_:x:)`` for definition, domain, and discussion.
+    /// See ``SpecialFunctions/incompleteGammaUpper(_:x:)->T`` for definition, domain, and discussion.
     @inlinable static func incompleteGammaUpper(_ a: Float, x: Float) throws -> Float {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -572,7 +571,7 @@ public extension SpecialFunctions {
     
     /// Regularized lower incomplete gamma P(a, x) for `Float`.
     ///
-    /// See ``regularizedGammaP(_:x:)`` for definition, domain, and discussion.
+    /// See ``SpecialFunctions/regularizedGammaP(_:x:)->T`` for definition, domain, and discussion.
     @inlinable static func regularizedGammaP(_ a: Float, x: Float) throws -> Float {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -583,7 +582,7 @@ public extension SpecialFunctions {
     
     /// Regularized upper incomplete gamma Q(a, x) for `Float`.
     ///
-    /// See ``regularizedGammaQ(_:x:)`` for definition, domain, and discussion.
+    /// See ``SpecialFunctions/regularizedGammaQ(_:x:)->T`` for definition, domain, and discussion.
     @inlinable static func regularizedGammaQ(_ a: Float, x: Float) throws -> Float {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -594,7 +593,7 @@ public extension SpecialFunctions {
     
     /// Inverse regularized lower incomplete gamma x = P⁻¹(a, p) for `Float`.
     ///
-    /// See ``regularizedGammaPInv(_:p:)`` for domain and discussion.
+    /// See ``SpecialFunctions/regularizedGammaPInv(_:p:)->T`` for domain and discussion.
     @inlinable static func regularizedGammaPInv(_ a: Float, p: Float) throws -> Float {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p") }
@@ -605,7 +604,7 @@ public extension SpecialFunctions {
     
     /// Inverse regularized upper incomplete gamma x = Q⁻¹(a, q) for `Float`.
     ///
-    /// See ``regularizedGammaQInv(_:q:)`` for domain and discussion.
+    /// See ``SpecialFunctions/regularizedGammaQInv(_:q:)->T`` for domain and discussion.
     @inlinable static func regularizedGammaQInv(_ a: Float, q: Float) throws -> Float {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard q.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "q") }
@@ -616,7 +615,7 @@ public extension SpecialFunctions {
     
     /// Derivative d/dx P(a, x) for `Float`.
     ///
-    /// See ``regularizedGammaPDerivative(_:x:)`` for definition, domain, and discussion.
+    /// See ``SpecialFunctions/regularizedGammaPDerivative(_:x:)->T`` for definition, domain, and discussion.
     @inlinable static func regularizedGammaPDerivative(_ a: Float, x: Float) throws -> Float {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -676,7 +675,7 @@ public extension SpecialFunctions {
     
     /// Γ(a) / Γ(b) for `Float80` (x86_64 only).
     ///
-    /// See ``gammaRatio(_:_: )`` for discussion of domain and motivation.
+    /// See ``SpecialFunctions/gammaRatio(_:_: )`` for discussion of domain and motivation.
     @inlinable static func gammaRatio(_ a: Float80, _ b: Float80) throws -> Float80 {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
@@ -687,7 +686,7 @@ public extension SpecialFunctions {
     
     /// Γ(a) / Γ(a + δ) for `Float80` (x86_64 only).
     ///
-    /// See ``gammaDeltaRatio(_:delta:)`` for discussion of domain and motivation.
+    /// See ``SpecialFunctions/gammaDeltaRatio(_:delta:)`` for discussion of domain and motivation.
     @inlinable static func gammaDeltaRatio(_ a: Float80, delta: Float80) throws -> Float80 {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard delta.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "delta") }
@@ -699,7 +698,7 @@ public extension SpecialFunctions {
     
     /// Lower incomplete gamma γ(a, x) for `Float80` (x86_64 only).
     ///
-    /// See ``incompleteGammaLower(_:x:)`` for definition, domain, and discussion.
+    /// See ``SpecialFunctions/incompleteGammaLower(_:x:)`` for definition, domain, and discussion.
     @inlinable static func incompleteGammaLower(_ a: Float80, x: Float80) throws -> Float80 {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -710,7 +709,7 @@ public extension SpecialFunctions {
     
     /// Upper incomplete gamma Γ(a, x) for `Float80` (x86_64 only).
     ///
-    /// See ``incompleteGammaUpper(_:x:)`` for definition, domain, and discussion.
+    /// See ``SpecialFunctions/incompleteGammaUpper(_:x:)`` for definition, domain, and discussion.
     @inlinable static func incompleteGammaUpper(_ a: Float80, x: Float80) throws -> Float80 {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -721,7 +720,7 @@ public extension SpecialFunctions {
     
     /// Regularized lower incomplete gamma P(a, x) for `Float80` (x86_64 only).
     ///
-    /// See ``regularizedGammaP(_:x:)`` for definition, domain, and discussion.
+    /// See ``SpecialFunctions/regularizedGammaP(_:x:)`` for definition, domain, and discussion.
     @inlinable static func regularizedGammaP(_ a: Float80, x: Float80) throws -> Float80 {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -732,7 +731,7 @@ public extension SpecialFunctions {
     
     /// Regularized upper incomplete gamma Q(a, x) for `Float80` (x86_64 only).
     ///
-    /// See ``regularizedGammaQ(_:x:)`` for definition, domain, and discussion.
+    /// See ``SpecialFunctions/regularizedGammaQ(_:x:)`` for definition, domain, and discussion.
     @inlinable static func regularizedGammaQ(_ a: Float80, x: Float80) throws -> Float80 {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -743,7 +742,7 @@ public extension SpecialFunctions {
     
     /// Inverse regularized lower incomplete gamma x = P⁻¹(a, p) for `Float80` (x86_64 only).
     ///
-    /// See ``regularizedGammaPInv(_:p:)`` for domain and discussion.
+    /// See ``SpecialFunctions/regularizedGammaPInv(_:p:)`` for domain and discussion.
     @inlinable static func regularizedGammaPInv(_ a: Float80, p: Float80) throws -> Float80 {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p") }
@@ -754,7 +753,7 @@ public extension SpecialFunctions {
     
     /// Inverse regularized upper incomplete gamma x = Q⁻¹(a, q) for `Float80` (x86_64 only).
     ///
-    /// See ``regularizedGammaQInv(_:q:)`` for domain and discussion.
+    /// See ``SpecialFunctions/regularizedGammaQInv(_:q:)`` for domain and discussion.
     @inlinable static func regularizedGammaQInv(_ a: Float80, q: Float80) throws -> Float80 {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard q.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "q") }
@@ -765,7 +764,7 @@ public extension SpecialFunctions {
     
     /// Derivative d/dx P(a, x) for `Float80` (x86_64 only).
     ///
-    /// See ``regularizedGammaPDerivative(_:x:)`` for definition, domain, and discussion.
+    /// See ``SpecialFunctions/regularizedGammaPDerivative(_:x:)`` for definition, domain, and discussion.
     @inlinable static func regularizedGammaPDerivative(_ a: Float80, x: Float80) throws -> Float80 {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -777,4 +776,3 @@ public extension SpecialFunctions {
 #endif
     
 }
-

@@ -281,8 +281,8 @@ public extension SpecialFunctions {
     /// - SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: 1) if x ∉ [0, 1].
     ///
     /// SeeAlso:
-    /// - regularizedIncompleteBeta(_:_:x:) for I_x(a, b).
-    /// - beta(_:_) for B(a, b).
+    /// - ``SpecialFunctions/regularizedIncompleteBeta(_:_:x:)->T`` for I_x(a, b).
+    /// - ``SpecialFunctions/beta(_:_:)`` for B(a, b).
     @inlinable static func regularizedIncompleteBetaDerivative<T: BinaryFloatingPoint>(_ a: T, _ b: T, x: T) throws -> T {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
@@ -291,8 +291,6 @@ public extension SpecialFunctions {
     }
     
     // MARK: - Float overloads (Beta)
-    // Direct Float-precision entry points that avoid generic conversions and call
-    // the corresponding C implementations for speed.
     
     /// Complete Beta B(a, b) for Float. Requires a > 0 and b > 0.
     @inlinable static func beta(_ a: Float, _ b: Float) throws -> Float {
@@ -353,7 +351,7 @@ public extension SpecialFunctions {
     
     /// Derivative d/dx I_x(a, b) for Float.
     ///
-    /// See regularizedIncompleteBetaDerivative(_:_:x:) for definition, domain, and discussion.
+    /// See ``SpecialFunctions/regularizedIncompleteBetaDerivative(_:_:x:)->T`` for definition, domain, and discussion.
     @inlinable static func regularizedIncompleteBetaDerivative(_ a: Float, _ b: Float, x: Float) throws -> Float {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
@@ -362,7 +360,6 @@ public extension SpecialFunctions {
     }
     
     // MARK: - Float80 overloads (x86_64)
-    // Extended-precision versions for platforms that support Float80.
     
 #if arch(x86_64)
     /// Complete Beta B(a, b) for Float80 (x86_64 only). Requires a > 0 and b > 0.
@@ -424,7 +421,7 @@ public extension SpecialFunctions {
     
     /// Derivative d/dx I_x(a, b) for Float80 (x86_64 only).
     ///
-    /// See regularizedIncompleteBetaDerivative(_:_:x:) for definition, domain, and discussion.
+    /// See ``SpecialFunctions/regularizedIncompleteBetaDerivative(_:_:x:)`` for definition, domain, and discussion.
     @inlinable static func regularizedIncompleteBetaDerivative(_ a: Float80, _ b: Float80, x: Float80) throws -> Float80 {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
@@ -433,4 +430,3 @@ public extension SpecialFunctions {
     }
 #endif
 }
-
