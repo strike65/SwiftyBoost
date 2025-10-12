@@ -446,15 +446,6 @@ struct EllipticAndLambertWTests {
                 _ = try SpecialFunctions.completeEllipticIntegralK(1.1)
             }
         }
-        let ns: [Double] = [-0.5, 0.0, 0.5, 1.5]
-        for k in ks {
-            for n in ns {
-                #expect(try SpecialFunctions.completeEllipticIntegralPi(k, characteristic: n) == bs_ellint_3_complete(k, n))
-                for phi in phis {
-                    #expect(try SpecialFunctions.incompleteEllipticIntegralPi(k, characteristic: n, phi: phi) == bs_ellint_3(k, n, phi))
-                }
-            }
-        }
     }
 
     @Test

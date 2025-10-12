@@ -149,68 +149,7 @@ public extension SpecialFunctions {
         return T(bs_ellint_2(dk, dphi))
     }
     
-    /// Compute Legendre’s complete elliptic integral of the third kind Π(n | k).
-    ///
-    /// Definition (modulus k, characteristic n):
-    /// - Π(n | k) = Π(n; π/2 | k) = ∫₀^{π/2} dθ / ((1 − n sin²θ) √(1 − k² sin²θ))
-    ///
-    /// Domain:
-    /// - Requires |k| ≤ 1 for this wrapper. Additional singularities may occur for
-    ///   some (n, k) when 1 − n sin²θ crosses zero; these are handled by Boost.Math.
-    ///   We validate finiteness of inputs and the |k| bound.
-    ///
-    /// Parameters:
-    /// - k: The modulus (|k| ≤ 1).
-    /// - n: The characteristic (finite real).
-    ///
-    /// Returns:
-    /// - Π(n | k) as `T`.
-    ///
-    /// Throws:
-    /// - `SpecialFunctionError.parameterNotFinite(name: "k")` if `k` is NaN or ±∞.
-    /// - `SpecialFunctionError.parameterNotFinite(name: "n")` if `n` is NaN or ±∞.
-    /// - `SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1)` if `|k| > 1`.
-    @inlinable static func completeEllipticIntegralPi<T: BinaryFloatingPoint>(_ k: T, characteristic n: T) throws -> T {
-        let dk = D(k), dn = D(n)
-        guard dk.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
-        guard dn.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "n") }
-        guard abs(dk) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
-        return T(bs_ellint_3_complete(dk, dn))
-    }
-    
-    /// Compute Legendre’s incomplete elliptic integral of the third kind Π(n; φ | k).
-    ///
-    /// Definition (modulus k, characteristic n, amplitude φ):
-    /// - Π(n; φ | k) = ∫₀^{φ} dθ / ((1 − n sin²θ) √(1 − k² sin²θ))
-    ///
-    /// Domain:
-    /// - Requires |k| ≤ 1 for this wrapper. Additional singularities may occur for
-    ///   some (n, k, φ) when 1 − n sin²θ crosses zero; these are handled by Boost.Math.
-    ///   We validate finiteness of inputs and the |k| bound.
-    ///
-    /// Parameters:
-    /// - k: The modulus (|k| ≤ 1).
-    /// - n: The characteristic (finite real).
-    /// - phi: The amplitude φ (finite real).
-    ///
-    /// Returns:
-    /// - Π(n; φ | k) as `T`.
-    ///
-    /// Throws:
-    /// - `SpecialFunctionError.parameterNotFinite(name: "k")` if `k` is NaN or ±∞.
-    /// - `SpecialFunctionError.parameterNotFinite(name: "n")` if `n` is NaN or ±∞.
-    /// - `SpecialFunctionError.parameterNotFinite(name: "phi")` if `phi` is NaN or ±∞.
-    /// - `SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1)` if `|k| > 1`.
-    @inlinable static func incompleteEllipticIntegralPi<T: BinaryFloatingPoint>(_ k: T, characteristic n: T, phi: T) throws -> T {
-        let dk = D(k), dn = D(n), dphi = D(phi)
-        guard dk.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
-        guard dn.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "n") }
-        guard dphi.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "phi") }
-        guard abs(dk) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
-        // Boost/C bridge signature is ellint_3(k, n, phi): pass (k, n, phi) in that order.
-        return T(bs_ellint_3(dk, dn, dphi))
-    }
-    
+  
     // MARK: - Float overloads
     // Direct Float-precision entry points that avoid generic conversions and call
     // the corresponding C implementations.
@@ -245,24 +184,7 @@ public extension SpecialFunctions {
         return bs_ellint_2_f(k, phi)
     }
     
-    /// Π(n | k) for `Float`. Requires |k| ≤ 1 and finite n.
-    @inlinable static func completeEllipticIntegralPi(_ k: Float, characteristic n: Float) throws -> Float {
-        guard k.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
-        guard n.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "n") }
-        guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
-        return bs_ellint_3_complete_f(k, n)
-    }
-    
-    /// Π(n; φ | k) for `Float`. Requires |k| ≤ 1 and finite n, φ.
-    @inlinable static func incompleteEllipticIntegralPi(_ k: Float, characteristic n: Float, phi: Float) throws -> Float {
-        guard k.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
-        guard n.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "n") }
-        guard phi.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "phi") }
-        guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
-        // Pass (k, n, phi)
-        return bs_ellint_3_f(k, n, phi)
-    }
-    
+   
     // MARK: - Float80 overloads (x86_64)
     // Extended-precision versions for platforms that support Float80.
     
@@ -297,23 +219,6 @@ public extension SpecialFunctions {
         return bs_ellint_2_l(k, phi)
     }
     
-    /// Π(n | k) for `Float80` (x86_64 only). Requires |k| ≤ 1 and finite n.
-    @inlinable static func completeEllipticIntegralPi(_ k: Float80, characteristic n: Float80) throws -> Float80 {
-        guard k.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
-        guard n.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "n") }
-        guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
-        return bs_ellint_3_complete_l(k, n)
-    }
-    
-    /// Π(n; φ | k) for `Float80` (x86_64 only). Requires |k| ≤ 1 and finite n, φ.
-    @inlinable static func incompleteEllipticIntegralPi(_ k: Float80, characteristic n: Float80, phi: Float80) throws -> Float80 {
-        guard k.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
-        guard n.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "n") }
-        guard phi.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "phi") }
-        guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
-        // Pass (k, n, phi)
-        return bs_ellint_3_l(k, n, phi)
-    }
 #endif
     
 }
