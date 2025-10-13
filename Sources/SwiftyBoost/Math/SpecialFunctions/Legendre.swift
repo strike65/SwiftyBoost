@@ -138,6 +138,46 @@ public extension SpecialFunctions {
         return T(bs_assoc_legendre_p(Int32(n), Int32(m), dx))
     }
     
+    /// Derivative of the Legendre polynomial, Pₙ′(x), for integer n ≥ 0.
+    ///
+    /// Parameters:
+    /// - n: Degree (non‑negative integer).
+    /// - x: Evaluation point (finite real).
+    ///
+    /// Returns:
+    /// - Pₙ′(x) as `T`.
+    ///
+    /// Throws:
+    /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
+    /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
+    @inlinable static func legendrePPrime<T: BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
+        let dx = D(x)
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        return T(bs_legendre_p_prime(Int32(n), dx))
+    }
+    
+    /// Zeros of the Legendre polynomial Pₗ(x), i.e. the l simple roots in (−1, 1) for l ≥ 1.
+    ///
+    /// Behavior:
+    /// - For l ≤ 0, returns an empty array.
+    /// - For l ≥ 1, returns an array of length l with the roots in ascending order as provided by Boost.
+    ///
+    /// Parameters:
+    /// - degree: l, the degree (non‑negative integer).
+    ///
+    /// Returns:
+    /// - An array [x_i] of length l containing the zeros of Pₗ(x), converted to `T`.
+    @inlinable static func legendrePZeros<T: BinaryFloatingPoint>(degree l: Int) throws -> [T] {
+        guard l >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "degree") }
+        guard l > 0 else { return [] }
+        var tmp = Array<Double>(repeating: .zero, count: l)
+        tmp.withUnsafeMutableBufferPointer { buf in
+            bs_legendre_p_zeros(Int32(l), buf.baseAddress!)
+        }
+        return tmp.map(T.init)
+    }
+    
     // MARK: - Float overloads
     // These overloads call directly into the Float-precision C implementations for
     // performance and to avoid intermediate conversions.
@@ -189,6 +229,24 @@ public extension SpecialFunctions {
         guard abs(m) <= n else { throw SpecialFunctionError.parameterOutOfRange(name: "m", min: Double(-n), max: Double(n)) }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_assoc_legendre_p_f(Int32(n), Int32(m), x)
+    }
+    
+    /// Pₙ′(x) for `Float`. Requires `n ≥ 0` and finite `x`.
+    @inlinable static func legendrePPrime(_ n: Int, _ x: Float) throws -> Float {
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        return bs_legendre_p_prime_f(Int32(n), x)
+    }
+    
+    /// Zeros of Pₗ(x) for `Float`. For l ≤ 0 returns [].
+    @inlinable static func legendrePZeros(degree l: Int) throws -> [Float] {
+        guard l >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "degree") }
+        guard l > 0 else { return [] }
+        var out = Array<Float>(repeating: .zero, count: l)
+        out.withUnsafeMutableBufferPointer { buf in
+            bs_legendre_p_zeros_f(Int32(l), buf.baseAddress!)
+        }
+        return out
     }
     
     // MARK: - Float80 overloads (x86_64)
@@ -243,5 +301,24 @@ public extension SpecialFunctions {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_assoc_legendre_p_l(Int32(n), Int32(m), x)
     }
+    
+    /// Pₙ′(x) for `Float80` (x86_64 only). Requires `n ≥ 0` and finite `x`.
+    @inlinable static func legendrePPrime(_ n: Int, _ x: Float80) throws -> Float80 {
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        return bs_legendre_p_prime_l(Int32(n), x)
+    }
+    
+    /// Zeros of Pₗ(x) for `Float80` (x86_64 only). For l ≤ 0 returns [].
+    @inlinable static func legendrePZeros(degree l: Int) throws -> [Float80] {
+        guard l >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "degree") }
+        guard l > 0 else { return [] }
+        var out = Array<Float80>(repeating: .zero, count: l)
+        out.withUnsafeMutableBufferPointer { buf in
+            bs_legendre_p_zeros_l(Int32(l), buf.baseAddress!)
+        }
+        return out
+    }
 #endif
 }
+

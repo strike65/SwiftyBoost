@@ -120,6 +120,8 @@ long double bs_const_catalan_l(void);
 long double bs_const_zeta_three_l(void);
 long double bs_const_phi_l(void);
 
+// MARK: Special Functions
+
 // Gamma / Error
 double bs_tgamma(double x);
 double bs_lgamma(double x);
@@ -301,12 +303,18 @@ long double bs_cyl_bessel_k_l(long double v, long double x);
 // Legendre
 double bs_legendre_p(int n, double x);
 double bs_assoc_legendre_p(int n, int m, double x);
+double bs_legendre_p_prime(int n, double x);
+void bs_legendre_p_zeros(int l, double* out);
 
 float bs_legendre_p_f(int n, float x);
 float bs_assoc_legendre_p_f(int n, int m, float x);
+float bs_legendre_p_prime_f(int n, float x);
+void bs_legendre_p_zeros_f(int l, float* out);
 
 long double bs_legendre_p_l(int n, long double x);
 long double bs_assoc_legendre_p_l(int n, int m, long double x);
+long double bs_legendre_p_prime_l(int n, long double x);
+void bs_legendre_p_zeros_l(int l, long double* out);
 
 // Elliptic integrals (Legendre forms)
 double bs_ellint_1_complete(double k);

@@ -65,6 +65,7 @@
 #include <vector>
 #include <limits>
 #include <stdexcept>
+#include <algorithm> // for std::min, std::copy
 
 // Exception-safe wrapper: translate Boost throws to numeric sentinels.
 // - Overflow -> +infinity
@@ -346,12 +347,45 @@ long double bs_cyl_bessel_k_l(long double v, long double x) { return bs_wrap<lon
 // Legendre
 double bs_legendre_p(int n, double x)                 { return bs_wrap<double>([&] { return boost::math::legendre_p(n, x); }); }
 double bs_assoc_legendre_p(int n, int m, double x)    { return bs_wrap<double>([&] { return boost::math::legendre_p(n, m, x); }); }
+double bs_legendre_p_prime(int n, double x)           { return bs_wrap<double>([&] { return boost::math::legendre_p_prime(n, x); }); }
+void bs_legendre_p_zeros(int l, double* out) {
+    if (!out) return;
+    try {
+        auto v = boost::math::legendre_p_zeros<double>(l);
+        const std::size_t n = std::min<std::size_t>(static_cast<std::size_t>(l), v.size());
+        std::copy(v.begin(), v.begin() + n, out);
+    } catch (...) {
+        // Leave output as-is on error
+    }
+}
 
 float bs_legendre_p_f(int n, float x)                 { return bs_wrap<float>([&] { return boost::math::legendre_p(n, x); }); }
 float bs_assoc_legendre_p_f(int n, int m, float x)    { return bs_wrap<float>([&] { return boost::math::legendre_p(n, m, x); }); }
+float bs_legendre_p_prime_f(int n, float x)           { return bs_wrap<float>([&] { return boost::math::legendre_p_prime(n, x); }); }
+void bs_legendre_p_zeros_f(int l, float* out) {
+    if (!out) return;
+    try {
+        auto v = boost::math::legendre_p_zeros<float>(l);
+        const std::size_t n = std::min<std::size_t>(static_cast<std::size_t>(l), v.size());
+        std::copy(v.begin(), v.begin() + n, out);
+    } catch (...) {
+        // Leave output as-is on error
+    }
+}
 
 long double bs_legendre_p_l(int n, long double x)              { return bs_wrap<long double>([&] { return boost::math::legendre_p(n, x); }); }
 long double bs_assoc_legendre_p_l(int n, int m, long double x) { return bs_wrap<long double>([&] { return boost::math::legendre_p(n, m, x); }); }
+long double bs_legendre_p_prime_l(int n, long double x)        { return bs_wrap<long double>([&] { return boost::math::legendre_p_prime(n, x); }); }
+void bs_legendre_p_zeros_l(int l, long double* out) {
+    if (!out) return;
+    try {
+        auto v = boost::math::legendre_p_zeros<long double>(l);
+        const std::size_t n = std::min<std::size_t>(static_cast<std::size_t>(l), v.size());
+        std::copy(v.begin(), v.begin() + n, out);
+    } catch (...) {
+        // Leave output as-is on error
+    }
+}
 
 // Elliptic integrals (Legendre forms)
 double bs_ellint_1_complete(double k)                 { return bs_wrap<double>([&] { return boost::math::ellint_1(k); }); }
