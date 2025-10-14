@@ -6,9 +6,8 @@ DerivedData/
 .swiftpm/configuration/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
-Docs/
-Doc*
-boostcl
+
+boostcl/
 ## OS
 .DS_Store
 .AppleDouble
