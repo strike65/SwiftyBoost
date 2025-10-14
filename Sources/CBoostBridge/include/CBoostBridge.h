@@ -122,30 +122,37 @@ long double bs_const_phi_l(void);
 
 // MARK: Special Functions
 
-// Gamma / Error
-double bs_tgamma(double x);
-double bs_lgamma(double x);
+// Error
 double bs_erf(double x);
 double bs_erfc(double x);
-// Γ(a) / Γ(b)
-double      bs_tgamma_ratio(double a, double b);
-float       bs_tgamma_ratio_f(float a, float b);
-long double bs_tgamma_ratio_l(long double a, long double b);
+double bs_erf_inv(double p);
+double bs_erfc_inv(double p);
+float bs_erf_inv_f(float p);
+float bs_erfc_inv_f(float p);
+long double bs_erf_inv_l(long double p);
+long double bs_erfc_inv_l(long double p);
 
-// Γ(a) / Γ(a + delta)
-double      bs_tgamma_delta_ratio(double a, double delta);
-float       bs_tgamma_delta_ratio_f(float a, float delta);
-long double bs_tgamma_delta_ratio_l(long double a, long double delta);
-
-float bs_tgamma_f(float x);
-float bs_lgamma_f(float x);
 float bs_erf_f(float x);
 float bs_erfc_f(float x);
 
-long double bs_tgamma_l(long double x);
-long double bs_lgamma_l(long double x);
 long double bs_erf_l(long double x);
 long double bs_erfc_l(long double x);
+
+// Gamma
+double bs_tgamma(double x);
+double bs_lgamma(double x);
+double bs_tgamma_ratio(double a, double b);
+double bs_tgamma_delta_ratio(double a, double delta);
+
+float bs_tgamma_f(float x);
+float bs_lgamma_f(float x);
+float bs_tgamma_ratio_f(float a, float b);
+float bs_tgamma_delta_ratio_f(float a, float delta);
+
+long double bs_tgamma_l(long double x);
+long double bs_lgamma_l(long double x);
+long double bs_tgamma_ratio_l(long double a, long double b);
+long double bs_tgamma_delta_ratio_l(long double a, long double delta);
 
 // Incomplete gamma (lower/upper, regularized, and inverses)
 double bs_tgamma_lower(double a, double x);
@@ -432,6 +439,30 @@ long double bs_binomial_coefficient_l( unsigned int n, unsigned int k);
 double bs_double_factorial(unsigned int i);
 float bs_double_factorial_f(unsigned int i);
 long double bs_double_factorial_l(unsigned int i);
+
+// Laguerre
+double bs_laguerre(unsigned int n, double x);
+float bs_laguerre_f(unsigned int n, float x);
+long double bs_laguerre_l(unsigned int n, long double x);
+
+double bs_assoc_laguerre(unsigned int n, unsigned int m, double x);
+float bs_assoc_laguerre_f(unsigned int n, unsigned int m, float x);
+long double bs_assoc_laguerre_l(unsigned int n, unsigned int m, long double x);
+
+// Chebyshev
+double bs_chebyshev_T(unsigned int n, double x);
+double bs_chebyshev_U(unsigned int n, double x);
+float bs_chebyshev_T_f(unsigned int n, float x);
+float bs_chebyshev_U_f(unsigned int n, float x);
+long double bs_chebyshev_T_l(unsigned int n, long double x);
+long double bs_chebyshev_U_l(unsigned int n, long double x);
+
+// Chebyshev series evaluation via Clenshaw (first kind):
+// Evaluates S(x) = sum_{k=0}^{count-1} c[k] * T_k(x)
+// where c points to an array of Chebyshev coefficients c_0..c_{count-1}.
+double bs_chebyshev_clenshaw(const double* c, size_t count, double x);
+float  bs_chebyshev_clenshaw_f(const float* c, size_t count, float x);
+long double bs_chebyshev_clenshaw_l(const long double* c, size_t count, long double x);
 
 #ifdef __cplusplus
 }

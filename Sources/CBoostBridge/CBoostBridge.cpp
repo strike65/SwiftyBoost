@@ -61,6 +61,7 @@
 #include <boost/math/special_functions/fibonacci.hpp>
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/special_functions/prime.hpp>
+#include <boost/math/special_functions/chebyshev.hpp>
 
 #include <vector>
 #include <limits>
@@ -81,6 +82,29 @@ inline T bs_wrap(F&& f) noexcept {
     } catch (...) {
         return std::numeric_limits<T>::quiet_NaN();
     }
+}
+
+// Local helper: Clenshaw recurrence for Chebyshev T-series with half-weight on c0.
+// Evaluates S(x) = c0/2 + sum_{k=1}^{count-1} c[k] * T_k(x), with T0=1, T1=x.
+template <typename Real>
+static inline Real sb_chebyshev_clenshaw_impl(const Real* c, size_t count, Real x) noexcept {
+    if (c == nullptr || count == 0) {
+        return Real(0);
+    }
+    if (count == 1) {
+        // Standard half-weight convention for Chebyshev series.
+        return c[0] / Real(2);
+    }
+
+    Real b2 = Real(0);
+    Real b1 = c[count - 1];
+    // j runs from count-2 down to 1 inclusive.
+    for (size_t j = count - 2; j >= 1; --j) {
+        const Real tmp = Real(2) * x * b1 - b2 + c[j];
+        b2 = b1;
+        b1 = tmp;
+    }
+    return x * b1 - b2 + Real(0.5) * c[0];
 }
 
 extern "C" {
@@ -183,16 +207,24 @@ double bs_tgamma(double x)              { return bs_wrap<double>([&] { return bo
 double bs_lgamma(double x)              { return bs_wrap<double>([&] { return boost::math::lgamma(x); }); }
 double bs_erf(double x)                 { return bs_wrap<double>([&] { return boost::math::erf(x); }); }
 double bs_erfc(double x)                { return bs_wrap<double>([&] { return boost::math::erfc(x); }); }
+double bs_erf_inv(double p)             { return bs_wrap<double>([&] { return boost::math::erf_inv(p); }); }
+double bs_erfc_inv(double p)            { return bs_wrap<double>([&] { return boost::math::erfc_inv(p); }); }
 
 float bs_tgamma_f(float x)              { return bs_wrap<float>([&] { return boost::math::tgamma(x); }); }
 float bs_lgamma_f(float x)              { return bs_wrap<float>([&] { return boost::math::lgamma(x); }); }
 float bs_erf_f(float x)                 { return bs_wrap<float>([&] { return boost::math::erf(x); }); }
 float bs_erfc_f(float x)                { return bs_wrap<float>([&] { return boost::math::erfc(x); }); }
+float bs_erf_inv_f(float p)            { return bs_wrap<float>([&] { return boost::math::erf_inv(p); }); }
+float bs_erfc_inv_f(float p)           { return bs_wrap<float>([&] { return boost::math::erfc_inv(p); }); }
 
 long double bs_tgamma_l(long double x)  { return bs_wrap<long double>([&] { return boost::math::tgamma(x); }); }
 long double bs_lgamma_l(long double x)  { return bs_wrap<long double>([&] { return boost::math::lgamma(x); }); }
 long double bs_erf_l(long double x)     { return bs_wrap<long double>([&] { return boost::math::erf(x); }); }
 long double bs_erfc_l(long double x)    { return bs_wrap<long double>([&] { return boost::math::erfc(x); }); }
+long double bs_erf_inv_l(long double p) { return bs_wrap<long double>([&] { return boost::math::erf_inv(p); }); }
+long double bs_erfc_inv_l(long double p){ return bs_wrap<long double>([&] { return boost::math::erfc_inv(p); }); }
+
+
 
 // Incomplete gamma (lower/upper, regularized, and inverses)
 double bs_tgamma_lower(double a, double x)      { return bs_wrap<double>([&] { return boost::math::tgamma_lower(a, x); }); }
@@ -584,6 +616,39 @@ float bs_double_factorial_f(unsigned int i) {
 }
 long double bs_double_factorial_l(unsigned int i) {
     return bs_wrap<long double>([&] { return boost::math::double_factorial<long double>(i); });
+}
+
+// Laguerre
+double bs_laguerre(unsigned int n, double x)    { return bs_wrap<double>([&] { return boost::math::laguerre(n, x); }); }
+float bs_laguerre_f(unsigned int n, float x)    { return bs_wrap<float>([&] { return boost::math::laguerre(n, x); }); }
+long double bs_laguerre_l(unsigned int n, long double x) { return bs_wrap<long double>([&] { return boost::math::laguerre(n, x); }); }
+
+double bs_assoc_laguerre(unsigned int n, unsigned int m, double x) { return bs_wrap<double>([&] { return boost::math::laguerre(n, m, x); }); }
+float bs_assoc_laguerre_f(unsigned int n, unsigned int m, float x) { return bs_wrap<float>([&] { return boost::math::laguerre(n, m, x); }); }
+long double bs_assoc_laguerre_l(unsigned int n, unsigned int m, long double x) { return bs_wrap<long double>([&] { return boost::math::laguerre(n, m, x); }); }
+
+// Chebyshev
+double bs_chebyshev_T(unsigned int n, double x) { return bs_wrap<double>([&] { return boost::math::chebyshev_t(n, x); }); }
+double bs_chebyshev_U(unsigned int n, double x) { return bs_wrap<double>([&] { return boost::math::chebyshev_u(n, x); }); }
+float bs_chebyshev_T_f(unsigned int n, float x) { return bs_wrap<float>([&] { return boost::math::chebyshev_t(n, x); }); }
+float bs_chebyshev_U_f(unsigned int n, float x) { return bs_wrap<float>([&] { return boost::math::chebyshev_u(n, x); }); }
+long double bs_chebyshev_T_l(unsigned int n, long double x) { return bs_wrap<long double>([&] { return boost::math::chebyshev_t(n, x); }); }
+long double bs_chebyshev_U_l(unsigned int n, long double x) { return bs_wrap<long double>([&] { return boost::math::chebyshev_u(n, x); }); }
+
+// Chebyshev series evaluation via Clenshaw (first kind):
+// Evaluates S(x) = c0/2 + sum_{k=1}^{count-1} c[k] * T_k(x)
+// where c points to c_0..c_{count-1}.
+
+double bs_chebyshev_clenshaw(const double* c, size_t count, double x) {
+    return sb_chebyshev_clenshaw_impl<double>(c, count, x);
+}
+
+float bs_chebyshev_clenshaw_f(const float* c, size_t count, float x) {
+    return sb_chebyshev_clenshaw_impl<float>(c, count, x);
+}
+
+long double bs_chebyshev_clenshaw_l(const long double* c, size_t count, long double x) {
+    return sb_chebyshev_clenshaw_impl<long double>(c, count, x);
 }
 
 } // extern "C"

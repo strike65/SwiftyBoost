@@ -62,7 +62,7 @@ public extension SpecialFunctions {
     /// Range:
     /// - erfc(x) ∈ (0, 2) for all real x.
     ///
-    /// Parameters:
+    /// Par/Users/volker/Documents/Develop_current/personal/SwiftyBoost/SwiftyBoost/Sources/CBoostBridge/include/CBoostBridge.hameters:
     /// - x: The input value (finite real).
     ///
     /// Returns:
@@ -75,6 +75,40 @@ public extension SpecialFunctions {
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return T(bs_erfc(dx))
     }
+    
+    /// Compute the inverse Gaussian error function erf⁻¹(z).
+    ///
+    /// Definition:
+    /// - Given z = erf(x), this returns x = erf⁻¹(z).
+    ///
+    /// Domain (real-valued result):
+    /// - Requires |z| < 1. At z = ±1 the inverse diverges (±∞), and for |z| > 1 there is no real solution.
+    ///
+    /// Parameters:
+    /// - z: The target value of erf(x) (finite real).
+    ///
+    /// Returns:
+    /// - x such that erf(x) = z, as `T`.
+    ///
+    /// Throws:
+    /// - `SpecialFunctionError.parameterNotFinite(name: "z")` if `z` is NaN or ±∞.
+    /// - `SpecialFunctionError.parameterOutOfRange(name: "z", min: -1.nextUp, max: 1.nextDown)` if `|z| ≥ 1`.
+    ///
+    /// Notes:
+    /// - This generic overload funnels through a Double-backed backend and converts the result back to `T`.
+    @inlinable static func inverseErrorFunction<T: BinaryFloatingPoint>(_ z: T) throws -> T {
+        let dp = D(z)
+        guard dp.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
+        guard abs(dp) < 1 else {
+            throw SpecialFunctionError.parameterOutOfRange(
+                name: "z",
+                min: (-1.0).nextUp,
+                max: (1.0).nextDown
+            )
+        }
+        return T(bs_erf_inv(dp))
+    }
+    
     
     // MARK: - Float overloads
     
@@ -94,6 +128,31 @@ public extension SpecialFunctions {
         return bs_erfc_f(x)
     }
     
+    /// Inverse error function erf⁻¹(z) for `Float`.
+    ///
+    /// Domain:
+    /// - Requires |z| < 1 for a finite real result.
+    ///
+    /// Parameters:
+    /// - z: Target value of erf(x) (finite real).
+    ///
+    /// Returns:
+    /// - x such that erf(x) = z, as `Float`.
+    ///
+    /// Throws:
+    /// - `SpecialFunctionError.parameterNotFinite(name: "z")` if `z` is NaN or ±∞.
+    /// - `SpecialFunctionError.parameterOutOfRange(name: "z", min: -1.nextUp, max: 1.nextDown)` if `|z| ≥ 1`.
+    @inlinable static func inverseErrorFunction(_ z: Float) throws -> Float {
+        guard z.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
+        guard abs(z) < 1 else {
+            throw SpecialFunctionError.parameterOutOfRange(
+                name: "z",
+                min: Double(Float(-1).nextUp),
+                max: Double(Float(1).nextDown)
+            )
+        }
+        return bs_erf_inv_f(z)
+    }
     // MARK: - Float80 overloads (x86_64 only)
     
 #if arch(x86_64)
@@ -112,5 +171,32 @@ public extension SpecialFunctions {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_erfc_l(x)
     }
+    
+    /// Inverse error function erf⁻¹(z) for `Float80` (x86_64 only).
+    ///
+    /// Domain:
+    /// - Requires |z| < 1 for a finite real result.
+    ///
+    /// Parameters:
+    /// - z: Target value of erf(x) (finite real).
+    ///
+    /// Returns:
+    /// - x such that erf(x) = z, as `Float80`.
+    ///
+    /// Throws:
+    /// - `SpecialFunctionError.parameterNotFinite(name: "z")` if `z` is NaN or ±∞.
+    /// - `SpecialFunctionError.parameterOutOfRange(name: "z", min: -1.nextUp, max: 1.nextDown)` if `|z| ≥ 1`.
+    @inlinable static func inverseErrorFunction(_ z: Float80) throws -> Float80 {
+        guard z.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
+        guard abs(z) < 1 else {
+            throw SpecialFunctionError.parameterOutOfRange(
+                name: "z",
+                min: Double((Float80(-1)).nextUp),
+                max: Double((Float80(1)).nextDown)
+            )
+        }
+        return bs_erf_inv_l(z)
+    }
+
 #endif
 }
