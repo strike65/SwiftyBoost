@@ -7,6 +7,9 @@ All notable changes to this project are tracked here, following the principles o
 - Aligned supported platforms in README with `Package.swift` (macOS, iOS).
 - Updated SPM installation URL to `github.com/strike65/SwiftyBoost`.
 - Clarified DocC generation and output paths; added a link to the changelog and versioning policy.
+- Added GitHub Actions workflow to build DocC and deploy `Docs/` to GitHub Pages on pushes to `main` (see `.github/workflows/docs.yml`).
+- Added README badges: documentation link to `https://strike65.github.io/SwiftyBoost/` and Pages workflow status badge.
+- Added direct “Browse online” link under Documentation section in README.
 
 ## [0.1.0] - 2025-10-12
 - Expanded Boost-backed special function coverage, including additional elliptic, hypergeometric, and Lambert W variants.
