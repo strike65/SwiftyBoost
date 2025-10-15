@@ -1,6 +1,6 @@
 # SwiftyBoost
 
-[![Documentation](https://img.shields.io/badge/docs-website-blue?logo=swift)](https://strike65.github.io/SwiftyBoost/) [![Pages](https://github.com/strike65/SwiftyBoost/actions/workflows/docs.yml/badge.svg)](https://github.com/strike65/SwiftyBoost/actions/workflows/docs.yml)
+[![Documentation](https://img.shields.io/badge/docs-website-blue?logo=swift)](https://strike65.github.io/SwiftyBoost/documentation/swiftyboost) [![Pages](https://github.com/strike65/SwiftyBoost/actions/workflows/docs.yml/badge.svg)](https://github.com/strike65/SwiftyBoost/actions/workflows/docs.yml)
 
 SwiftyBoost gives Swift developers direct access to Boost.Math special functions through a thin, type-safe wrapper. The package keeps Swift ergonomics—generics, errors, and platform availability—while reusing Boost’s battle-tested numerical algorithms via a small C++ bridge target.
 
