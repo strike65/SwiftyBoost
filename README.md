@@ -70,9 +70,10 @@ APIs throw `SpecialFunctionError` for invalid inputs or domain violations. See D
 ## Documentation
 - DocC sources live under `Sources/SwiftyBoost/Documentation.docc`.
 - Generate a static docs site with: `make documentation`.
-- Output is written to `Docs/` with entry `Docs/index.html`.
-- To build a `.doccarchive` instead: `make documentation-archive` (outputs `Docs/SwiftyBoost.doccarchive`).
- - Browse online: https://strike65.github.io/SwiftyBoost/
+ - Output is written to `Docs/` and published via GitHub Pages.
+ - The site root redirects to the main DocC page: https://strike65.github.io/SwiftyBoost/
+ - Direct landing page (canonical DocC path): https://strike65.github.io/SwiftyBoost/documentation/swiftyboost/
+ - To build a `.doccarchive` instead: `make documentation-archive` (outputs `Docs/SwiftyBoost.doccarchive`).
 
 ## Contributing
 

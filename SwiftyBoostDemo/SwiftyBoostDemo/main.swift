@@ -23,9 +23,11 @@
 
 import Foundation
 import SwiftyBoost
+import CBoostBridge
 
 print("\(try SpecialFunctions.besselJ_f(v: 0, x: 1.0))")
 print("\(SpecialFunctions.bernoulli_b2n(100))")
 print("\(SpecialFunctions.tangent_t2n(count: 10, startIndex: 22))")
 print("\(try SpecialFunctions.factorial(170  ))")
-print("\(try SpecialFunctions.inverseErrorFunction(1))")
+print("\(try SpecialFunctions.inverseErrorFunction(1.0/2.0))")
+print("\(bs_const_pi())")

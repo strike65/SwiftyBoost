@@ -8,28 +8,26 @@ let package = Package(
     defaultLocalization: "en",
     platforms: [.macOS(.v13), .iOS(.v16)],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "SwiftyBoost",
             targets: ["SwiftyBoost"]
         ),
     ],
     dependencies: [
-        // DocC plugin for command-line documentation generation
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0")
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
-                name: "CBoostBridge",
-                publicHeadersPath: "include",
-                cxxSettings: [
-                    .headerSearchPath("../../extern/boost/libs/math/include"),
-                    .unsafeFlags([
-                        "-std=c++20"
-                    ])
-                ]
+            name: "CBoostBridge",
+            publicHeadersPath: "include",
+            cSettings: [
+                // Für C/ObjC-Header-Suche (falls nötig)
+                .headerSearchPath("../../extern/boost")
+            ],
+            cxxSettings: [
+                // Für C++-Header-Suche (Boost)
+                .headerSearchPath("../../extern/boost")
+            ]
         ),
         .target(
             name: "SwiftyBoost",
@@ -39,5 +37,6 @@ let package = Package(
             name: "SwiftyBoostTests",
             dependencies: ["SwiftyBoost", "CBoostBridge"]
         ),
-    ]
+    ],
+    cxxLanguageStandard: .cxx17
 )

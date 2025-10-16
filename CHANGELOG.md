@@ -3,6 +3,7 @@
 All notable changes to this project are tracked here, following the principles of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adhering to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
+- Added generic complex type
 - Corrected README usage examples to match public API naming (`errorFunction`, `besselJ(v:x:)`).
 - Aligned supported platforms in README with `Package.swift` (macOS, iOS).
 - Updated SPM installation URL to `github.com/strike65/SwiftyBoost`.
@@ -10,6 +11,7 @@ All notable changes to this project are tracked here, following the principles o
 - Added GitHub Actions workflow to build DocC and deploy `Docs/` to GitHub Pages on pushes to `main` (see `.github/workflows/docs.yml`).
 - Added README badges: documentation link to `https://strike65.github.io/SwiftyBoost/` and Pages workflow status badge.
 - Added direct “Browse online” link under Documentation section in README.
+- Docs site root now redirects to the main DocC page for a cleaner entry URL (`https://strike65.github.io/SwiftyBoost` → `/documentation/swiftyboost/`); implemented by writing `Docs/index.html` during Pages deployment.
 
 ## [0.1.0] - 2025-10-12
 - Expanded Boost-backed special function coverage, including additional elliptic, hypergeometric, and Lambert W variants.
