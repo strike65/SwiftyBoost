@@ -24,6 +24,12 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Prepare Boost headers
+        run: |
+          cd extern/boost
+          ./bootstrap.sh
+          ./b2 headers
+
       - name: Configure Pages
         uses: actions/configure-pages@v5  # offizielle Pages-Action
 
