@@ -48,6 +48,29 @@ jobs:
           HOSTING_BASE_PATH: ${{ env.REPO_NAME }}
         run: make documentation
 
+      - name: Make site root show the docs
+        env:
+          HOSTING_BASE_PATH: ${{ env.REPO_NAME }}
+        run: |
+          BASE_PATH="/${HOSTING_BASE_PATH:-swiftyboost}"
+          DOC_PATH="$BASE_PATH/documentation/swiftyboost/"
+          cat > Docs/index.html <<EOF
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8">
+              <meta http-equiv="refresh" content="0; url=${DOC_PATH}">
+              <link rel="canonical" href="${DOC_PATH}">
+              <title>Redirecting…</title>
+              <meta name="viewport" content="width=device-width, initial-scale=1">
+            </head>
+            <body>
+              <p>Redirecting to documentation… <a href="${DOC_PATH}">Click here</a>.</p>
+              <script>location.replace('${DOC_PATH}');</script>
+            </body>
+          </html>
+          EOF
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -56,4 +79,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-

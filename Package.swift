@@ -27,8 +27,7 @@ let package = Package(
             cxxSettings: [
                 // Für C++-Header-Suche (Boost)
                 .headerSearchPath("../../extern/boost")
-            ],
-            cxxLanguageStandard: .cxx17
+            ]
         ),
         .target(
             name: "SwiftyBoost",
@@ -38,5 +37,6 @@ let package = Package(
             name: "SwiftyBoostTests",
             dependencies: ["SwiftyBoost", "CBoostBridge"]
         ),
-    ]
+    ],
+    cxxLanguageStandard: .cxx17
 )
