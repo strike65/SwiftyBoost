@@ -96,6 +96,9 @@ Typealiases are provided for convenience: `ComplexD` (`Double`), `ComplexF` (`Fl
 ## Development
 - Core Swift sources reside in `Sources/SwiftyBoost`, grouped by namespace under `Math/SpecialFunctions`.
 - The C++ interop layer lives in `Sources/CBoostBridge` and depends on headers in `extern/boost`. Run `git submodule update --init --recursive` after pulling Boost changes.
+  - Public headers are organized by domain under `Sources/CBoostBridge/include/` (e.g. `bs_constants.h`, `bs_gamma.h`, `bs_bessel.h`, …). The umbrella header `CBoostBridge.h` re-exports these and is the module’s public entry point.
+  - Implementations are split into focused units under `Sources/CBoostBridge/impl/` and composed by `Sources/CBoostBridge/CBoostBridge.cpp`. Shared helpers live in `Sources/CBoostBridge/internal/bs_internal.hpp`.
+  - All exported bridge symbols remain prefixed with `bs_` and simply forward to Boost.Math; no new algorithms are implemented in the bridge.
 - Build with `swift build`. Execute `swift test` (or filter suites with `swift test --filter FactorialAndCombinatoricsTests`) to validate changes in `Tests/SwiftyBoostTests`.
 - Use `swift package generate-xcodeproj` if you need an Xcode project for debugging.
 
@@ -113,7 +116,7 @@ Typealiases are provided for convenience: `ComplexD` (`Double`), `ComplexF` (`Fl
 Core APIs live in `Sources/SwiftyBoost`, with entry points in `SwiftyBoost.swift` and focused implementations under `Math/SpecialFunctions`. The `Sources/CBoostBridge` target hosts the C++ interop layer that forwards into `extern/boost`; run `git submodule update --init --recursive` whenever Boost is refreshed. Swift Testing suites that mirror the public API reside in `Tests/SwiftyBoostTests`, and the optional `SwiftyBoostDemo` workspace exercises the package inside an app target.
 
 ### Build, Test, and Development Commands
-Use `swift build` for a macOS/iOS-compatible build. Execute `swift test` to run the entire suite, or narrow scope with `swift test --filter FactorialAndCombinatoricsTests`. `swift package generate-xcodeproj` is handy when you need an Xcode project for debugging. When modifying the bridge, rebuild with `swift build -Xcxx -std=c++20` to ensure compiler flags match the manifest.
+Use `swift build` for a macOS/iOS-compatible build. Execute `swift test` to run the entire suite, or narrow scope with `swift test --filter FactorialAndCombinatoricsTests`. `swift package generate-xcodeproj` is handy when you need an Xcode project for debugging. The manifest sets the C++ language standard to match the project; no extra flags are required for normal builds.
 
 ### Coding Style & Naming Conventions
 Follow the Swift API Design Guidelines: types in PascalCase, methods and variables in camelCase, and namespaces grouped with nested structs (see `Sources/SwiftyBoost/Math/Namespaces.swift`). Prefer 4-space indentation and trailing commas in multiline literals. Keep bridge helpers prefixed with `bs_` to align with exported headers and avoid symbol clashes. Run `swift format .` before submitting, and align Boost-facing C++ changes with LLVM-style formatting.

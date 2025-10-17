@@ -17,6 +17,7 @@ All notable changes to this project are tracked here, following the principles o
 - Added README badges: documentation link to `https://strike65.github.io/SwiftyBoost/` and Pages workflow status badge.
 - Added direct “Browse online” link under Documentation section in README.
 - Docs site root now redirects to the main DocC page for a cleaner entry URL (`https://strike65.github.io/SwiftyBoost` → `/documentation/swiftyboost/`); implemented by writing `Docs/index.html` during Pages deployment.
+ - C++ bridge refactor: split the monolithic `CBoostBridge.h` into focused public headers under `Sources/CBoostBridge/include/` and introduced an umbrella header `CBoostBridge.h` that re-exports them. Broke up implementation into maintainable units under `Sources/CBoostBridge/impl/`, composed by `Sources/CBoostBridge/CBoostBridge.cpp`, with shared helpers in `internal/bs_internal.hpp`. No API or symbol changes (all `bs_*` names preserved).
 
 ## [0.1.0] - 2025-10-12
 - Expanded Boost-backed special function coverage, including additional elliptic, hypergeometric, and Lambert W variants.
