@@ -62,11 +62,23 @@
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/special_functions/prime.hpp>
 #include <boost/math/special_functions/chebyshev.hpp>
+#include <boost/math/special_functions/cardinal_b_spline.hpp>
+#include <boost/math/special_functions/spherical_harmonic.hpp>
 
 #include <vector>
 #include <limits>
 #include <stdexcept>
 #include <algorithm> // for std::min, std::copy
+#include <complex>   // for std::complex
+#include <boost/math/complex/atan.hpp>
+#include <boost/math/complex/acos.hpp>
+#include <boost/math/complex/acosh.hpp>
+#include <boost/math/complex/asin.hpp>
+#include <boost/math/complex/asinh.hpp>
+#include <boost/math/complex/atanh.hpp>
+#include <boost/math/complex/fabs.hpp>
+
+
 
 // Exception-safe wrapper: translate Boost throws to numeric sentinels.
 // - Overflow -> +infinity
@@ -84,27 +96,21 @@ inline T bs_wrap(F&& f) noexcept {
     }
 }
 
-// Local helper: Clenshaw recurrence for Chebyshev T-series with half-weight on c0.
-// Evaluates S(x) = c0/2 + sum_{k=1}^{count-1} c[k] * T_k(x), with T0=1, T1=x.
-template <typename Real>
-static inline Real sb_chebyshev_clenshaw_impl(const Real* c, size_t count, Real x) noexcept {
-    if (c == nullptr || count == 0) {
-        return Real(0);
+// Complex wrapper with same policy: on overflow => {+Inf,+Inf}, on other => {NaN,NaN}.
+template <class T, class F>
+static inline std::complex<T> bs_wrap_complex(F&& f) noexcept {
+    try {
+        return f();
+    } catch (const std::overflow_error&) {
+        const T inf = std::numeric_limits<T>::infinity();
+        return std::complex<T>(inf, inf);
+    } catch (const std::domain_error&) {
+        const T nan = std::numeric_limits<T>::quiet_NaN();
+        return std::complex<T>(nan, nan);
+    } catch (...) {
+        const T nan = std::numeric_limits<T>::quiet_NaN();
+        return std::complex<T>(nan, nan);
     }
-    if (count == 1) {
-        // Standard half-weight convention for Chebyshev series.
-        return c[0] / Real(2);
-    }
-
-    Real b2 = Real(0);
-    Real b1 = c[count - 1];
-    // j runs from count-2 down to 1 inclusive.
-    for (size_t j = count - 2; j >= 1; --j) {
-        const Real tmp = Real(2) * x * b1 - b2 + c[j];
-        b2 = b1;
-        b1 = tmp;
-    }
-    return x * b1 - b2 + Real(0.5) * c[0];
 }
 
 extern "C" {
@@ -201,6 +207,205 @@ long double bs_const_euler_l(void)             { return bs_wrap<long double>([] 
 long double bs_const_catalan_l(void)           { return bs_wrap<long double>([] { return boost::math::constants::catalan<long double>(); }); }
 long double bs_const_zeta_three_l(void)        { return bs_wrap<long double>([] { return boost::math::constants::zeta_three<long double>(); }); }
 long double bs_const_phi_l(void)               { return bs_wrap<long double>([] { return boost::math::constants::phi<long double>(); }); }
+
+
+// MARK: Complex numbers
+
+// Converters for C POD <-> std::complex
+static inline std::complex<double> to_std(bs_complex_d z) noexcept { return { z.re, z.im }; }
+static inline bs_complex_d from_std(std::complex<double> z) noexcept { return { static_cast<double>(z.real()), static_cast<double>(z.imag()) }; }
+
+static inline std::complex<float> to_std(bs_complex_f z) noexcept { return { z.re, z.im }; }
+static inline bs_complex_f from_std(std::complex<float> z) noexcept { return { static_cast<float>(z.real()), static_cast<float>(z.imag()) }; }
+
+static inline std::complex<long double> to_std(bs_complex_l z) noexcept { return { z.re, z.im }; }
+static inline bs_complex_l from_std(std::complex<long double> z) noexcept { return { static_cast<long double>(z.real()), static_cast<long double>(z.imag()) }; }
+
+// Elementary arithmetic
+bs_complex_d bs_cadd(bs_complex_d a, bs_complex_d b) {
+    auto r = bs_wrap_complex<double>([&]{ return to_std(a) + to_std(b); });
+    return from_std(r);
+}
+bs_complex_d bs_csub(bs_complex_d a, bs_complex_d b) {
+    auto r = bs_wrap_complex<double>([&]{ return to_std(a) - to_std(b); });
+    return from_std(r);
+}
+bs_complex_d bs_cmul(bs_complex_d a, bs_complex_d b) {
+    auto r = bs_wrap_complex<double>([&]{ return to_std(a) * to_std(b); });
+    return from_std(r);
+}
+bs_complex_d bs_cdiv(bs_complex_d a, bs_complex_d b) {
+    auto r = bs_wrap_complex<double>([&]{ return to_std(a) / to_std(b); });
+    return from_std(r);
+}
+
+bs_complex_f bs_cadd_f(bs_complex_f a, bs_complex_f b) {
+    auto r = bs_wrap_complex<float>([&]{ return to_std(a) + to_std(b); });
+    return from_std(r);
+}
+bs_complex_f bs_csub_f(bs_complex_f a, bs_complex_f b) {
+    auto r = bs_wrap_complex<float>([&]{ return to_std(a) - to_std(b); });
+    return from_std(r);
+}
+bs_complex_f bs_cmul_f(bs_complex_f a, bs_complex_f b) {
+    auto r = bs_wrap_complex<float>([&]{ return to_std(a) * to_std(b); });
+    return from_std(r);
+}
+bs_complex_f bs_cdiv_f(bs_complex_f a, bs_complex_f b) {
+    auto r = bs_wrap_complex<float>([&]{ return to_std(a) / to_std(b); });
+    return from_std(r);
+}
+
+bs_complex_l bs_cadd_l(bs_complex_l a, bs_complex_l b) {
+    auto r = bs_wrap_complex<long double>([&]{ return to_std(a) + to_std(b); });
+    return from_std(r);
+}
+bs_complex_l bs_csub_l(bs_complex_l a, bs_complex_l b) {
+    auto r = bs_wrap_complex<long double>([&]{ return to_std(a) - to_std(b); });
+    return from_std(r);
+}
+bs_complex_l bs_cmul_l(bs_complex_l a, bs_complex_l b) {
+    auto r = bs_wrap_complex<long double>([&]{ return to_std(a) * to_std(b); });
+    return from_std(r);
+}
+bs_complex_l bs_cdiv_l(bs_complex_l a, bs_complex_l b) {
+    auto r = bs_wrap_complex<long double>([&]{ return to_std(a) / to_std(b); });
+    return from_std(r);
+}
+
+// Elementary functions: prefer std::complex; Boost.Math provides some complex overloads too.
+bs_complex_d bs_cexp(bs_complex_d z) {
+    auto r = bs_wrap_complex<double>([&]{ return std::exp(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_d bs_clog(bs_complex_d z) {
+    auto r = bs_wrap_complex<double>([&]{ return std::log(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_d bs_csqrt(bs_complex_d z) {
+    auto r = bs_wrap_complex<double>([&]{ return std::sqrt(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_d bs_csin(bs_complex_d z) {
+    auto r = bs_wrap_complex<double>([&]{ return std::sin(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_d bs_ccos(bs_complex_d z) {
+    auto r = bs_wrap_complex<double>([&]{ return std::cos(to_std(z)); });
+    return from_std(r);
+}
+
+bs_complex_d bs_ctan(bs_complex_d z) {
+    auto r = bs_wrap_complex<double>([&]{ return std::tan(to_std(z)); });
+    return from_std(r);
+}
+
+bs_complex_d bs_csinh(bs_complex_d z) {
+    auto r = bs_wrap_complex<double>([&]{ return std::sinh(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_d bs_ccosh(bs_complex_d z) {
+    auto r = bs_wrap_complex<double>([&]{ return std::cosh(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_d bs_ctanh(bs_complex_d z) {
+    auto r = bs_wrap_complex<double>([&]{ return std::tanh(to_std(z)); });
+    return from_std(r);
+}
+
+bs_complex_d bs_catan(bs_complex_d z) {
+    auto r = bs_wrap_complex<double>([&]{ return std::atan(to_std(z)); });
+    return from_std(r);
+}
+
+
+bs_complex_f bs_cexp_f(bs_complex_f z) {
+    auto r = bs_wrap_complex<float>([&]{ return std::exp(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_f bs_clog_f(bs_complex_f z) {
+    auto r = bs_wrap_complex<float>([&]{ return std::log(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_f bs_csqrt_f(bs_complex_f z) {
+    auto r = bs_wrap_complex<float>([&]{ return std::sqrt(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_f bs_csin_f(bs_complex_f z) {
+    auto r = bs_wrap_complex<float>([&]{ return std::sin(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_f bs_ccos_f(bs_complex_f z) {
+    auto r = bs_wrap_complex<float>([&]{ return std::cos(to_std(z)); });
+    return from_std(r);
+}
+
+bs_complex_f bs_ctan_f(bs_complex_f z) {
+    auto r = bs_wrap_complex<float>([&]{ return std::tan(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_f bs_csinh_f(bs_complex_f z)  {
+    auto r = bs_wrap_complex<float>([&]{ return std::sinh(to_std(z)); });
+    return from_std(r);
+}
+
+bs_complex_f bs_ccosh_f(bs_complex_f z)  {
+    auto r = bs_wrap_complex<float>([&]{ return std::cosh(to_std(z)); });
+    return from_std(r);
+}
+
+bs_complex_f bs_ctanh_f(bs_complex_f z)  {
+    auto r = bs_wrap_complex<float>([&]{ return std::tanh(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_f bs_catan_f(bs_complex_f z)  {
+    auto r = bs_wrap_complex<float>([&]{ return std::atan(to_std(z)); });
+    return from_std(r);
+}
+
+bs_complex_l bs_cexp_l(bs_complex_l z) {
+    auto r = bs_wrap_complex<long double>([&]{ return std::exp(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_l bs_clog_l(bs_complex_l z) {
+    auto r = bs_wrap_complex<long double>([&]{ return std::log(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_l bs_csqrt_l(bs_complex_l z) {
+    auto r = bs_wrap_complex<long double>([&]{ return std::sqrt(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_l bs_csin_l(bs_complex_l z) {
+    auto r = bs_wrap_complex<long double>([&]{ return std::sin(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_l bs_ccos_l(bs_complex_l z) {
+    auto r = bs_wrap_complex<long double>([&]{ return std::cos(to_std(z)); });
+    return from_std(r);
+}
+
+bs_complex_l bs_ctan_l(bs_complex_l z) {
+    auto r = bs_wrap_complex<long double>([&]{ return std::tan(to_std(z)); });
+    return from_std(r);
+}
+
+bs_complex_l bs_csinh_l(bs_complex_l z) {
+    auto r = bs_wrap_complex<long double>([&]{ return std::sinh(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_l bs_ccosh_l(bs_complex_l z) {
+    auto r = bs_wrap_complex<long double>([&]{ return std::cosh(to_std(z)); });
+    return from_std(r);
+}
+bs_complex_l bs_ctanh_l(bs_complex_l z) {
+    auto r = bs_wrap_complex<long double>([&]{ return std::tanh(to_std(z)); });
+    return from_std(r);
+}
+
+bs_complex_l bs_catan_l(bs_complex_l z) {
+    auto r = bs_wrap_complex<long double>([&]{ return std::atan(to_std(z)); });
+    return from_std(r);
+}
 
 // Gamma / Error
 double bs_tgamma(double x)              { return bs_wrap<double>([&] { return boost::math::tgamma(x); }); }
@@ -640,15 +845,195 @@ long double bs_chebyshev_U_l(unsigned int n, long double x) { return bs_wrap<lon
 // where c points to c_0..c_{count-1}.
 
 double bs_chebyshev_clenshaw(const double* c, size_t count, double x) {
-    return sb_chebyshev_clenshaw_impl<double>(c, count, x);
+    return bs_wrap<double>([&] { return boost::math::chebyshev_clenshaw_recurrence(c, count, x);} );
 }
 
 float bs_chebyshev_clenshaw_f(const float* c, size_t count, float x) {
-    return sb_chebyshev_clenshaw_impl<float>(c, count, x);
+    return bs_wrap<float>([&] { return boost::math::chebyshev_clenshaw_recurrence(c, count, x);} );
 }
 
 long double bs_chebyshev_clenshaw_l(const long double* c, size_t count, long double x) {
-    return sb_chebyshev_clenshaw_impl<long double>(c, count, x);
+    return bs_wrap<long double>([&] { return boost::math::chebyshev_clenshaw_recurrence(c, count, x);} );
+}
+
+bs_complex_d bs_spherical_harmonic(unsigned int n, int m, double theta, double phi) {
+    auto z = boost::math::spherical_harmonic(n, m, theta, phi);
+    bs_complex_d r{ z.real(), z.imag() };
+    return r;
+}
+
+bs_complex_f bs_spherical_harmonic_f(unsigned int n, int m, float theta, float phi) {
+    auto z = boost::math::spherical_harmonic(n, m, theta, phi);
+    bs_complex_f r{ static_cast<float>(z.real()), static_cast<float>(z.imag()) };
+    return r;
+}
+
+bs_complex_l bs_spherical_harmonic_l(unsigned int n, int m, long double theta, long double phi) {
+    auto z = boost::math::spherical_harmonic(n, m, theta, phi);
+    bs_complex_l r{ static_cast<long double>(z.real()), static_cast<long double>(z.imag()) };
+    return r;
+}
+
+
+} //extern C
+
+// MARK: Cardinal B-spline runtime dispatch (n in [0, 12])
+
+template <typename Real>
+static inline Real dispatch_cardinal_b_spline(unsigned int n, Real x) {
+    switch (n) {
+        case 0:  return boost::math::cardinal_b_spline<0,  Real>(x);
+        case 1:  return boost::math::cardinal_b_spline<1,  Real>(x);
+        case 2:  return boost::math::cardinal_b_spline<2,  Real>(x);
+        case 3:  return boost::math::cardinal_b_spline<3,  Real>(x);
+        case 4:  return boost::math::cardinal_b_spline<4,  Real>(x);
+        case 5:  return boost::math::cardinal_b_spline<5,  Real>(x);
+        case 6:  return boost::math::cardinal_b_spline<6,  Real>(x);
+        case 7:  return boost::math::cardinal_b_spline<7,  Real>(x);
+        case 8:  return boost::math::cardinal_b_spline<8,  Real>(x);
+        case 9:  return boost::math::cardinal_b_spline<9,  Real>(x);
+        case 10: return boost::math::cardinal_b_spline<10, Real>(x);
+        case 11: return boost::math::cardinal_b_spline<11, Real>(x);
+        case 12: return boost::math::cardinal_b_spline<12, Real>(x);
+        case 13: return boost::math::cardinal_b_spline<12, Real>(x);
+        case 14: return boost::math::cardinal_b_spline<12, Real>(x);
+        case 15: return boost::math::cardinal_b_spline<12, Real>(x);
+        case 16: return boost::math::cardinal_b_spline<12, Real>(x);
+        case 17: return boost::math::cardinal_b_spline<12, Real>(x);
+        case 18: return boost::math::cardinal_b_spline<12, Real>(x);
+        case 19: return boost::math::cardinal_b_spline<12, Real>(x);
+        case 20: return boost::math::cardinal_b_spline<12, Real>(x);
+        default: return std::numeric_limits<Real>::quiet_NaN();
+    }
+}
+
+template <typename Real>
+static inline Real dispatch_cardinal_b_spline_prime(unsigned int n, Real x) {
+    switch (n) {
+/*        case 0:  return boost::math::cardinal_b_spline_prime<0,  Real>(x);
+        case 1:  return boost::math::cardinal_b_spline_prime<1,  Real>(x);
+        case 2:  return boost::math::cardinal_b_spline_prime<2,  Real>(x); */
+        case 3:  return boost::math::cardinal_b_spline_prime<3,  Real>(x);
+        case 4:  return boost::math::cardinal_b_spline_prime<4,  Real>(x);
+        case 5:  return boost::math::cardinal_b_spline_prime<5,  Real>(x);
+        case 6:  return boost::math::cardinal_b_spline_prime<6,  Real>(x);
+        case 7:  return boost::math::cardinal_b_spline_prime<7,  Real>(x);
+        case 8:  return boost::math::cardinal_b_spline_prime<8,  Real>(x);
+        case 9:  return boost::math::cardinal_b_spline_prime<9,  Real>(x);
+        case 10: return boost::math::cardinal_b_spline_prime<10, Real>(x);
+        case 11: return boost::math::cardinal_b_spline_prime<11, Real>(x);
+        case 12: return boost::math::cardinal_b_spline_prime<12, Real>(x);
+        case 13: return boost::math::cardinal_b_spline_prime<12, Real>(x);
+        case 14: return boost::math::cardinal_b_spline_prime<12, Real>(x);
+        case 15: return boost::math::cardinal_b_spline_prime<12, Real>(x);
+        case 16: return boost::math::cardinal_b_spline_prime<12, Real>(x);
+        case 17: return boost::math::cardinal_b_spline_prime<12, Real>(x);
+        case 18: return boost::math::cardinal_b_spline_prime<12, Real>(x);
+        case 19: return boost::math::cardinal_b_spline_prime<12, Real>(x);
+        case 20: return boost::math::cardinal_b_spline_prime<12, Real>(x);
+        default: return std::numeric_limits<Real>::quiet_NaN();
+    }
+}
+
+template <typename Real>
+static inline Real dispatch_cardinal_b_spline_double_prime(unsigned int n, Real x) {
+    switch (n) {
+/*        case 0:  return boost::math::cardinal_b_spline_double_prime<0,  Real>(x);
+        case 1:  return boost::math::cardinal_b_spline_double_prime<1,  Real>(x);
+        case 2:  return boost::math::cardinal_b_spline_double_prime<2,  Real>(x); */
+        case 3:  return boost::math::cardinal_b_spline_double_prime<3,  Real>(x);
+        case 4:  return boost::math::cardinal_b_spline_double_prime<4,  Real>(x);
+        case 5:  return boost::math::cardinal_b_spline_double_prime<5,  Real>(x);
+        case 6:  return boost::math::cardinal_b_spline_double_prime<6,  Real>(x);
+        case 7:  return boost::math::cardinal_b_spline_double_prime<7,  Real>(x);
+        case 8:  return boost::math::cardinal_b_spline_double_prime<8,  Real>(x);
+        case 9:  return boost::math::cardinal_b_spline_double_prime<9,  Real>(x);
+        case 10: return boost::math::cardinal_b_spline_double_prime<10, Real>(x);
+        case 11: return boost::math::cardinal_b_spline_double_prime<11, Real>(x);
+        case 12: return boost::math::cardinal_b_spline_double_prime<12, Real>(x);
+        case 13: return boost::math::cardinal_b_spline_double_prime<12, Real>(x);
+        case 14: return boost::math::cardinal_b_spline_double_prime<12, Real>(x);
+        case 15: return boost::math::cardinal_b_spline_double_prime<12, Real>(x);
+        case 16: return boost::math::cardinal_b_spline_double_prime<12, Real>(x);
+        case 17: return boost::math::cardinal_b_spline_double_prime<12, Real>(x);
+        case 18: return boost::math::cardinal_b_spline_double_prime<12, Real>(x);
+        case 19: return boost::math::cardinal_b_spline_double_prime<12, Real>(x);
+        case 20: return boost::math::cardinal_b_spline_double_prime<12, Real>(x);
+        default: return std::numeric_limits<Real>::quiet_NaN();
+    }
+}
+
+template <typename Real>
+static inline Real dispatch_forward_cardinal_b_spline(unsigned int n, Real x) {
+    switch (n) {
+        case 0:  return boost::math::forward_cardinal_b_spline<0,  Real>(x);
+        case 1:  return boost::math::forward_cardinal_b_spline<1,  Real>(x);
+        case 2:  return boost::math::forward_cardinal_b_spline<2,  Real>(x);
+        case 3:  return boost::math::forward_cardinal_b_spline<3,  Real>(x);
+        case 4:  return boost::math::forward_cardinal_b_spline<4,  Real>(x);
+        case 5:  return boost::math::forward_cardinal_b_spline<5,  Real>(x);
+        case 6:  return boost::math::forward_cardinal_b_spline<6,  Real>(x);
+        case 7:  return boost::math::forward_cardinal_b_spline<7,  Real>(x);
+        case 8:  return boost::math::forward_cardinal_b_spline<8,  Real>(x);
+        case 9:  return boost::math::forward_cardinal_b_spline<9,  Real>(x);
+        case 10: return boost::math::forward_cardinal_b_spline<10, Real>(x);
+        case 11: return boost::math::forward_cardinal_b_spline<11, Real>(x);
+        case 12: return boost::math::forward_cardinal_b_spline<12, Real>(x);
+        case 13: return boost::math::forward_cardinal_b_spline<12, Real>(x);
+        case 14: return boost::math::forward_cardinal_b_spline<12, Real>(x);
+        case 15: return boost::math::forward_cardinal_b_spline<12, Real>(x);
+        case 16: return boost::math::forward_cardinal_b_spline<12, Real>(x);
+        case 17: return boost::math::forward_cardinal_b_spline<12, Real>(x);
+        case 18: return boost::math::forward_cardinal_b_spline<12, Real>(x);
+        case 19: return boost::math::forward_cardinal_b_spline<12, Real>(x);
+        case 20: return boost::math::forward_cardinal_b_spline<12, Real>(x);
+        default: return std::numeric_limits<Real>::quiet_NaN();
+    }
+}
+
+
+extern "C" {
+
+// double
+double bs_cardinal_b_spline(unsigned int n, double x) {
+    return bs_wrap<double>([&]{ return dispatch_cardinal_b_spline<double>(n, x); });
+}
+double bs_cardinal_b_spline_prime(unsigned int n, double x) {
+    return bs_wrap<double>([&]{ return dispatch_cardinal_b_spline_prime<double>(n, x); });
+}
+double bs_cardinal_b_spline_double_prime(unsigned int n, double x) {
+    return bs_wrap<double>([&]{ return dispatch_cardinal_b_spline_double_prime<double>(n, x); });
+}
+double bs_forward_cardinal_b_spline(unsigned int n, double x) {
+    return bs_wrap<double>([&]{ return dispatch_forward_cardinal_b_spline<double>(n, x); });
+}
+
+// float
+float bs_cardinal_b_spline_f(unsigned int n, float x) {
+    return bs_wrap<float>([&]{ return dispatch_cardinal_b_spline<float>(n, x); });
+}
+float bs_cardinal_b_spline_prime_f(unsigned int n, float x) {
+    return bs_wrap<float>([&]{ return dispatch_cardinal_b_spline_prime<float>(n, x); });
+}
+float bs_cardinal_b_spline_double_prime_f(unsigned int n, float x) {
+    return bs_wrap<float>([&]{ return dispatch_cardinal_b_spline_double_prime<float>(n, x); });
+}
+float bs_forward_cardinal_b_spline_f(unsigned int n, float x) {
+    return bs_wrap<float>([&]{ return dispatch_forward_cardinal_b_spline<float>(n, x); });
+}
+
+// long double
+long double bs_cardinal_b_spline_l(unsigned int n, long double x) {
+    return bs_wrap<long double>([&]{ return dispatch_cardinal_b_spline<long double>(n, x); });
+}
+long double bs_cardinal_b_spline_prime_l(unsigned int n, long double x) {
+    return bs_wrap<long double>([&]{ return dispatch_cardinal_b_spline_prime<long double>(n, x); });
+}
+long double bs_cardinal_b_spline_double_prime_l(unsigned int n, long double x) {
+    return bs_wrap<long double>([&]{ return dispatch_cardinal_b_spline_double_prime<long double>(n, x); });
+}
+long double bs_forward_cardinal_b_spline_l(unsigned int n, long double x) {
+    return bs_wrap<long double>([&]{ return dispatch_forward_cardinal_b_spline<long double>(n, x); });
 }
 
 } // extern "C"
