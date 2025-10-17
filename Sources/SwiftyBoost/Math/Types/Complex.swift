@@ -33,9 +33,7 @@
 //
 
 import Foundation
-#if canImport(CBoostBridge)
 import CBoostBridge
-#endif
 
 /// A generic complex number with real and imaginary parts stored as `BinaryFloatingPoint`.
 ///
@@ -443,123 +441,73 @@ public extension Complex where T == Double {
     /// Complex exponential: exp(a + ib)
     @inlinable
     var exp: Complex<Double> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_d(re: real, im: imag)
         let r = bs_cexp(z)
         return Complex(r.re, r.im)
-        #else
-        let ea = Darwin.exp(real)
-        return Complex(ea * cos(imag), ea * sin(imag))
-        #endif
     }
 
     /// Natural logarithm: log(z) = ln|z| + i arg(z)
     @inlinable
     var log: Complex<Double> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_d(re: real, im: imag)
         let r = bs_clog(z)
         return Complex(r.re, r.im)
-        #else
-        Complex(Darwin.log(magnitude), phase)
-        #endif
     }
 
     /// Complex sine: sin(a + ib)
     @inlinable
     var sin: Complex<Double> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_d(re: real, im: imag)
         let r = bs_csin(z)
         return Complex(r.re, r.im)
-        #else
-        // Fallback via identity: sin(x+iy) = sin x cosh y + i cos x sinh y
-        let x = real, y = imag
-        return Complex(Swift.sin(x) * cosh(y), Swift.cos(x) * sinh(y))
-        #endif
     }
 
     /// Complex cosine: cos(a + ib)
     @inlinable
     var cos: Complex<Double> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_d(re: real, im: imag)
         let r = bs_ccos(z)
         return Complex(r.re, r.im)
-        #else
-        // cos(x+iy) = cos x cosh y − i sin x sinh y
-        let x = real, y = imag
-        return Complex(Swift.cos(x) * cosh(y), -Swift.sin(x) * sinh(y))
-        #endif
     }
 
     /// Complex tangent: tan(a + ib)
     @inlinable
     var tan: Complex<Double> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_d(re: real, im: imag)
         let r = bs_ctan(z)
         return Complex(r.re, r.im)
-        #else
-        return self.sin / self.cos
-        #endif
     }
 
     /// Complex hyperbolic sine: sinh(a + ib)
     @inlinable
     var sinh: Complex<Double> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_d(re: real, im: imag)
         let r = bs_csinh(z)
         return Complex(r.re, r.im)
-        #else
-        // sinh(x+iy) = sinh x cos y + i cosh x sin y
-        let x = real, y = imag
-        return Complex(Swift.sinh(x) * Swift.cos(y), Swift.cosh(x) * Swift.sin(y))
-        #endif
     }
 
     /// Complex hyperbolic cosine: cosh(a + ib)
     @inlinable
     var cosh: Complex<Double> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_d(re: real, im: imag)
         let r = bs_ccosh(z)
         return Complex(r.re, r.im)
-        #else
-        // cosh(x+iy) = cosh x cos y + i sinh x sin y
-        let x = real, y = imag
-        return Complex(Swift.cosh(x) * Swift.cos(y), Swift.sinh(x) * Swift.sin(y))
-        #endif
     }
 
     /// Complex hyperbolic tangent: tanh(a + ib)
     @inlinable
     var tanh: Complex<Double> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_d(re: real, im: imag)
         let r = bs_ctanh(z)
         return Complex(r.re, r.im)
-        #else
-        return self.sinh / self.cosh
-        #endif
     }
 
     /// Complex arctangent: atan(a + ib)
     @inlinable
     var atan: Complex<Double> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_d(re: real, im: imag)
         let r = bs_catan(z)
         return Complex(r.re, r.im)
-        #else
-        // Fallback using identity: atan z = (i/2) [ln(1 - i z) - ln(1 + i z)]
-        let i = Complex<Double>.i
-        let one = Complex<Double>.one
-        let lhs = (one - i * self).log
-        let rhs = (one + i * self).log
-        return (i / 2) * (lhs - rhs)
-        #endif
     }
 }
 
@@ -581,52 +529,33 @@ public extension Complex where T == Float {
     /// Complex exponential: exp(a + ib)
     @inlinable
     var exp: Complex<Float> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_f(re: real, im: imag)
         let r = bs_cexp_f(z)
         return Complex(r.re, r.im)
-        #else
-        let ea = Float(Darwin.exp(Double(real)))
-        return Complex(ea * cos(imag), ea * sin(imag))
-        #endif
     }
 
     /// Natural logarithm: log(z) = ln|z| + i arg(z)
     @inlinable
     var log: Complex<Float> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_f(re: real, im: imag)
         let r = bs_clog_f(z)
         return Complex(r.re, r.im)
-        #else
-        Complex(Float(Darwin.log(Double(magnitude))), phase)
-        #endif
     }
 
     /// Complex sine: sin(a + ib)
     @inlinable
     var sin: Complex<Float> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_f(re: real, im: imag)
         let r = bs_csin_f(z)
         return Complex(r.re, r.im)
-        #else
-        let x = real, y = imag
-        return Complex(Swift.sin(x) * cosh(y), Swift.cos(x) * sinh(y))
-        #endif
     }
 
     /// Complex cosine: cos(a + ib)
     @inlinable
     var cos: Complex<Float> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_f(re: real, im: imag)
         let r = bs_ccos_f(z)
         return Complex(r.re, r.im)
-        #else
-        let x = real, y = imag
-        return Complex(Swift.cos(x) * cosh(y), -Swift.sin(x) * sinh(y))
-        #endif
     }
 
     /// Complex tangent: tan(a + ib)
@@ -639,55 +568,33 @@ public extension Complex where T == Float {
     /// Complex hyperbolic sine: sinh(a + ib)
     @inlinable
     var sinh: Complex<Float> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_f(re: real, im: imag)
         let r = bs_csinh_f(z)
         return Complex(r.re, r.im)
-        #else
-        let x = real, y = imag
-        return Complex(Swift.sinh(x) * Swift.cos(y), Swift.cosh(x) * Swift.sin(y))
-        #endif
     }
 
     /// Complex hyperbolic cosine: cosh(a + ib)
     @inlinable
     var cosh: Complex<Float> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_f(re: real, im: imag)
         let r = bs_ccosh_f(z)
         return Complex(r.re, r.im)
-        #else
-        let x = real, y = imag
-        return Complex(Swift.cosh(x) * Swift.cos(y), Swift.sinh(x) * Swift.sin(y))
-        #endif
     }
 
     /// Complex hyperbolic tangent: tanh(a + ib)
     @inlinable
     var tanh: Complex<Float> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_f(re: real, im: imag)
         let r = bs_ctanh_f(z)
         return Complex(r.re, r.im)
-        #else
-        return self.sinh / self.cosh
-        #endif
     }
 
     /// Complex arctangent: atan(a + ib)
     @inlinable
     var atan: Complex<Float> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_f(re: real, im: imag)
         let r = bs_catan_f(z)
         return Complex(r.re, r.im)
-        #else
-        let i = Complex<Float>.i
-        let one = Complex<Float>.one
-        let lhs = (one - i * self).log
-        let rhs = (one + i * self).log
-        return (i / 2) * (lhs - rhs)
-        #endif
     }
 }
 
@@ -710,118 +617,73 @@ public extension Complex where T == Float80 {
     /// Complex exponential: exp(a + ib)
     @inlinable
     var exp: Complex<Float80> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_l(re: real, im: imag)
         let r = bs_cexp_l(z)
         return Complex(r.re, r.im)
-        #else
-        let ea = Float80(Darwin.exp(Double(real)))
-        return Complex(ea * cos(imag), ea * sin(imag))
-        #endif
     }
 
     /// Natural logarithm: log(z) = ln|z| + i arg(z)
     @inlinable
     var log: Complex<Float80> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_l(re: real, im: imag)
         let r = bs_clog_l(z)
         return Complex(r.re, r.im)
-        #else
-        Complex(Float80(Darwin.log(Double(magnitude))), phase)
-        #endif
     }
 
     /// Complex sine: sin(a + ib)
     @inlinable
     var sin: Complex<Float80> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_l(re: real, im: imag)
         let r = bs_csin_l(z)
         return Complex(r.re, r.im)
-        #else
-        let x = real, y = imag
-        return Complex(Swift.sin(x) * cosh(y), Swift.cos(x) * sinh(y))
-        #endif
     }
 
     /// Complex cosine: cos(a + ib)
     @inlinable
     var cos: Complex<Float80> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_l(re: real, im: imag)
         let r = bs_ccos_l(z)
         return Complex(r.re, r.im)
-        #else
-        let x = real, y = imag
-        return Complex(Swift.cos(x) * cosh(y), -Swift.sin(x) * sinh(y))
-        #endif
     }
 
     /// Complex tangent: tan(a + ib)
     @inlinable
     var tan: Complex<Float80> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_l(re: real, im: imag)
         let r = bs_ctan_l(z)
         return Complex(r.re, r.im)
-        #else
-        return self.sin / self.cos
-        #endif
     }
 
     /// Complex hyperbolic sine: sinh(a + ib)
     @inlinable
     var sinh: Complex<Float80> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_l(re: real, im: imag)
         let r = bs_csinh_l(z)
         return Complex(r.re, r.im)
-        #else
-        let x = real, y = imag
-        return Complex(Swift.sinh(x) * Swift.cos(y), Swift.cosh(x) * Swift.sin(y))
-        #endif
     }
 
     /// Complex hyperbolic cosine: cosh(a + ib)
     @inlinable
     var cosh: Complex<Float80> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_l(re: real, im: imag)
         let r = bs_ccosh_l(z)
         return Complex(r.re, r.im)
-        #else
-        let x = real, y = imag
-        return Complex(Swift.cosh(x) * Swift.cos(y), Swift.sinh(x) * Swift.sin(y))
-        #endif
     }
 
     /// Complex hyperbolic tangent: tanh(a + ib)
     @inlinable
     var tanh: Complex<Float80> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_l(re: real, im: imag)
         let r = bs_ctanh_l(z)
         return Complex(r.re, r.im)
-        #else
-        return self.sinh / self.cosh
-        #endif
     }
 
     /// Complex arctangent: atan(a + ib)
     @inlinable
     var atan: Complex<Float80> {
-        #if canImport(CBoostBridge)
         let z = bs_complex_l(re: real, im: imag)
         let r = bs_catan_l(z)
         return Complex(r.re, r.im)
-        #else
-        let i = Complex<Float80>.i
-        let one = Complex<Float80>.one
-        let lhs = (one - i * self).log
-        let rhs = (one + i * self).log
-        return (i / 2) * (lhs - rhs)
-        #endif
     }
 }
 #endif

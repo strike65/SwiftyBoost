@@ -52,7 +52,6 @@ import CBoostBridge
 /// Notes
 /// - All values are pure constants with no side effects.
 /// - Thread-safe by construction (no mutable state).
-public enum Constants<T: BinaryFloatingPoint> {}
 
 
 // MARK: - Double specializations

@@ -64,7 +64,7 @@
 #include <boost/math/special_functions/chebyshev.hpp>
 #include <boost/math/special_functions/cardinal_b_spline.hpp>
 #include <boost/math/special_functions/spherical_harmonic.hpp>
-
+#include <boost/math/special_functions/gegenbauer.hpp>
 #include <vector>
 #include <limits>
 #include <stdexcept>
@@ -77,6 +77,10 @@
 #include <boost/math/complex/asinh.hpp>
 #include <boost/math/complex/atanh.hpp>
 #include <boost/math/complex/fabs.hpp>
+#include <boost/math/special_functions/sqrt1pm1.hpp>
+#include <boost/math/special_functions/powm1.hpp>
+#include <boost/math/special_functions/hypot.hpp>
+#include <boost/math/special_functions/bessel_prime.hpp>
 
 
 
@@ -522,6 +526,8 @@ double bs_log1p(double x)            { return bs_wrap<double>([&] { return boost
 double bs_log1pmx(double x)          { return bs_wrap<double>([&] { return boost::math::log1pmx(x); }); }
 double bs_powm1(double x, double y)  { return bs_wrap<double>([&] { return boost::math::powm1(x, y); }); }
 double bs_cbrt(double x)             { return bs_wrap<double>([&] { return boost::math::cbrt(x); }); }
+double bs_sqrt1pm1(double x)         { return bs_wrap<double>([&] { return boost::math::sqrt1pm1(x); }); }
+double bs_hypot(double x, double y)  { return bs_wrap<double>([&] { return boost::math::hypot(x, y); }); }
 
 float bs_expint_Ei_f(float x)        { return bs_wrap<float>([&] { return boost::math::expint(x); }); }
 float bs_expint_En_f(int n, float x) { return bs_wrap<float>([&] { return boost::math::expint(n, x); }); }
@@ -530,6 +536,8 @@ float bs_log1p_f(float x)            { return bs_wrap<float>([&] { return boost:
 float bs_log1pmx_f(float x)          { return bs_wrap<float>([&] { return boost::math::log1pmx(x); }); }
 float bs_powm1_f(float x, float y)   { return bs_wrap<float>([&] { return boost::math::powm1(x, y); }); }
 float bs_cbrt_f(float x)             { return bs_wrap<float>([&] { return boost::math::cbrt(x); }); }
+float bs_sqrt1pm1_f(float x)         { return bs_wrap<float>([&] { return boost::math::sqrt1pm1(x); }); }
+float bs_hypot_f(float x, float y)  { return bs_wrap<float>([&] { return boost::math::hypot(x, y); }); }
 
 long double bs_expint_Ei_l(long double x)          { return bs_wrap<long double>([&] { return boost::math::expint(x); }); }
 long double bs_expint_En_l(int n, long double x)   { return bs_wrap<long double>([&] { return boost::math::expint(n, x); }); }
@@ -538,6 +546,8 @@ long double bs_log1p_l(long double x)              { return bs_wrap<long double>
 long double bs_log1pmx_l(long double x)            { return bs_wrap<long double>([&] { return boost::math::log1pmx(x); }); }
 long double bs_powm1_l(long double x, long double y) { return bs_wrap<long double>([&] { return boost::math::powm1(x, y); }); }
 long double bs_cbrt_l(long double x)               { return bs_wrap<long double>([&] { return boost::math::cbrt(x); }); }
+long double bs_sqrt1pm1_l(long double x)         { return bs_wrap<long double>([&] { return boost::math::sqrt1pm1(x); }); }
+long double bs_hypot_l(long double x, long double y)  { return bs_wrap<long double>([&] { return boost::math::hypot(x, y); }); }
 
 // Trig helpers
 double bs_sin_pi(double x)             { return bs_wrap<double>([&] { return boost::math::sin_pi(x); }); }
@@ -570,17 +580,104 @@ double bs_cyl_bessel_j(double v, double x) { return bs_wrap<double>([&] { return
 double bs_cyl_neumann(double v, double x)  { return bs_wrap<double>([&] { return boost::math::cyl_neumann(v, x); }); }
 double bs_cyl_bessel_i(double v, double x) { return bs_wrap<double>([&] { return boost::math::cyl_bessel_i(v, x); }); }
 double bs_cyl_bessel_k(double v, double x) { return bs_wrap<double>([&] { return boost::math::cyl_bessel_k(v, x); }); }
+double bs_cyl_bessel_j_zero ( double v, int m) { return bs_wrap<double>([&] { return boost::math::cyl_bessel_j_zero<double>(v, m); }); }
+void bs_cyl_bessel_j_zeros(double v, int start_index, unsigned int number_of_zeros, double* out) {
+    if (!out || number_of_zeros == 0) return;
+        // Fill the caller-provided buffer; the function returns the output iterator, which we can ignore.
+    boost::math::cyl_bessel_j_zero(v, start_index, number_of_zeros, out);
+}
 
 float bs_cyl_bessel_j_f(float v, float x) { return bs_wrap<float>([&] { return boost::math::cyl_bessel_j(v, x); }); }
 float bs_cyl_neumann_f(float v, float x)  { return bs_wrap<float>([&] { return boost::math::cyl_neumann(v, x); }); }
 float bs_cyl_bessel_i_f(float v, float x) { return bs_wrap<float>([&] { return boost::math::cyl_bessel_i(v, x); }); }
 float bs_cyl_bessel_k_f(float v, float x) { return bs_wrap<float>([&] { return boost::math::cyl_bessel_k(v, x); }); }
+float bs_cyl_bessel_j_zero_f ( float v, int m) { return bs_wrap<float>([&] { return boost::math::cyl_bessel_j_zero<float>(v, m); }); }
+void bs_cyl_bessel_j_zeros_f(float v, int start_index, unsigned int number_of_zeros, float* out) {
+    if (!out || number_of_zeros == 0) return;
+        // Fill the caller-provided buffer; the function returns the output iterator, which we can ignore.
+    boost::math::cyl_bessel_j_zero(v, start_index, number_of_zeros, out);
+}
 
 long double bs_cyl_bessel_j_l(long double v, long double x) { return bs_wrap<long double>([&] { return boost::math::cyl_bessel_j(v, x); }); }
 long double bs_cyl_neumann_l(long double v, long double x)  { return bs_wrap<long double>([&] { return boost::math::cyl_neumann(v, x); }); }
 long double bs_cyl_bessel_i_l(long double v, long double x) { return bs_wrap<long double>([&] { return boost::math::cyl_bessel_i(v, x); }); }
 long double bs_cyl_bessel_k_l(long double v, long double x) { return bs_wrap<long double>([&] { return boost::math::cyl_bessel_k(v, x); }); }
+long double bs_cyl_bessel_j_zero_l( long double v, int m) { return bs_wrap<long double>([&] { return boost::math::cyl_bessel_j_zero<long double>(v, m); }); }
+void bs_cyl_bessel_j_zeros_l(long double v, int start_index, unsigned int number_of_zeros, long double* out) {
+    if (!out || number_of_zeros == 0) return;
+        // Fill the caller-provided buffer; the function returns the output iterator, which we can ignore.
+    boost::math::cyl_bessel_j_zero(v, start_index, number_of_zeros, out);
+}
+// Spherical Bessel/Neumann bridges (no helpers)
+double bs_sph_bessel(unsigned int n, double x) {
+    return boost::math::sph_bessel(n, x);
+}
+float bs_sph_bessel_f(unsigned int n, float x) {
+    return boost::math::sph_bessel(n, x);
+}
+long double bs_sph_bessel_l(unsigned int n, long double x) {
+    return boost::math::sph_bessel(n, x);
+}
 
+double bs_sph_neumann(unsigned int n, double x) {
+    return boost::math::sph_neumann(n, x);
+}
+float bs_sph_neumann_f(unsigned int n, float x) {
+    return boost::math::sph_neumann(n, x);
+}
+long double bs_sph_neumann_l(unsigned int n, long double x) {
+    return boost::math::sph_neumann(n, x);
+}
+
+double bs_cyl_bessel_j_prime(double v, double x) {
+    return boost::math::cyl_bessel_j_prime(v, x);
+}
+
+double bs_cyl_bessel_i_prime(double v, double x) {
+    return boost::math::cyl_bessel_i_prime(v, x);
+}
+double bs_cyl_bessel_k_prime(double v, double x) {
+    return boost::math::cyl_bessel_k_prime(v, x);
+}
+double bs_sph_bessel_prime(unsigned int n, double x) {
+    return boost::math::sph_bessel_prime(n, x);
+}
+double bs_sph_neumann_prime(unsigned int n, double x) {
+    return boost::math::sph_neumann_prime(n, x);
+}
+float bs_cyl_bessel_j_prime_f(float v, float x) {
+    return boost::math::cyl_bessel_j_prime(v, x);
+}
+float bs_cyl_bessel_i_prime_f(float v, float x) {
+    return boost::math::cyl_bessel_i_prime(v, x);
+}
+float bs_cyl_bessel_k_prime_f(float v, float x) {
+    return boost::math::cyl_bessel_k_prime(v, x);
+}
+float bs_sph_bessel_prime_f(unsigned int n, float x) {
+    return boost::math::sph_bessel_prime(n, x);
+}
+float bs_sph_neumann_prime_f(unsigned int n, float x) {
+    return boost::math::sph_neumann_prime(n, x);
+}
+long double bs_cyl_bessel_j_prime_l(long double v, long double x) {
+    return boost::math::cyl_bessel_j_prime(v, x);
+}
+
+long double bs_cyl_bessel_i_prime_l(long double v, long double x) {
+    return boost::math::cyl_bessel_i_prime(v, x);
+}
+long double bs_cyl_bessel_k_prime_l(long double v, long double x) {
+    return boost::math::cyl_bessel_k_prime(v, x);
+}
+long double bs_sph_bessel_prime_l(unsigned int n, long double x) {
+    return boost::math::sph_bessel_prime(n, x);
+}
+long double bs_sph_neumann_prime_l(unsigned int n, long double x) {
+    return boost::math::sph_neumann_prime(n, x);
+}
+
+                                           
 // Legendre
 double bs_legendre_p(int n, double x)                 { return bs_wrap<double>([&] { return boost::math::legendre_p(n, x); }); }
 double bs_assoc_legendre_p(int n, int m, double x)    { return bs_wrap<double>([&] { return boost::math::legendre_p(n, m, x); }); }
@@ -1035,5 +1132,37 @@ long double bs_cardinal_b_spline_double_prime_l(unsigned int n, long double x) {
 long double bs_forward_cardinal_b_spline_l(unsigned int n, long double x) {
     return bs_wrap<long double>([&]{ return dispatch_forward_cardinal_b_spline<long double>(n, x); });
 }
+
+double      bs_gegenbauer           (unsigned int n, double lambda, double x) {
+    return bs_wrap<double>([&]{ return boost::math::gegenbauer(n, lambda, x) ; });
+}
+double      bs_gegenbauer_prime     (unsigned int n, double lambda, double x) {
+    return bs_wrap<double>([&]{ return boost::math::gegenbauer_prime(n, lambda, x) ; });
+}
+double      bs_gegenbauer_derivative(unsigned int n, double lambda, double x, unsigned int k) {
+    return bs_wrap<double>([&]{ return boost::math::gegenbauer_derivative(n, lambda, x, k) ; });
+}
+
+
+float      bs_gegenbauer_f           (unsigned int n, float lambda, float x) {
+    return bs_wrap<float>([&]{ return boost::math::gegenbauer(n, lambda, x) ; });
+}
+float      bs_gegenbauer_prime_f     (unsigned int n, float lambda, float x) {
+    return bs_wrap<float>([&]{ return boost::math::gegenbauer_prime(n, lambda, x) ; });
+}
+float      bs_gegenbauer_derivative_f(unsigned int n, float lambda, float x, unsigned int k) {
+    return bs_wrap<float>([&]{ return boost::math::gegenbauer_derivative(n, lambda, x, k) ; });
+}
+
+long double      bs_gegenbauer_l           (unsigned int n, long double lambda, long double x) {
+    return bs_wrap<long double>([&]{ return boost::math::gegenbauer(n, lambda, x) ; });
+}
+long double      bs_gegenbauer_prime_l     (unsigned int n, long double lambda, long double x) {
+    return bs_wrap<long double>([&]{ return boost::math::gegenbauer_prime(n, lambda, x) ; });
+}
+long double      bs_gegenbauer_derivative_l(unsigned int n, long double lambda, long double x, unsigned int k) {
+    return bs_wrap<long double>([&]{ return boost::math::gegenbauer_derivative(n, lambda, x, k) ; });
+}
+
 
 } // extern "C"

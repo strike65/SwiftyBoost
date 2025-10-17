@@ -7,9 +7,4 @@
 //
 
 // Intentionally empty. See Math/SpecialFunctions/.
-import CBoostBridge
-
-public enum SpecialFunctions {
-    
-}
 
