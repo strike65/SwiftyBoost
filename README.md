@@ -8,6 +8,7 @@ SwiftyBoost gives Swift developers direct access to Boost.Math special functions
 - Gamma, Beta, error, Bessel, Legendre, elliptic (Legendre and Carlson), Lambert W, Owen's T, and other high-precision helpers.
 - `CBoostBridge` target that forwards Swift calls into the vendored Boost headers under `extern/boost`.
 - Architectural awareness with dedicated `Float`, `Double`, and (x86_64) `Float80` overloads plus generic `BinaryFloatingPoint` entry points.
+- Generic `Complex<T: BinaryFloatingPoint>` type with arithmetic, polar helpers, and elementary complex functions (`exp`, `log`, `sin`, `cos`, `tan`, `sinh`, `cosh`, `tanh`, `atan`). Double/Float/(x86_64) Float80 specializations call Boost-backed bridge functions (`bs_*`).
 
 ## Requirements
 - Swift 6.2 or later.
@@ -60,6 +61,37 @@ let nFact: Double = try SpecialFunctions.factorial(10)   // 3,628,800
 ```
 
 APIs throw `SpecialFunctionError` for invalid inputs or domain violations. See DocC symbol docs for function‑specific bounds mirrored from Boost.Math.
+
+### Complex Numbers
+
+SwiftyBoost includes a lightweight, generic complex number type with stable arithmetic and Boost-backed elementary functions where available.
+
+```swift
+import SwiftyBoost
+
+// Construction and constants
+let z1 = Complex<Double>(3, -4)
+let z2: ComplexD = .i                      // 0 + 1i
+let z3 = Complex<Float>.fromPolar(radius: 2, phase: .pi/6)
+
+// Arithmetic
+let s = z1 + ComplexD(1, 2)
+let p = z1 * z2
+let q = z1 / ComplexD(-1, 4)              // Smith’s algorithm for stability
+
+// Properties and transforms
+let m  = z1.magnitude                      // 5
+let arg = z1.phase                         // atan2(imag, real)
+let zr = z1.squareRoot                     // principal sqrt
+
+// Elementary complex functions (Boost-backed for Double/Float/Float80)
+let e  = z1.exp
+let l  = z1.log
+let sn = z1.sin
+let cs = z1.cos
+```
+
+Typealiases are provided for convenience: `ComplexD` (`Double`), `ComplexF` (`Float`), and `ComplexX` (`Float80`, x86_64 only).
 
 ## Development
 - Core Swift sources reside in `Sources/SwiftyBoost`, grouped by namespace under `Math/SpecialFunctions`.

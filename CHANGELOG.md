@@ -3,7 +3,12 @@
 All notable changes to this project are tracked here, following the principles of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adhering to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
-- Added generic complex type
+- Added a generic complex number type `Complex<T: BinaryFloatingPoint>`
+  - Conforms to `Sendable`, `Equatable`, `Hashable`, `Codable`; includes `ComplexD`, `ComplexF`, and (x86_64) `ComplexX` typealiases.
+  - Stable arithmetic: Smith’s algorithm for division, numerically robust magnitude, principal square root.
+  - Mixed scalar operations, polar helpers (`fromPolar`, `phase`), and normalization.
+  - Double/Float/(x86_64) Float80 specializations call Boost-backed bridge functions (`bs_cexp`, `bs_clog`, `bs_csin`, `bs_ccos`, `bs_ctan`, `bs_csinh`, `bs_ccosh`, `bs_ctanh`, `bs_catan`).
+  - Added README usage section and examples.
 - Corrected README usage examples to match public API naming (`errorFunction`, `besselJ(v:x:)`).
 - Aligned supported platforms in README with `Package.swift` (macOS, iOS).
 - Updated SPM installation URL to `github.com/strike65/SwiftyBoost`.

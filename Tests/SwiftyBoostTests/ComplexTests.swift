@@ -194,6 +194,74 @@ struct ComplexDoubleBasicTests {
         let z2 = Complex(3.0, -2.0)
         #expect(z2.description == "3.0 - 2.0i" || z2.description == "3 - 2i")
     }
+
+    @Test("Euler’s formula exp(iθ) = cos θ + i sin θ")
+    func eulersFormula() {
+        let theta: Double = 1.2345
+        let eitheta = Complex(0.0, theta).exp
+        let rhs = Complex(cos(theta), sin(theta))
+        #expect(abs(eitheta.real - rhs.real) < 1e-12)
+        #expect(abs(eitheta.imag - rhs.imag) < 1e-12)
+    }
+
+    @Test("Trig identities for real inputs: sin^2 + cos^2 = 1, tan = sin/cos")
+    func trigIdentitiesReal() {
+        let x: Double = -0.75
+        let z = Complex(x, 0.0)
+        let s = z.sin
+        let c = z.cos
+        let t = z.tan
+        let sum = s * s + c * c
+        #expect(abs(sum.real - 1.0) < 1e-12)
+        #expect(abs(sum.imag - 0.0) < 1e-12)
+        let ratio = s / c
+        #expect(abs(ratio.real - t.real) < 1e-12)
+        #expect(abs(ratio.imag - t.imag) < 1e-12)
+    }
+
+    @Test("Hyperbolic identity for real inputs: cosh^2 - sinh^2 = 1")
+    func hyperbolicIdentityReal() {
+        let x: Double = 1.1
+        let z = Complex(x, 0.0)
+        let ch = z.cosh
+        let sh = z.sinh
+        let diff = ch * ch - sh * sh
+        #expect(abs(diff.real - 1.0) < 1e-12)
+        #expect(abs(diff.imag - 0.0) < 1e-12)
+    }
+
+    @Test("atan consistency: tan(atan(z)) ≈ z (small |z|)")
+    func atanConsistency() {
+        let z = Complex(0.1, -0.05)
+        let a = z.atan
+        let t = a.tan
+        #expect(abs(t.real - z.real) < 1e-12)
+        #expect(abs(t.imag - z.imag) < 1e-12)
+    }
+
+    @Test("Phase edge cases")
+    func phaseEdges() {
+        // (-1, 0) has phase π
+        let m1 = Complex(-1.0, 0.0)
+        #expect(abs(m1.phase - .pi) < 1e-12)
+        // (0, 1) has phase π/2
+        let i = Complex<Double>.i
+        #expect(abs(i.phase - .pi/2) < 1e-12)
+        // (0, -1) has phase -π/2
+        let mi = Complex(0.0, -1.0)
+        #expect(abs(mi.phase + .pi/2) < 1e-12)
+    }
+
+    @Test("Finite/Infinite/NaN flags and literals")
+    func flagsAndLiterals() {
+        let a: ComplexD = 2.5 // ExpressibleByFloatLiteral
+        #expect(a == ComplexD(2.5, 0))
+        #expect(ComplexD(1, 2).isFinite)
+        #expect(ComplexD(.infinity, 0).isInfinite)
+        #expect(ComplexD(0, .infinity).isInfinite)
+        #expect(ComplexD(.nan, 0).isNaN)
+        #expect(ComplexD(0, .nan).isNaN)
+    }
 }
 
 @Suite("Complex Float specializations")
@@ -224,6 +292,23 @@ struct ComplexFloatTests {
         #expect(abs(l.real - logf(4)) < 1e-6)
         #expect(abs(l.imag - 0) < 1e-6)
     }
+
+    @Test("Trig/hyperbolic identities (Float)")
+    func trigHyperbolicFloat() {
+        let x: Float = 0.75
+        let z = Complex(x, 0)
+        let s = z.sin
+        let c = z.cos
+        let sum = s * s + c * c
+        #expect(abs(sum.real - 1) < 1e-5)
+        #expect(abs(sum.imag - 0) < 1e-5)
+
+        let ch = z.cosh
+        let sh = z.sinh
+        let diff = ch * ch - sh * sh
+        #expect(abs(diff.real - 1) < 1e-5)
+        #expect(abs(diff.imag - 0) < 1e-5)
+    }
 }
 
 #if arch(x86_64)
@@ -253,5 +338,23 @@ struct ComplexFloat80Tests {
         #expect(abs(l.real - logl(4)) < 1e-12)
         #expect(abs(l.imag - 0) < 1e-12)
     }
+
+    @Test("Trig/hyperbolic identities (Float80)")
+    func trigHyperbolicFloat80() {
+        let x: Float80 = -1.25
+        let z = Complex(x, 0)
+        let s = z.sin
+        let c = z.cos
+        let sum = s * s + c * c
+        #expect(abs(sum.real - 1) < 1e-12)
+        #expect(abs(sum.imag - 0) < 1e-12)
+
+        let ch = z.cosh
+        let sh = z.sinh
+        let diff = ch * ch - sh * sh
+        #expect(abs(diff.real - 1) < 1e-12)
+        #expect(abs(diff.imag - 0) < 1e-12)
+    }
 }
 #endif
+
