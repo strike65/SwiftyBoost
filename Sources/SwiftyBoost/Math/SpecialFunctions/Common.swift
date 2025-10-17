@@ -17,140 +17,118 @@
 //
 
 import CBoostBridge
-    // MARK: - Errors
+
+// MARK: - Errors
+
+/// Errors thrown by special functions when inputs are invalid or outside the domain.
+///
+/// Use these errors to understand why a computation failed (e.g., an argument
+/// is not finite, violates domain restrictions, or the function has a
+/// mathematical pole at the requested input).
+///
+/// You can pattern match on the associated values (e.g., parameter name or
+/// min/max bounds) to build user-facing diagnostics.
+public enum SpecialFunctionError: Error & Equatable {
+    /// Parameter must be strictly positive (e.g., `n >= 0`).
+    ///
+    /// - Parameter name: The name of the offending parameter.
+    case parameterNotPositive(name: String)
+    /// Parameter is outside the valid range [min, max].
+    ///
+    /// - Parameters:
+    ///   - name: The name of the offending parameter.
+    ///   - min: The inclusive lower bound.
+    ///   - max: The inclusive upper bound.
+    case parameterOutOfRange(name: String, min: Double, max: Double)
+    /// Parameter is not finite (NaN or ±∞).
+    ///
+    /// - Parameter name: The name of the offending parameter.
+    case parameterNotFinite(name: String)
+    /// A simple pole occurs at a non-positive integer for this function (e.g., Γ(x)).
+    ///
+    /// - Parameter name: The name of the offending parameter.
+    case poleAtNonPositiveInteger(name: String)
+    /// Inputs form an invalid combination for the real-valued function.
+    ///
+    /// - Parameter message: A human-readable explanation of the invalid combination.
+    case invalidCombination(message: String)
+    /// Parameter is greater than the maximum allowed integer value.
+    ///
+    /// - Parameters:
+    ///   - name: The name of the offending parameter.
+    ///   - max: The maximum allowed integer value.
+    case parameterExceedsMaximumIntegerValue(name: String, max: Int)
+}
+
+// MARK: - Helper casts
+
+/// Converts a generic `BinaryFloatingPoint` to `Double`.
+///
+/// This small utility enables generic algorithms to call C/Boost-backed
+/// implementations that operate on `Double`.
+///
+/// - Parameter x: A `BinaryFloatingPoint` value.
+/// - Returns: `x` converted to `Double`.
+@usableFromInline internal func D<T: BinaryFloatingPoint>(_ x: T) -> Double { Double(x) }
+
+/// The base of the natural logarithm, e ≈ 2.718281828..., from Boost.Math constants.
+///
+/// - Returns: The double-precision value of Euler’s number provided by Boost.Math.
+@inlinable public var boostE: Double { bs_const_e() }
+
+// MARK: - Numerically stable helpers
+extension SpecialFunctions {
     
-    /// Errors thrown by special functions when inputs are invalid or outside the domain.
+    /// Computes `exp(x) - 1` with improved numerical stability for small `x`.
     ///
-    /// Use these errors to understand why a computation failed (e.g., argument is
-    /// not finite, argument violates domain restrictions, or the function has a
-    /// mathematical pole at the requested input).
-    public enum SpecialFunctionError: Error & Equatable {
-        /// Parameter must be strictly positive (e.g., `n >= 0`).
-        case parameterNotPositive(name: String)
-        /// Parameter is outside the valid range [min, max].
-        case parameterOutOfRange(name: String, min: Double, max: Double)
-        /// Parameter is not finite (NaN or ±∞).
-        case parameterNotFinite(name: String)
-        /// A simple pole occurs at a non-positive integer for this function (e.g., Γ(x)).
-        case poleAtNonPositiveInteger(name: String)
-        /// Inputs form an invalid combination for the real-valued function.
-        case invalidCombination(message: String)
-        /// Parameter is greater than max allowed
-        case parameterExceedsMaximumIntegerValue(name: String, max: Int)
-    }
-    
-    // MARK: - Helper casts
-    
-    /// Convert a generic `BinaryFloatingPoint` to `Double`.
-    ///
-    /// This is a small, inline helper used by generic overloads to funnel
-    /// computation through a `Double`-backed C implementation, while preserving
-    /// the public API’s generic signature.
-    ///
-    /// Parameters:
-    /// - x: A `BinaryFloatingPoint` value.
-    ///
-    /// Returns:
-    /// - `x` converted to `Double`.
-    @usableFromInline internal func D<T: BinaryFloatingPoint>(_ x: T) -> Double { Double(x) }
-    
-    /// The base of the natural logarithm, e ≈ 2.718281828..., from Boost.Math constants.
-    ///
-    /// Use this to access a consistent `Double` value sourced from the C bridge.
-    @inlinable public var boostE: Double { bs_const_e() }
-    
-    // MARK: - Numerically stable helpers
-    
-    /// Compute exp(x) - 1 with improved accuracy for small x.
-    ///
-    /// Parameters:
-    /// - x: The input value `x`.
-    ///
-    /// Returns:
-    /// - `exp(x) - 1` as `T`.
-    ///
-    /// Throws:
-    /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    ///
-    /// Example:
-    /// ```swift
-    /// let y = try expm1(1e-8 as Double)
-    /// ```
-    @inlinable public func expm1<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    /// - Parameter x: The exponent.
+    /// - Returns: `exp(x) - 1` as `T`.
+    /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    @inlinable static func expm1<T: BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return T(bs_expm1(dx))
     }
     
-    /// Compute ln(1 + x) with improved accuracy for small x.
+    /// Computes `log(1 + x)` with improved numerical stability near zero.
     ///
-    /// Domain:
-    /// - Requires `x > -1` (ln(1+x) undefined for x ≤ -1 in the reals).
-    ///
-    /// Parameters:
-    /// - x: The input value `x`.
-    ///
-    /// Returns:
-    /// - `ln(1 + x)` as `T`.
-    ///
-    /// Throws:
-    /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    /// - `SpecialFunctionError.parameterOutOfRange(name: "x", ...)` if `x ≤ -1`.
-    ///
-    /// Example:
-    /// ```swift
-    /// let y = try log1p(1e-8 as Double)
-    /// ```
-    @inlinable public func log1p<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    /// - Parameter x: The input value; must satisfy `x > -1`.
+    /// - Returns: `log(1 + x)` as `T`.
+    /// - Throws:
+    ///   - `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    ///   - `SpecialFunctionError.parameterOutOfRange` if `x <= -1`.
+    @inlinable static func log1p<T: BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dx > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: -1.0.nextUp, max: Double.infinity) }
         return T(bs_log1p(dx))
     }
     
-    /// Compute ln(1 + x) - x with improved accuracy near zero.
+    /// Computes `log(1 + x) - x` with improved numerical stability near zero.
     ///
-    /// Domain:
-    /// - Requires `x > -1`.
-    ///
-    /// Parameters:
-    /// - x: The input value `x`.
-    ///
-    /// Returns:
-    /// - `ln(1 + x) - x` as `T`.
-    ///
-    /// Throws:
-    /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    /// - `SpecialFunctionError.parameterOutOfRange(name: "x", ...)` if `x ≤ -1`.
-    @inlinable public func log1pmx<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    /// - Parameter x: The input value; must satisfy `x > -1`.
+    /// - Returns: `log(1 + x) - x` as `T`.
+    /// - Throws:
+    ///   - `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    ///   - `SpecialFunctionError.parameterOutOfRange` if `x <= -1`.
+    @inlinable static func log1pmx<T: BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dx > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: -1.0.nextUp, max: Double.infinity) }
         return T(bs_log1pmx(dx))
     }
     
-    /// Compute x^y - 1 with improved accuracy, enforcing a real-valued domain.
+    /// Computes `x^y - 1` with improved stability for small results.
     ///
-    /// Domain:
-    /// - Negative base with a non-integer exponent is undefined over the reals.
-    ///   This function throws `invalidCombination` in that case.
-    ///
-    /// Parameters:
-    /// - x: The base.
-    /// - y: The exponent.
-    ///
-    /// Returns:
-    /// - `x^y - 1` as `T`.
-    ///
-    /// Throws:
-    /// - `SpecialFunctionError.parameterNotFinite(name: "x"|"y")` if inputs are NaN or ±∞.
-    /// - `SpecialFunctionError.invalidCombination(...)` if `x < 0` and `y` is non-integer.
-    ///
-    /// Example:
-    /// ```swift
-    /// let v = try powm1(1.000001 as Double, 3.0 as Double)
-    /// ```
-    @inlinable public func powm1<T: BinaryFloatingPoint>(_ x: T, _ y: T) throws -> T {
+    /// - Parameters:
+    ///   - x: The base.
+    ///   - y: The exponent.
+    /// - Returns: `x^y - 1` as `T`.
+    /// - Throws:
+    ///   - `SpecialFunctionError.parameterNotFinite` if `x` or `y` is not finite.
+    ///   - `SpecialFunctionError.invalidCombination` if `x < 0` and `y` is non-integer
+    ///     (undefined in the reals).
+    @inlinable static func powm1<T: BinaryFloatingPoint>(_ x: T, _ y: T) throws -> T {
         let dx = D(x), dy = D(y)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dy.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
@@ -161,55 +139,78 @@ import CBoostBridge
         return T(bs_powm1(dx, dy))
     }
     
-    /// Compute the real cube root of x.
+    /// Computes the real cube root `cbrt(x)`.
     ///
-    /// Parameters:
-    /// - x: The input value `x`.
-    ///
-    /// Returns:
-    /// - `cbrt(x)` as `T`.
-    ///
-    /// Throws:
-    /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    @inlinable public func cbrt<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    /// - Parameter x: The input value.
+    /// - Returns: The real cube root of `x` as `T`.
+    /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    @inlinable static func cbrt<T: BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return T(bs_cbrt(dx))
     }
     
-    // MARK: - Float overloads
-    // These overloads call directly into the Float-precision C implementations for
-    // best performance and to avoid unnecessary conversions.
-    
-    /// Exponential integral E_n(x) for `Float`.
-    @inlinable public func exponentialIntegralEn(_ n: Int, _ x: Float) throws -> Float {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return bs_expint_En_f(Int32(n), x)
+    /// Computes `sqrt(1 + x) - 1` with improved numerical stability near zero.
+    ///
+    /// - Parameter x: The input value.
+    /// - Returns: `sqrt(1 + x) - 1` as `T`.
+    /// - Note: This overload does not throw and relies on the underlying Boost implementation.
+    @inlinable static func sqrt1pm1<T: BinaryFloatingPoint>(x: T) -> T {
+        return T(bs_sqrt1pm1(Double(x)))
     }
     
-    /// Compute exp(x) - 1 for `Float`.
-    @inlinable public func expm1(_ x: Float) throws -> Float {
+    //double bs_sqrt1pm1(double x)         { return bs_wrap<double>([&] { return boost::math::sqrt1pm1(x); }); }
+    //double bs_hypot(double x, double y)  { return bs_wrap<double>([&] { return boost::math::hypot(x, y); }); }
+    
+    
+    // MARK: - Float overloads
+    
+    /// Computes `exp(x) - 1` for `Float`.
+    ///
+    /// - Parameter x: The exponent.
+    /// - Returns: `exp(x) - 1` as `Float`.
+    /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    @inlinable static func expm1(_ x: Float) throws -> Float {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_expm1_f(x)
     }
     
-    /// Compute ln(1 + x) for `Float`. Requires `x > -1`.
-    @inlinable public func log1p(_ x: Float) throws -> Float {
+    /// Computes `log(1 + x)` for `Float`. Requires `x > -1`.
+    ///
+    /// - Parameter x: The input; must satisfy `x > -1`.
+    /// - Returns: `log(1 + x)` as `Float`.
+    /// - Throws:
+    ///   - `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    ///   - `SpecialFunctionError.parameterOutOfRange` if `x <= -1`.
+    @inlinable static func log1p(_ x: Float) throws -> Float {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard x > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: Double(Float(-1).nextUp), max: Double.infinity) }
         return bs_log1p_f(x)
     }
     
-    /// Compute ln(1 + x) - x for `Float`. Requires `x > -1`.
-    @inlinable public func log1pmx(_ x: Float) throws -> Float {
+    /// Computes `log(1 + x) - x` for `Float`. Requires `x > -1`.
+    ///
+    /// - Parameter x: The input; must satisfy `x > -1`.
+    /// - Returns: `log(1 + x) - x` as `Float`.
+    /// - Throws:
+    ///   - `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    ///   - `SpecialFunctionError.parameterOutOfRange` if `x <= -1`.
+    @inlinable static func log1pmx(_ x: Float) throws -> Float {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard x > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: Double(Float(-1).nextUp), max: Double.infinity) }
         return bs_log1pmx_f(x)
     }
     
-    /// Compute x^y - 1 for `Float`, with real-domain checks.
-    @inlinable public func powm1(_ x: Float, _ y: Float) throws -> Float {
+    /// Computes `x^y - 1` for `Float`, with real-domain checks.
+    ///
+    /// - Parameters:
+    ///   - x: The base.
+    ///   - y: The exponent.
+    /// - Returns: `x^y - 1` as `Float`.
+    /// - Throws:
+    ///   - `SpecialFunctionError.parameterNotFinite` if `x` or `y` is not finite.
+    ///   - `SpecialFunctionError.invalidCombination` if `x < 0` and `y` is non-integer.
+    @inlinable static func powm1(_ x: Float, _ y: Float) throws -> Float {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard y.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
         let yIsInteger = y == y.rounded(.towardZero)
@@ -219,45 +220,66 @@ import CBoostBridge
         return bs_powm1_f(x, y)
     }
     
-    /// Compute the real cube root for `Float`.
-    @inlinable public func cbrt(_ x: Float) throws -> Float {
+    /// Computes the real cube root for `Float`.
+    ///
+    /// - Parameter x: The input value.
+    /// - Returns: The real cube root of `x` as `Float`.
+    /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    @inlinable static func cbrt(_ x: Float) throws -> Float {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_cbrt_f(x)
     }
     
     // MARK: - Float80 overloads (x86_64)
-    // Extended-precision versions for platforms that support Float80.
     
 #if arch(x86_64)
-    /// Exponential integral E_n(x) for `Float80` (x86_64 only).
-    @inlinable public func exponentialIntegralEn(_ n: Int, _ x: Float80) throws -> Float80 {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return bs_expint_En_l(Int32(n), x)
-    }
     
-    /// Compute exp(x) - 1 for `Float80` (x86_64 only).
-    @inlinable public func expm1(_ x: Float80) throws -> Float80 {
+    /// Computes `exp(x) - 1` for `Float80` (x86_64 only).
+    ///
+    /// - Parameter x: The exponent.
+    /// - Returns: `exp(x) - 1` as `Float80`.
+    /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    @inlinable static func expm1(_ x: Float80) throws -> Float80 {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_expm1_l(x)
     }
     
-    /// Compute ln(1 + x) for `Float80` (x86_64 only). Requires `x > -1`.
-    @inlinable public func log1p(_ x: Float80) throws -> Float80 {
+    /// Computes `log(1 + x)` for `Float80` (x86_64 only). Requires `x > -1`.
+    ///
+    /// - Parameter x: The input; must satisfy `x > -1`.
+    /// - Returns: `log(1 + x)` as `Float80`.
+    /// - Throws:
+    ///   - `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    ///   - `SpecialFunctionError.parameterOutOfRange` if `x <= -1`.
+    @inlinable static func log1p(_ x: Float80) throws -> Float80 {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard x > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: Double(-1).nextUp, max: Double.infinity) }
         return bs_log1p_l(x)
     }
     
-    /// Compute ln(1 + x) - x for `Float80` (x86_64 only). Requires `x > -1`.
-    @inlinable public func log1pmx(_ x: Float80) throws -> Float80 {
+    /// Computes `log(1 + x) - x` for `Float80` (x86_64 only). Requires `x > -1`.
+    ///
+    /// - Parameter x: The input; must satisfy `x > -1`.
+    /// - Returns: `log(1 + x) - x` as `Float80`.
+    /// - Throws:
+    ///   - `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    ///   - `SpecialFunctionError.parameterOutOfRange` if `x <= -1`.
+    @inlinable static func log1pmx(_ x: Float80) throws -> Float80 {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard x > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: Double(-1).nextUp, max: Double.infinity) }
         return bs_log1pmx_l(x)
     }
     
-    /// Compute x^y - 1 for `Float80` (x86_64 only), with real-domain checks.
-    @inlinable public func powm1(_ x: Float80, _ y: Float80) throws -> Float80 {
+    /// Computes `x^y - 1` for `Float80` (x86_64 only), with real-domain checks.
+    ///
+    /// - Parameters:
+    ///   - x: The base.
+    ///   - y: The exponent.
+    /// - Returns: `x^y - 1` as `Float80`.
+    /// - Throws:
+    ///   - `SpecialFunctionError.parameterNotFinite` if `x` or `y` is not finite.
+    ///   - `SpecialFunctionError.invalidCombination` if `x < 0` and `y` is non-integer.
+    @inlinable static func powm1(_ x: Float80, _ y: Float80) throws -> Float80 {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard y.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
         let yIsInteger = y == y.rounded(.towardZero)
@@ -267,8 +289,12 @@ import CBoostBridge
         return bs_powm1_l(x, y)
     }
     
-    /// Compute the real cube root for `Float80` (x86_64 only).
-    @inlinable public func cbrt(_ x: Float80) throws -> Float80 {
+    /// Computes the real cube root for `Float80` (x86_64 only).
+    ///
+    /// - Parameter x: The input value.
+    /// - Returns: The real cube root of `x` as `Float80`.
+    /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    @inlinable static func cbrt(_ x: Float80) throws -> Float80 {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_cbrt_l(x)
     }
@@ -276,36 +302,23 @@ import CBoostBridge
     
     // MARK: - sinPi / cosPi helpers
     
-    /// Compute sin(πx) in a numerically stable way.
+    /// Computes `sin(πx)` with improved accuracy for half- and integer-aligned arguments.
     ///
-    /// This helper leverages a Boost.Math implementation designed to reduce
-    /// catastrophic cancellation near integers.
-    ///
-    /// Parameters:
-    /// - x: The input value `x`.
-    ///
-    /// Returns:
-    /// - `sin(πx)` as `T`.
-    ///
-    /// Throws:
-    /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    @inlinable public func sinPi<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    /// - Parameter x: The input value.
+    /// - Returns: `sin(πx)` as `T`.
+    /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    @inlinable static func sinPi<T: BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return T(bs_sin_pi(dx))
     }
     
-    /// Compute cos(πx) in a numerically stable way.
+    /// Computes `cos(πx)` with improved accuracy for half- and integer-aligned arguments.
     ///
-    /// Parameters:
-    /// - x: The input value `x`.
-    ///
-    /// Returns:
-    /// - `cos(πx)` as `T`.
-    ///
-    /// Throws:
-    /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    @inlinable public func cosPi<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    /// - Parameter x: The input value.
+    /// - Returns: `cos(πx)` as `T`.
+    /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    @inlinable static func cosPi<T: BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return T(bs_cos_pi(dx))
@@ -313,14 +326,22 @@ import CBoostBridge
     
     // MARK: Float overloads for sinPi / cosPi
     
-    /// Compute sin(πx) for `Float`.
-    @inlinable public func sinPi(_ x: Float) throws -> Float {
+    /// Computes `sin(πx)` for `Float`.
+    ///
+    /// - Parameter x: The input value.
+    /// - Returns: `sin(πx)` as `Float`.
+    /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    @inlinable static func sinPi(_ x: Float) throws -> Float {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_sin_pi_f(x)
     }
     
-    /// Compute cos(πx) for `Float`.
-    @inlinable public func cosPi(_ x: Float) throws -> Float {
+    /// Computes `cos(πx)` for `Float`.
+    ///
+    /// - Parameter x: The input value.
+    /// - Returns: `cos(πx)` as `Float`.
+    /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    @inlinable static func cosPi(_ x: Float) throws -> Float {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_cos_pi_f(x)
     }
@@ -328,15 +349,24 @@ import CBoostBridge
     // MARK: Float80 overloads for sinPi / cosPi (x86_64)
     
 #if arch(x86_64)
-    /// Compute sin(πx) for `Float80` (x86_64 only).
-    @inlinable public func sinPi(_ x: Float80) throws -> Float80 {
+    /// Computes `sin(πx)` for `Float80` (x86_64 only).
+    ///
+    /// - Parameter x: The input value.
+    /// - Returns: `sin(πx)` as `Float80`.
+    /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    @inlinable static func sinPi(_ x: Float80) throws -> Float80 {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_sin_pi_l(x)
     }
     
-    /// Compute cos(πx) for `Float80` (x86_64 only).
-    @inlinable public func cosPi(_ x: Float80) throws -> Float80 {
+    /// Computes `cos(πx)` for `Float80` (x86_64 only).
+    ///
+    /// - Parameter x: The input value.
+    /// - Returns: `cos(πx)` as `Float80`.
+    /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
+    @inlinable static func cosPi(_ x: Float80) throws -> Float80 {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_cos_pi_l(x)
     }
 #endif
+}

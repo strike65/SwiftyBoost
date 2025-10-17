@@ -1,0 +1,59 @@
+#pragma once
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// Bessel (cylindrical, real)
+double bs_cyl_bessel_j(double v, double x);
+double bs_cyl_neumann(double v, double x);
+double bs_cyl_bessel_i(double v, double x);
+double bs_cyl_bessel_k(double v, double x);
+double bs_cyl_bessel_j_zero(double v, int m);
+void bs_cyl_bessel_j_zeros(double v, int start_index,
+                           unsigned int number_of_zeros, double *out);
+
+float bs_cyl_bessel_j_f(float v, float x);
+float bs_cyl_neumann_f(float v, float x);
+float bs_cyl_bessel_i_f(float v, float x);
+float bs_cyl_bessel_k_f(float v, float x);
+float bs_cyl_bessel_j_zero_f(float v, int m);
+void bs_cyl_bessel_j_zeros_f(float v, int start_index,
+                             unsigned int number_of_zeros, float *out);
+
+long double bs_cyl_bessel_j_l(long double v, long double x);
+long double bs_cyl_neumann_l(long double v, long double x);
+long double bs_cyl_bessel_i_l(long double v, long double x);
+long double bs_cyl_bessel_k_l(long double v, long double x);
+
+// Spherical Bessel/Neumann (real)
+double bs_sph_bessel(unsigned int n, double x);
+float bs_sph_bessel_f(unsigned int n, float x);
+long double bs_sph_bessel_l(unsigned int n, long double x);
+
+double bs_sph_neumann(unsigned int n, double x);
+float bs_sph_neumann_f(unsigned int n, float x);
+long double bs_sph_neumann_l(unsigned int n, long double x);
+
+double bs_cyl_bessel_j_prime(double v, double x);
+double bs_cyl_bessel_i_prime(double v, double x);
+double bs_cyl_bessel_k_prime(double v, double x);
+double bs_sph_bessel_prime(unsigned int n, double x);
+double bs_sph_neumann_prime(unsigned int n, double x);
+
+float bs_cyl_bessel_j_prime_f(float v, float x);
+float bs_cyl_bessel_i_prime_f(float v, float x);
+float bs_cyl_bessel_k_prime_f(float v, float x);
+float bs_sph_bessel_prime_f(unsigned int n, float x);
+float bs_sph_neumann_prime_f(unsigned int n, float x);
+
+long double bs_cyl_bessel_j_prime_l(long double v, long double x);
+long double bs_cyl_bessel_i_prime_l(long double v, long double x);
+long double bs_cyl_bessel_k_prime_l(long double v, long double x);
+long double bs_sph_bessel_prime_l(unsigned int n, long double x);
+long double bs_sph_neumann_prime_l(unsigned int n, long double x);
+
+#ifdef __cplusplus
+}
+#endif
+

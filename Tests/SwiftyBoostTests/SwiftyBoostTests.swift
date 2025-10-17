@@ -698,18 +698,18 @@ struct CommonHelpersTests {
         let xs: [Double] = [-0.9, -0.1, 0.0, 0.1, 1.0]
         for x in xs {
             if x > -1 {
-                #expect(try expm1(x) == bs_expm1(x))
-                #expect(try log1p(x) == bs_log1p(x))
-                #expect(try log1pmx(x) == bs_log1pmx(x))
+                #expect(try SpecialFunctions.expm1(x) == bs_expm1(x))
+                #expect(try SpecialFunctions.log1p(x) == bs_log1p(x))
+                #expect(try SpecialFunctions.log1pmx(x) == bs_log1pmx(x))
             } else {
                 #expect(throws: SpecialFunctionError.parameterOutOfRange(name: "x", min: -1.0.nextUp, max: Double.infinity)) {
-                    _ = try log1p(x)
+                    _ = try SpecialFunctions.log1p(x)
                 }
                 #expect(throws: SpecialFunctionError.parameterOutOfRange(name: "x", min: -1.0.nextUp, max: Double.infinity)) {
-                    _ = try log1pmx(x)
+                    _ = try SpecialFunctions.log1pmx(x)
                 }
             }
-            #expect(try cbrt(x) == bs_cbrt(x))
+            #expect(try SpecialFunctions.cbrt(x) == bs_cbrt(x))
         }
     }
 
@@ -717,10 +717,10 @@ struct CommonHelpersTests {
     func powm1_Double() throws {
         let cases: [(Double, Double)] = [(1.000001, 3.0), (2.0, -1.5), (0.5, 2.5), (-2.0, -2.0)]
         for (x, y) in cases {
-            #expect(try powm1(x, y) == bs_powm1(x, y))
+            #expect(try SpecialFunctions.powm1(x, y) == bs_powm1(x, y))
         }
         #expect(throws: SpecialFunctionError.invalidCombination(message: "powm1 is undefined for negative base with non-integer exponent in the reals")) {
-            _ = try powm1(-2.0 as Double, 0.5 as Double)
+            _ = try SpecialFunctions.powm1(-2.0 as Double, 0.5 as Double)
         }
     }
 
@@ -728,8 +728,8 @@ struct CommonHelpersTests {
     func sinPi_cosPi_Double() throws {
         let xs: [Double] = [-2.5, -1.0, -0.25, 0.0, 0.25, 1.0, 2.5]
         for x in xs {
-            #expect(try sinPi(x) == bs_sin_pi(x))
-            #expect(try cosPi(x) == bs_cos_pi(x))
+            #expect(try SpecialFunctions.sinPi(x) == bs_sin_pi(x))
+            #expect(try SpecialFunctions.cosPi(x) == bs_cos_pi(x))
         }
     }
 }
