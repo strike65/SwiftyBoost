@@ -20,32 +20,41 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 //
-#pragma once
 
+#include <boost/math/special_functions/acosh.hpp>
+#include <boost/math/special_functions/asinh.hpp>
+#include <boost/math/special_functions/atanh.hpp>
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-
-// Elliptic integrals (Carlson symmetric forms)
-double bs_ellint_rc(double x, double y);
-double bs_ellint_rf(double x, double y, double z);
-double bs_ellint_rd(double x, double y, double z);
-double bs_ellint_rj(double x, double y, double z, double p);
-double bs_ellint_rg(double x, double y, double z);
-
-float bs_ellint_rc_f(float x, float y);
-float bs_ellint_rf_f(float x, float y, float z);
-float bs_ellint_rd_f(float x, float y, float z);
-float bs_ellint_rj_f(float x, float y, float z, float p);
-float bs_ellint_rg_f(float x, float y, float z);
-
-long double bs_ellint_rc_l(long double x, long double y);
-long double bs_ellint_rf_l(long double x, long double y, long double z);
-long double bs_ellint_rd_l(long double x, long double y, long double z);
-long double bs_ellint_rj_l(long double x, long double y, long double z, long double p);
-long double bs_ellint_rg_l(long double x, long double y, long double z);
-
+    double bs_acosh(const double x) {
+        return boost::math::acosh(x);
+    }
+    double bs_asinh(const double x) {
+        return boost::math::asinh(x);
+    }
+    double bs_atanh(const double x) {
+        return boost::math::atanh(x);
+    }
+    float bs_acosh_f(const float x) {
+        return boost::math::atanh(x);
+    }
+    float bs_asinh_f(const float x) {
+        return boost::math::atanh(x);
+    }
+    float bs_atanh_f(const float x) {
+        return boost::math::atanh(x);
+    }
+    long double bs_acosh_l(const long double x) {
+        return boost::math::atanh(x);
+    }
+    long double bs_asinh_l(const long double x) {
+        return boost::math::atanh(x);
+    }
+    long double bs_atanh_l(const long double x) {
+        return boost::math::atanh(x);
+    }
 #ifdef __cplusplus
 }
 #endif
-

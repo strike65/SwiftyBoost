@@ -2,7 +2,7 @@
 //  Common.swift
 //  Math/SpecialFunctions
 //
-//  Created by VT on 11.10.25.
+//  Created by Volker Thieme 2025.
 //  Copyright © 2025 Volker Thieme.
 //  License: MIT (see project root)
 //
@@ -70,11 +70,6 @@ public enum SpecialFunctionError: Error & Equatable {
 /// - Parameter x: A `BinaryFloatingPoint` value.
 /// - Returns: `x` converted to `Double`.
 @usableFromInline internal func D<T: BinaryFloatingPoint>(_ x: T) -> Double { Double(x) }
-
-/// The base of the natural logarithm, e ≈ 2.718281828..., from Boost.Math constants.
-///
-/// - Returns: The double-precision value of Euler’s number provided by Boost.Math.
-@inlinable public var boostE: Double { bs_const_e() }
 
 // MARK: - Numerically stable helpers
 extension SpecialFunctions {
@@ -159,6 +154,21 @@ extension SpecialFunctions {
         return T(bs_sqrt1pm1(Double(x)))
     }
     
+    /// Computes the reciprocal square root `1 / sqrt(x)` in a numerically stable way
+    /// using Boost.Math’s `rsqrt` backend.
+    ///
+    /// - Parameter x: Input value (finite). Real-valued branch requires `x ≥ 0`.
+    /// - Returns: `1 / sqrt(x)` as `T`.
+    /// - Throws:
+    ///   - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
+    ///   - `SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞)` if `x < 0`.
+    @inlinable static func rsqrt<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+        let dx = D(x)
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
+        return T(bs_rsqrt(dx))
+    }
+    
     //double bs_sqrt1pm1(double x)         { return bs_wrap<double>([&] { return boost::math::sqrt1pm1(x); }); }
     //double bs_hypot(double x, double y)  { return bs_wrap<double>([&] { return boost::math::hypot(x, y); }); }
     
@@ -230,6 +240,19 @@ extension SpecialFunctions {
         return bs_cbrt_f(x)
     }
     
+    /// Computes the reciprocal square root `1 / sqrt(x)` for `Float`.
+    ///
+    /// - Parameter x: Input value (finite). Real-valued branch requires `x ≥ 0`.
+    /// - Returns: `1 / sqrt(x)` as `Float`.
+    /// - Throws:
+    ///   - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
+    ///   - `SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞)` if `x < 0`.
+    @inlinable static func rsqrt(_ x: Float) throws -> Float {
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
+        return bs_rsqrt_f(x)
+    }
+    
     // MARK: - Float80 overloads (x86_64)
     
 #if arch(x86_64)
@@ -297,6 +320,19 @@ extension SpecialFunctions {
     @inlinable static func cbrt(_ x: Float80) throws -> Float80 {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_cbrt_l(x)
+    }
+    
+    /// Computes the reciprocal square root `1 / sqrt(x)` for `Float80` (x86_64 only).
+    ///
+    /// - Parameter x: Input value (finite). Real-valued branch requires `x ≥ 0`.
+    /// - Returns: `1 / sqrt(x)` as `Float80`.
+    /// - Throws:
+    ///   - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
+    ///   - `SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞)` if `x < 0`.
+    @inlinable static func rsqrt(_ x: Float80) throws -> Float80 {
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
+        return bs_rsqrt_l(x)
     }
 #endif
     

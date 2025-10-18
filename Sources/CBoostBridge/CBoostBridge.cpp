@@ -1,21 +1,38 @@
 //
-//  Created by VT on 11.10.25.
+//  Created by Volker Thieme 2025.
 //  Copyright © 2025 Volker Thieme.
-//  Licensed under the same terms as the rest of the project.
 //
-//  This file composes the C ABI bridge from smaller implementation units.
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
+//
 
 #include "CBoostBridge.h"
 
 #include "internal/bs_internal.hpp"
 
 // Order of includes loosely mirrors public headers for clarity
-#include "impl/constants.inc"
-#include "impl/complex.inc"
-#include "impl/gamma_error.inc"
-#include "impl/beta_digamma_owens.inc"
-#include "impl/exp_trig_airy.inc"
-#include "impl/bessel_legendre_elliptic.inc"
-#include "impl/lambert_hypergeom.inc"
-#include "impl/numbers_factorials_polys_splines.inc"
-
+#include "impl/constants.hxx"
+#include "impl/complex.hxx"
+#include "impl/gamma_error.hxx"
+#include "impl/beta_digamma_owens.hxx"
+#include "impl/exp_trig_airy.hxx"
+#include "impl/bessel_legendre_elliptic.hxx"
+#include "impl/lambert_hypergeom.hxx"
+#include "impl/numbers_factorials_polys_splines.hxx"
+#include "impl/bs_sin_cardinal.hxx"
+#include "impl/bs_a_hyper.hxx"

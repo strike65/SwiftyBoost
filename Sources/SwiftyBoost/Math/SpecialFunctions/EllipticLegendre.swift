@@ -97,6 +97,12 @@ public extension SpecialFunctions {
         guard abs(dk) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
         return T(bs_ellint_1(dk, dphi))
     }
+
+    // Mixed-precision promotions (Float ↔ Double) → Double
+    /// F(φ | k) with mixed `Float`/`Double`; returns `Double`.
+    @inlinable static func incompleteEllipticIntegralF(_ k: Float, phi: Double) throws -> Double { try incompleteEllipticIntegralF(Double(k), phi: phi) }
+    /// F(φ | k) with mixed `Double`/`Float`; returns `Double`.
+    @inlinable static func incompleteEllipticIntegralF(_ k: Double, phi: Float) throws -> Double { try incompleteEllipticIntegralF(k, phi: Double(phi)) }
     
     /// Compute Legendre’s complete elliptic integral of the second kind E(k).
     ///
@@ -148,6 +154,12 @@ public extension SpecialFunctions {
         guard abs(dk) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
         return T(bs_ellint_2(dk, dphi))
     }
+
+    // Mixed-precision promotions (Float ↔ Double) → Double
+    /// E(φ | k) with mixed `Float`/`Double`; returns `Double`.
+    @inlinable static func incompleteEllipticIntegralE(_ k: Float, phi: Double) throws -> Double { try incompleteEllipticIntegralE(Double(k), phi: phi) }
+    /// E(φ | k) with mixed `Double`/`Float`; returns `Double`.
+    @inlinable static func incompleteEllipticIntegralE(_ k: Double, phi: Float) throws -> Double { try incompleteEllipticIntegralE(k, phi: Double(phi)) }
     
     /// Compute Legendre’s incomplete elliptic integral of the third kind Π(n; φ | k) in its characteristic form.
     ///
@@ -186,6 +198,12 @@ public extension SpecialFunctions {
         let dk = D(k), dphi = D(phi), dnu = D(nu)
         return T(bs_ellint_3(dk, dnu, dphi))
     }
+
+    // Mixed-precision promotions for Π(n; φ | k) (Float ↔ Double) → Double
+    /// Π with mixed argument types; returns `Double`.
+    @inlinable static func incompleteEllipticIntegralPi(_ k: Float, _ nu: Double, _ phi: Double) -> Double { incompleteEllipticIntegralPi(Double(k), nu, phi) }
+    @inlinable static func incompleteEllipticIntegralPi(_ k: Double, _ nu: Float, _ phi: Double) -> Double { incompleteEllipticIntegralPi(k, Double(nu), phi) }
+    @inlinable static func incompleteEllipticIntegralPi(_ k: Double, _ nu: Double, _ phi: Float) -> Double { incompleteEllipticIntegralPi(k, nu, Double(phi)) }
     
     /// Compute Legendre’s complete elliptic integral of the third kind Π(n | k) in its characteristic form.
     ///
@@ -225,6 +243,10 @@ public extension SpecialFunctions {
         return T(bs_ellint_3_complete(dk, dnu))
 
     }
+
+    // Mixed-precision promotions for Π(n | k) (Float ↔ Double) → Double
+    @inlinable static func completeEllipticIntegralPi(_ k: Float, _ nu: Double) -> Double { completeEllipticIntegralPi(Double(k), nu) }
+    @inlinable static func completeEllipticIntegralPi(_ k: Double, _ nu: Float) -> Double { completeEllipticIntegralPi(k, Double(nu)) }
     
     // MARK: - Float overloads
     // Direct Float-precision entry points that avoid generic conversions and call
@@ -309,6 +331,12 @@ public extension SpecialFunctions {
         guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
         return bs_ellint_1_l(k, phi)
     }
+
+    // Mixed promotions with Float80 → Float80
+    @inlinable static func incompleteEllipticIntegralF(_ k: Float80, phi: Double) throws -> Float80 { try incompleteEllipticIntegralF(k, phi: Float80(phi)) }
+    @inlinable static func incompleteEllipticIntegralF(_ k: Double, phi: Float80) throws -> Float80 { try incompleteEllipticIntegralF(Float80(k), phi: phi) }
+    @inlinable static func incompleteEllipticIntegralF(_ k: Float80, phi: Float) throws -> Float80 { try incompleteEllipticIntegralF(k, phi: Float80(phi)) }
+    @inlinable static func incompleteEllipticIntegralF(_ k: Float, phi: Float80) throws -> Float80 { try incompleteEllipticIntegralF(Float80(k), phi: phi) }
     
     /// E(k) for `Float80` (x86_64 only). Requires |k| ≤ 1.
     @inlinable static func completeEllipticIntegralE(_ k: Float80) throws -> Float80 {
@@ -324,6 +352,12 @@ public extension SpecialFunctions {
         guard abs(k) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
         return bs_ellint_2_l(k, phi)
     }
+
+    // Mixed promotions with Float80 → Float80
+    @inlinable static func incompleteEllipticIntegralE(_ k: Float80, phi: Double) throws -> Float80 { try incompleteEllipticIntegralE(k, phi: Float80(phi)) }
+    @inlinable static func incompleteEllipticIntegralE(_ k: Double, phi: Float80) throws -> Float80 { try incompleteEllipticIntegralE(Float80(k), phi: phi) }
+    @inlinable static func incompleteEllipticIntegralE(_ k: Float80, phi: Float) throws -> Float80 { try incompleteEllipticIntegralE(k, phi: Float80(phi)) }
+    @inlinable static func incompleteEllipticIntegralE(_ k: Float, phi: Float80) throws -> Float80 { try incompleteEllipticIntegralE(Float80(k), phi: phi) }
 
     /// Π(n; φ | k) for `Float80` (x86_64 only) in characteristic form.
     ///
@@ -341,6 +375,14 @@ public extension SpecialFunctions {
     @inlinable static func incompleteEllipticIntegralPi(_ k: Float80, _ nu: Float80, _ phi: Float80) -> Float80 {
         return bs_ellint_3_f_l(k, nu, phi)
     }
+
+    // Mixed promotions with Float80 for Π(n; φ | k) → Float80
+    @inlinable static func incompleteEllipticIntegralPi(_ k: Float80, _ nu: Double, _ phi: Double) -> Float80 { incompleteEllipticIntegralPi(k, Float80(nu), Float80(phi)) }
+    @inlinable static func incompleteEllipticIntegralPi(_ k: Double, _ nu: Float80, _ phi: Double) -> Float80 { incompleteEllipticIntegralPi(Float80(k), nu, Float80(phi)) }
+    @inlinable static func incompleteEllipticIntegralPi(_ k: Double, _ nu: Double, _ phi: Float80) -> Float80 { incompleteEllipticIntegralPi(Float80(k), Float80(nu), phi) }
+    @inlinable static func incompleteEllipticIntegralPi(_ k: Float80, _ nu: Float, _ phi: Float) -> Float80 { incompleteEllipticIntegralPi(k, Float80(nu), Float80(phi)) }
+    @inlinable static func incompleteEllipticIntegralPi(_ k: Float, _ nu: Float80, _ phi: Float) -> Float80 { incompleteEllipticIntegralPi(Float80(k), nu, Float80(phi)) }
+    @inlinable static func incompleteEllipticIntegralPi(_ k: Float, _ nu: Float, _ phi: Float80) -> Float80 { incompleteEllipticIntegralPi(Float80(k), Float80(nu), phi) }
     
     /// Π(n | k) for `Float80` (x86_64 only) in characteristic form (complete third-kind integral).
     ///
@@ -354,6 +396,12 @@ public extension SpecialFunctions {
     @inlinable static func completeEllipticIntegralPi(_ k: Float80, _ nu: Float80) -> Float80 {
         return bs_ellint_3_complete_l(k, nu)
     }
+
+    // Mixed promotions with Float80 for Π(n | k) → Float80
+    @inlinable static func completeEllipticIntegralPi(_ k: Float80, _ nu: Double) -> Float80 { completeEllipticIntegralPi(k, Float80(nu)) }
+    @inlinable static func completeEllipticIntegralPi(_ k: Double, _ nu: Float80) -> Float80 { completeEllipticIntegralPi(Float80(k), nu) }
+    @inlinable static func completeEllipticIntegralPi(_ k: Float80, _ nu: Float) -> Float80 { completeEllipticIntegralPi(k, Float80(nu)) }
+    @inlinable static func completeEllipticIntegralPi(_ k: Float, _ nu: Float80) -> Float80 { completeEllipticIntegralPi(Float80(k), nu) }
 
 #endif
     

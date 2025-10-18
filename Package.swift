@@ -26,8 +26,9 @@ let package = Package(
             ],
             cxxSettings: [
                 // Für C++-Header-Suche (Boost)
+                .unsafeFlags(["-xc++", "-std=c++20"]),
                 .headerSearchPath("../../extern/boost")
-            ]
+            ],
         ),
         .target(
             name: "SwiftyBoost",

@@ -69,6 +69,10 @@ public extension SpecialFunctions {
         guard dy > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "y") }
         return T(bs_ellint_rc(dx, dy))
     }
+
+    // Mixed-precision promotions (Float ↔ Double) → Double
+    @inlinable static func carlsonRC(_ x: Float, _ y: Double) throws -> Double { try carlsonRC(Double(x), y) }
+    @inlinable static func carlsonRC(_ x: Double, _ y: Float) throws -> Double { try carlsonRC(x, Double(y)) }
     
     /// Carlson’s symmetric integral RF(x, y, z).
     ///
@@ -98,6 +102,11 @@ public extension SpecialFunctions {
         }
         return T(bs_ellint_rf(dx, dy, dz))
     }
+
+    // Mixed-precision promotions (Float ↔ Double) → Double
+    @inlinable static func carlsonRF(_ x: Float, _ y: Double, _ z: Double) throws -> Double { try carlsonRF(Double(x), y, z) }
+    @inlinable static func carlsonRF(_ x: Double, _ y: Float, _ z: Double) throws -> Double { try carlsonRF(x, Double(y), z) }
+    @inlinable static func carlsonRF(_ x: Double, _ y: Double, _ z: Float) throws -> Double { try carlsonRF(x, y, Double(z)) }
     
     /// Carlson’s symmetric integral RD(x, y, z).
     ///
@@ -127,6 +136,11 @@ public extension SpecialFunctions {
         }
         return T(bs_ellint_rd(dx, dy, dz))
     }
+
+    // Mixed-precision promotions (Float ↔ Double) → Double
+    @inlinable static func carlsonRD(_ x: Float, _ y: Double, _ z: Double) throws -> Double { try carlsonRD(Double(x), y, z) }
+    @inlinable static func carlsonRD(_ x: Double, _ y: Float, _ z: Double) throws -> Double { try carlsonRD(x, Double(y), z) }
+    @inlinable static func carlsonRD(_ x: Double, _ y: Double, _ z: Float) throws -> Double { try carlsonRD(x, y, Double(z)) }
     
     /// Carlson’s symmetric integral RJ(x, y, z, p).
     ///
@@ -157,6 +171,12 @@ public extension SpecialFunctions {
         }
         return T(bs_ellint_rj(dx, dy, dz, dp))
     }
+
+    // Mixed-precision promotions (Float ↔ Double) → Double
+    @inlinable static func carlsonRJ(_ x: Float, _ y: Double, _ z: Double, _ p: Double) throws -> Double { try carlsonRJ(Double(x), y, z, p) }
+    @inlinable static func carlsonRJ(_ x: Double, _ y: Float, _ z: Double, _ p: Double) throws -> Double { try carlsonRJ(x, Double(y), z, p) }
+    @inlinable static func carlsonRJ(_ x: Double, _ y: Double, _ z: Float, _ p: Double) throws -> Double { try carlsonRJ(x, y, Double(z), p) }
+    @inlinable static func carlsonRJ(_ x: Double, _ y: Double, _ z: Double, _ p: Float) throws -> Double { try carlsonRJ(x, y, z, Double(p)) }
     
     /// Carlson’s symmetric mean RG(x, y, z).
     ///
@@ -184,6 +204,11 @@ public extension SpecialFunctions {
         }
         return T(bs_ellint_rg(dx, dy, dz))
     }
+
+    // Mixed-precision promotions (Float ↔ Double) → Double
+    @inlinable static func carlsonRG(_ x: Float, _ y: Double, _ z: Double) throws -> Double { try carlsonRG(Double(x), y, z) }
+    @inlinable static func carlsonRG(_ x: Double, _ y: Float, _ z: Double) throws -> Double { try carlsonRG(x, Double(y), z) }
+    @inlinable static func carlsonRG(_ x: Double, _ y: Double, _ z: Float) throws -> Double { try carlsonRG(x, y, Double(z)) }
     
     // MARK: - Float overloads
     // These overloads call directly into the Float-precision C implementations for
@@ -236,6 +261,12 @@ public extension SpecialFunctions {
         guard y > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "y") }
         return bs_ellint_rc_l(x, y)
     }
+
+    // Mixed promotions with Float80 → Float80
+    @inlinable static func carlsonRC(_ x: Float80, _ y: Double) throws -> Float80 { try carlsonRC(x, Float80(y)) }
+    @inlinable static func carlsonRC(_ x: Double, _ y: Float80) throws -> Float80 { try carlsonRC(Float80(x), y) }
+    @inlinable static func carlsonRC(_ x: Float80, _ y: Float) throws -> Float80 { try carlsonRC(x, Float80(y)) }
+    @inlinable static func carlsonRC(_ x: Float, _ y: Float80) throws -> Float80 { try carlsonRC(Float80(x), y) }
     
     /// RF(x, y, z) for `Float80` (x86_64 only). Requires x, y, z ≥ 0 and finite.
     @inlinable static func carlsonRF(_ x: Float80, _ y: Float80, _ z: Float80) throws -> Float80 {
@@ -243,6 +274,14 @@ public extension SpecialFunctions {
         guard x >= 0, y >= 0, z >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: Double.infinity) }
         return bs_ellint_rf_l(x, y, z)
     }
+
+    // Mixed promotions with Float80 → Float80
+    @inlinable static func carlsonRF(_ x: Float80, _ y: Double, _ z: Double) throws -> Float80 { try carlsonRF(x, Float80(y), Float80(z)) }
+    @inlinable static func carlsonRF(_ x: Double, _ y: Float80, _ z: Double) throws -> Float80 { try carlsonRF(Float80(x), y, Float80(z)) }
+    @inlinable static func carlsonRF(_ x: Double, _ y: Double, _ z: Float80) throws -> Float80 { try carlsonRF(Float80(x), Float80(y), z) }
+    @inlinable static func carlsonRF(_ x: Float80, _ y: Float, _ z: Float) throws -> Float80 { try carlsonRF(x, Float80(y), Float80(z)) }
+    @inlinable static func carlsonRF(_ x: Float, _ y: Float80, _ z: Float) throws -> Float80 { try carlsonRF(Float80(x), y, Float80(z)) }
+    @inlinable static func carlsonRF(_ x: Float, _ y: Float, _ z: Float80) throws -> Float80 { try carlsonRF(Float80(x), Float80(y), z) }
     
     /// RD(x, y, z) for `Float80` (x86_64 only). Requires x, y, z ≥ 0 and finite.
     @inlinable static func carlsonRD(_ x: Float80, _ y: Float80, _ z: Float80) throws -> Float80 {
@@ -250,6 +289,14 @@ public extension SpecialFunctions {
         guard x >= 0, y >= 0, z >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: Double.infinity) }
         return bs_ellint_rd_l(x, y, z)
     }
+
+    // Mixed promotions with Float80 → Float80
+    @inlinable static func carlsonRD(_ x: Float80, _ y: Double, _ z: Double) throws -> Float80 { try carlsonRD(x, Float80(y), Float80(z)) }
+    @inlinable static func carlsonRD(_ x: Double, _ y: Float80, _ z: Double) throws -> Float80 { try carlsonRD(Float80(x), y, Float80(z)) }
+    @inlinable static func carlsonRD(_ x: Double, _ y: Double, _ z: Float80) throws -> Float80 { try carlsonRD(Float80(x), Float80(y), z) }
+    @inlinable static func carlsonRD(_ x: Float80, _ y: Float, _ z: Float) throws -> Float80 { try carlsonRD(x, Float80(y), Float80(z)) }
+    @inlinable static func carlsonRD(_ x: Float, _ y: Float80, _ z: Float) throws -> Float80 { try carlsonRD(Float80(x), y, Float80(z)) }
+    @inlinable static func carlsonRD(_ x: Float, _ y: Float, _ z: Float80) throws -> Float80 { try carlsonRD(Float80(x), Float80(y), z) }
     
     /// RJ(x, y, z, p) for `Float80` (x86_64 only). Requires x, y, z, p ≥ 0 and finite.
     @inlinable static func carlsonRJ(_ x: Float80, _ y: Float80, _ z: Float80, _ p: Float80) throws -> Float80 {
@@ -257,6 +304,16 @@ public extension SpecialFunctions {
         guard x >= 0, y >= 0, z >= 0, p >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x/y/z/p", min: 0, max: Double.infinity) }
         return bs_ellint_rj_l(x, y, z, p)
     }
+
+    // Mixed promotions with Float80 → Float80
+    @inlinable static func carlsonRJ(_ x: Float80, _ y: Double, _ z: Double, _ p: Double) throws -> Float80 { try carlsonRJ(x, Float80(y), Float80(z), Float80(p)) }
+    @inlinable static func carlsonRJ(_ x: Double, _ y: Float80, _ z: Double, _ p: Double) throws -> Float80 { try carlsonRJ(Float80(x), y, Float80(z), Float80(p)) }
+    @inlinable static func carlsonRJ(_ x: Double, _ y: Double, _ z: Float80, _ p: Double) throws -> Float80 { try carlsonRJ(Float80(x), Float80(y), z, Float80(p)) }
+    @inlinable static func carlsonRJ(_ x: Double, _ y: Double, _ z: Double, _ p: Float80) throws -> Float80 { try carlsonRJ(Float80(x), Float80(y), Float80(z), p) }
+    @inlinable static func carlsonRJ(_ x: Float80, _ y: Float, _ z: Float, _ p: Float) throws -> Float80 { try carlsonRJ(x, Float80(y), Float80(z), Float80(p)) }
+    @inlinable static func carlsonRJ(_ x: Float, _ y: Float80, _ z: Float, _ p: Float) throws -> Float80 { try carlsonRJ(Float80(x), y, Float80(z), Float80(p)) }
+    @inlinable static func carlsonRJ(_ x: Float, _ y: Float, _ z: Float80, _ p: Float) throws -> Float80 { try carlsonRJ(Float80(x), Float80(y), z, Float80(p)) }
+    @inlinable static func carlsonRJ(_ x: Float, _ y: Float, _ z: Float, _ p: Float80) throws -> Float80 { try carlsonRJ(Float80(x), Float80(y), Float80(z), p) }
     
     /// RG(x, y, z) for `Float80` (x86_64 only). Requires x, y, z ≥ 0 and finite.
     @inlinable static func carlsonRG(_ x: Float80, _ y: Float80, _ z: Float80) throws -> Float80 {
@@ -264,5 +321,13 @@ public extension SpecialFunctions {
         guard x >= 0, y >= 0, z >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: Double.infinity) }
         return bs_ellint_rg_l(x, y, z)
     }
+
+    // Mixed promotions with Float80 → Float80
+    @inlinable static func carlsonRG(_ x: Float80, _ y: Double, _ z: Double) throws -> Float80 { try carlsonRG(x, Float80(y), Float80(z)) }
+    @inlinable static func carlsonRG(_ x: Double, _ y: Float80, _ z: Double) throws -> Float80 { try carlsonRG(Float80(x), y, Float80(z)) }
+    @inlinable static func carlsonRG(_ x: Double, _ y: Double, _ z: Float80) throws -> Float80 { try carlsonRG(Float80(x), Float80(y), z) }
+    @inlinable static func carlsonRG(_ x: Float80, _ y: Float, _ z: Float) throws -> Float80 { try carlsonRG(x, Float80(y), Float80(z)) }
+    @inlinable static func carlsonRG(_ x: Float, _ y: Float80, _ z: Float) throws -> Float80 { try carlsonRG(Float80(x), y, Float80(z)) }
+    @inlinable static func carlsonRG(_ x: Float, _ y: Float, _ z: Float80) throws -> Float80 { try carlsonRG(Float80(x), Float80(y), z) }
 #endif
 }

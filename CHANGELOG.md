@@ -3,6 +3,29 @@
 All notable changes to this project are tracked here, following the principles of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adhering to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
+- Mixed-precision promotions:
+  - Beta (complete/incomplete/regularized, inverses, derivative, parameter solvers)
+  - Gamma (ratios, incomplete/regularized P/Q, inverses, derivative)
+  - Bessel (J/Y/I/K + derivatives, integer-order helpers)
+  - Elliptic (Legendre F/E/Π; Carlson RC/RF/RD/RJ/RG)
+  - Chebyshev Clenshaw ([coefficients] vs `x` mixes)
+  - Owen’s T (all pairs)
+  - Spherical Harmonics (mixed angle types)
+  - Hypergeometric (1F0/0F1 full; 1F1/2F0 selected mixes; pFq arrays with z)
+  - Float80 (x86_64) promotions where applicable
+- Added Boost-backed helpers:
+  - `rsqrt` (reciprocal square root) with domain checks and unit tests for Double/Float/(x86_64) Float80.
+  - Sinus cardinalis (π-normalized) functions:
+    - `sinc_pi(x) = sin(πx)/(πx)` with removable singularity at 0.
+    - `sinhc_pi(x) = sinh(πx)/(πx)` with removable singularity at 0.
+    - Complex `sincc_pi(z) = sin(πz)/(πz)` for `ComplexD/F/(x86_64) ComplexX`.
+  - Bridge includes and mappings hardened for Boost 1.89.0 (sinc.hpp, sinhc.hpp); π-normalized forms used explicitly to avoid header ambiguities.
+- Documentation:
+  - New DocC page “Result-Type Promotions” (policy, supported APIs, and guidance).
+  - README quick reference and usage examples for promotions, `rsqrt`, and Sinus cardinalis.
+- Tests:
+  - Added suites for mixed promotions across modules and for new helpers.
+  - Real and complex tests for `sinc_pi`, `sinhc_pi`, and `sincc_pi` with identity checks and tolerances.
 - Added a generic complex number type `Complex<T: BinaryFloatingPoint>`
   - Conforms to `Sendable`, `Equatable`, `Hashable`, `Codable`; includes `ComplexD`, `ComplexF`, and (x86_64) `ComplexX` typealiases.
   - Stable arithmetic: Smith’s algorithm for division, numerically robust magnitude, principal square root.

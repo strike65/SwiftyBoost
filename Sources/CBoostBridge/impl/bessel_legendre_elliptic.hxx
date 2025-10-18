@@ -1,3 +1,25 @@
+//
+//  Created by Volker Thieme 2025.
+//  Copyright © 2025 Volker Thieme.
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
+//
 // Bessel, Legendre polynomials, and Elliptic integrals
 #include <boost/math/special_functions/bessel.hpp>
 #include <boost/math/special_functions/bessel_prime.hpp>
@@ -14,8 +36,9 @@
 #include <vector>
 #include "../internal/bs_internal.hpp"
 
+#ifdef __cplusplus
 extern "C" {
-
+#endif
 // Bessel (cylindrical, real)
 double bs_cyl_bessel_j(double v, double x) { return bs_wrap<double>([&] { return boost::math::cyl_bessel_j(v, x); }); }
 double bs_cyl_neumann(double v, double x)  { return bs_wrap<double>([&] { return boost::math::cyl_neumann(v, x); }); }
@@ -157,6 +180,6 @@ long double bs_ellint_rf_l(long double x, long double y, long double z) { return
 long double bs_ellint_rd_l(long double x, long double y, long double z) { return bs_wrap<long double>([&] { return boost::math::ellint_rd(x, y, z); }); }
 long double bs_ellint_rj_l(long double x, long double y, long double z, long double p) { return bs_wrap<long double>([&] { return boost::math::ellint_rj(x, y, z, p); }); }
 long double bs_ellint_rg_l(long double x, long double y, long double z) { return bs_wrap<long double>([&] { return boost::math::ellint_rg(x, y, z); }); }
-
-} // extern "C"
-
+#ifdef __cplusplus
+}
+#endif

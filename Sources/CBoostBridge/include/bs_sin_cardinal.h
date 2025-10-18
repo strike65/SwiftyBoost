@@ -19,31 +19,28 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
-//
-#pragma once
+//  
 
+#pragma once
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// Elliptic integrals (Carlson symmetric forms)
-double bs_ellint_rc(double x, double y);
-double bs_ellint_rf(double x, double y, double z);
-double bs_ellint_rd(double x, double y, double z);
-double bs_ellint_rj(double x, double y, double z, double p);
-double bs_ellint_rg(double x, double y, double z);
+#include "bs_complex.h"
 
-float bs_ellint_rc_f(float x, float y);
-float bs_ellint_rf_f(float x, float y, float z);
-float bs_ellint_rd_f(float x, float y, float z);
-float bs_ellint_rj_f(float x, float y, float z, float p);
-float bs_ellint_rg_f(float x, float y, float z);
+double bs_sinc_pi(double x);
+bs_complex_d bs_sincc_pi(bs_complex_d x);
+float bs_sinc_pi_f(float x);
+bs_complex_f bs_sincc_pi_f(bs_complex_f x);
+long double bs_sinc_pi_l(long double x);
+bs_complex_l bs_sincc_pi_l(bs_complex_l x);
 
-long double bs_ellint_rc_l(long double x, long double y);
-long double bs_ellint_rf_l(long double x, long double y, long double z);
-long double bs_ellint_rd_l(long double x, long double y, long double z);
-long double bs_ellint_rj_l(long double x, long double y, long double z, long double p);
-long double bs_ellint_rg_l(long double x, long double y, long double z);
+double bs_sinhc_pi(double x);
+bs_complex_d bs_sinhcc_pi(bs_complex_d x);
+float bs_sinhc_pi_f(float x);
+bs_complex_f bs_sinhcc_pi_f(bs_complex_f x);
+long double bs_sinhc_pi_l(long double x);
+bs_complex_l bs_sinhcc_pi_l(bs_complex_l x);
 
 #ifdef __cplusplus
 }

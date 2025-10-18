@@ -1,3 +1,25 @@
+//
+//  Created by Volker Thieme 2025.
+//  Copyright © 2025 Volker Thieme.
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
+//
 // Complex number helpers and elementary functions
 #include <complex>
 #include "../internal/bs_internal.hpp"
@@ -13,7 +35,9 @@ static inline bs_complex_f from_std(std::complex<float> z) noexcept { return { s
 static inline std::complex<long double> to_std(bs_complex_l z) noexcept { return { z.re, z.im }; }
 static inline bs_complex_l from_std(std::complex<long double> z) noexcept { return { static_cast<long double>(z.real()), static_cast<long double>(z.imag()) }; }
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
 // Elementary arithmetic
 bs_complex_d bs_cadd(bs_complex_d a, bs_complex_d b) {
@@ -100,6 +124,7 @@ bs_complex_l bs_csinh_l(bs_complex_l z){ auto r = bs_wrap_complex<long double>([
 bs_complex_l bs_ccosh_l(bs_complex_l z){ auto r = bs_wrap_complex<long double>([&]{ return std::cosh(to_std(z)); }); return from_std(r); }
 bs_complex_l bs_ctanh_l(bs_complex_l z){ auto r = bs_wrap_complex<long double>([&]{ return std::tanh(to_std(z)); }); return from_std(r); }
 bs_complex_l bs_catan_l(bs_complex_l z){ auto r = bs_wrap_complex<long double>([&]{ return std::atan(to_std(z)); }); return from_std(r); }
-
-} // extern "C"
+#ifdef __cplusplus
+}
+#endif
 

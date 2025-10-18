@@ -1,5 +1,5 @@
 //
-//  Created by VT on 14.10.25.
+//  Created by Volker Thieme 2025.
 //  Copyright © 2025 Volker Thieme.
 //  License: MIT (see project root)
 //
@@ -224,6 +224,43 @@ public extension SpecialFunctions {
         }
     }
 
+    // Mixed-precision promotions for Clenshaw (Float ↔ Double) → Double
+    /// Chebyshev T-series with Float coefficients and Double x; returns Double.
+    @inlinable static func chebyshevClenshawRecurrence(_ coefficients: [Float], x: Double, halfWeightC0: Bool = true) throws -> Double {
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        for c in coefficients { guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients") } }
+        if coefficients.isEmpty { return 0 }
+        if halfWeightC0 {
+            return coefficients.map(Double.init).withUnsafeBufferPointer { bp in
+                bs_chebyshev_clenshaw(bp.baseAddress, bp.count, x)
+            }
+        } else {
+            var coeffs = coefficients.map(Double.init)
+            coeffs[0] *= 2
+            return coeffs.withUnsafeBufferPointer { bp in
+                bs_chebyshev_clenshaw(bp.baseAddress, bp.count, x)
+            }
+        }
+    }
+
+    /// Chebyshev T-series with Double coefficients and Float x; returns Double.
+    @inlinable static func chebyshevClenshawRecurrence(_ coefficients: [Double], x: Float, halfWeightC0: Bool = true) throws -> Double {
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        for c in coefficients { guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients") } }
+        if coefficients.isEmpty { return 0 }
+        if halfWeightC0 {
+            return coefficients.withUnsafeBufferPointer { bp in
+                bs_chebyshev_clenshaw(bp.baseAddress, bp.count, Double(x))
+            }
+        } else {
+            var coeffs = coefficients
+            coeffs[0] *= 2
+            return coeffs.withUnsafeBufferPointer { bp in
+                bs_chebyshev_clenshaw(bp.baseAddress, bp.count, Double(x))
+            }
+        }
+    }
+
     #if arch(x86_64)
     /// Float80 overload for Chebyshev T-series via Clenshaw recurrence (bridged, x86_64 only).
     @inlinable static func chebyshevClenshawRecurrence(_ coefficients: [Float80], x: Float80, halfWeightC0: Bool = true) throws -> Float80 {
@@ -245,7 +282,64 @@ public extension SpecialFunctions {
             }
         }
     }
-    #endif
+
+    // Mixed-precision promotions for Clenshaw with Float80 (x86_64) → Float80
+    /// Chebyshev T-series with Float80 coefficients and Double x; returns Float80.
+    @inlinable static func chebyshevClenshawRecurrence(_ coefficients: [Float80], x: Double, halfWeightC0: Bool = true) throws -> Float80 {
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        for c in coefficients { guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients") } }
+        if coefficients.isEmpty { return 0 }
+        if halfWeightC0 {
+            return coefficients.withUnsafeBufferPointer { bp in
+                bs_chebyshev_clenshaw_l(bp.baseAddress, bp.count, Float80(x))
+            }
+        } else {
+            var coeffs = coefficients
+            coeffs[0] *= 2
+            return coeffs.withUnsafeBufferPointer { bp in
+                bs_chebyshev_clenshaw_l(bp.baseAddress, bp.count, Float80(x))
+            }
+        }
+    }
+
+    /// Chebyshev T-series with Double coefficients and Float80 x; returns Float80.
+    @inlinable static func chebyshevClenshawRecurrence(_ coefficients: [Double], x: Float80, halfWeightC0: Bool = true) throws -> Float80 {
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        for c in coefficients { guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients") } }
+        if coefficients.isEmpty { return 0 }
+        let coeffs = coefficients.map(Float80.init)
+        if halfWeightC0 {
+            return coeffs.withUnsafeBufferPointer { bp in
+                bs_chebyshev_clenshaw_l(bp.baseAddress, bp.count, x)
+            }
+        } else {
+            var c2 = coeffs
+            c2[0] *= 2
+            return c2.withUnsafeBufferPointer { bp in
+                bs_chebyshev_clenshaw_l(bp.baseAddress, bp.count, x)
+            }
+        }
+    }
+
+    /// Chebyshev T-series with Float coefficients and Float80 x; returns Float80.
+    @inlinable static func chebyshevClenshawRecurrence(_ coefficients: [Float], x: Float80, halfWeightC0: Bool = true) throws -> Float80 {
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        for c in coefficients { guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients") } }
+        if coefficients.isEmpty { return 0 }
+        let coeffs = coefficients.map(Float80.init)
+        if halfWeightC0 {
+            return coeffs.withUnsafeBufferPointer { bp in
+                bs_chebyshev_clenshaw_l(bp.baseAddress, bp.count, x)
+            }
+        } else {
+            var c2 = coeffs
+            c2[0] *= 2
+            return c2.withUnsafeBufferPointer { bp in
+                bs_chebyshev_clenshaw_l(bp.baseAddress, bp.count, x)
+            }
+        }
+    }
+#endif
 
     // MARK: - Recurrence helper
 
@@ -304,4 +398,3 @@ public extension SpecialFunctions {
     }
     #endif
 }
-

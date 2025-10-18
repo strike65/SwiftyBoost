@@ -1,6 +1,6 @@
 //
-//  Created by VT on 15.10.25.
-//  Copyright © 2025 Volker Thieme. All rights reserved.
+//  Created by Volker Thieme 2025.
+//  Copyright © 2025 Volker Thieme.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -693,6 +693,6 @@ public extension Complex where T == Float80 {
 public typealias ComplexD = Complex<Double>
 public typealias ComplexF = Complex<Float>
 #if arch(x86_64)
-public typealias ComplexX = Complex<Float80>
+public typealias ComplexL = Complex<Float80>
 #endif
 
