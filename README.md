@@ -58,6 +58,14 @@ let j0    = try SpecialFunctions.besselJ(v: 0.0, x: 2.5)
 
 // Factorials
 let nFact: Double = try SpecialFunctions.factorial(10)   // 3,628,800
+
+// Common helpers
+let invS = try SpecialFunctions.rsqrt(9.0)               // 1/3
+let s0   = try SpecialFunctions.sinc_pi(0.0)             // 1 (limit)
+let s12  = try SpecialFunctions.sinc_pi(0.5)             // 2/π
+let sh12 = try SpecialFunctions.sinhc_pi(0.5)            // sinh(π/2)/(π/2)
+let z    = ComplexD(0, 0.7)
+let sc   = SpecialFunctions.sincc_pi(z)                  // equals sinhc_pi(0.7)
 ```
 
 APIs throw `SpecialFunctionError` for invalid inputs or domain violations. See DocC symbol docs for function‑specific bounds mirrored from Boost.Math.
@@ -106,9 +114,36 @@ Typealiases are provided for convenience: `ComplexD` (`Double`), `ComplexF` (`Fl
 - DocC sources live under `Sources/SwiftyBoost/Documentation.docc`.
 - Generate a static docs site with: `make documentation`.
  - Output is written to `Docs/` and published via GitHub Pages.
- - The site root redirects to the main DocC page: https://strike65.github.io/SwiftyBoost/
- - Direct landing page (canonical DocC path): https://strike65.github.io/SwiftyBoost/documentation/swiftyboost/
- - To build a `.doccarchive` instead: `make documentation-archive` (outputs `Docs/SwiftyBoost.doccarchive`).
+- The site root redirects to the main DocC page: https://strike65.github.io/SwiftyBoost/
+- Direct landing page (canonical DocC path): https://strike65.github.io/SwiftyBoost/documentation/swiftyboost/
+- To build a `.doccarchive` instead: `make documentation-archive` (outputs `Docs/SwiftyBoost.doccarchive`).
+
+### Result-Type Promotions (Quick Reference)
+
+- Float ↔ Double → Double
+  - Multi-argument functions promoted from mixed `Float`/`Double` evaluate in `Double` and return `Double`.
+- Any presence of Float80 → Float80 (x86_64)
+  - On x86_64, if any argument is `Float80`, evaluation uses extended precision and returns `Float80`.
+- Single-argument functions
+  - Return the same type as the argument; no promotion applies.
+
+Supported mixed promotions (high level):
+- Gamma: ratios, incomplete/regularized P/Q (+ inverses, derivative)
+- Beta: complete/incomplete/regularized (+ inverses, derivative, parameter solvers)
+- Bessel: cylindrical J/Y/I/K and their derivatives (integer-order convenience overloads included)
+- Elliptic: Legendre F/E/Π (incomplete + complete Π), Carlson RC/RF/RD/RJ/RG
+- Chebyshev series: Clenshaw recursion mixes `[coefficients]` and `x` types
+- Owen’s T: all pairs
+- Spherical harmonics: mixed angle types (ComplexD/ComplexX return types)
+- Hypergeometric: 1F0, 0F1 (full), 1F1/2F0 (selected single‑parameter mixes), pFq (arrays and z)
+
+Advice:
+- Prefer `Double` unless you know `Float` is sufficient or `Float80` is required (x86_64 only).
+- Use explicit `Float`/`Double`/`Float80` overloads in tight loops to avoid conversions.
+- Mixed promotions are for convenience when inputs naturally come in different precisions.
+- Promotions don’t change numeric domains; invalid inputs still throw `SpecialFunctionError`.
+
+See DocC: “Result-Type Promotions” for the full list and details.
 
 ## Contributing
 

@@ -1,5 +1,5 @@
 //
-//  Created by VT on 11.10.25.
+//  Created by Volker Thieme 2025.
 //  Copyright © 2025 Volker Thieme.
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -51,4 +51,5 @@
 #include "bs_spherical_harmonics.h"
 #include "bs_cardinal_b_splines.h"
 #include "bs_gegenbauer.h"
-
+#include "bs_sin_cardinal.h"
+#include "bs_a_hyper.h"

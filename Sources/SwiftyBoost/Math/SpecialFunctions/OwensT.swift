@@ -75,6 +75,12 @@ public extension SpecialFunctions {
         // Delegate to Boost-backed implementation and convert back to T.
         return T(bs_owens_t(dh, da))
     }
+
+    // Mixed-precision promotions (Float ↔ Double) → Double
+    /// Owen’s T with mixed `Float`/`Double` arguments; returns `Double`.
+    @inlinable static func owensT(h: Float, a: Double) throws -> Double { try owensT(h: Double(h), a: a) }
+    /// Owen’s T with mixed `Double`/`Float` arguments; returns `Double`.
+    @inlinable static func owensT(h: Double, a: Float) throws -> Double { try owensT(h: h, a: Double(a)) }
     
     // MARK: - Float overloads
     
@@ -136,6 +142,12 @@ public extension SpecialFunctions {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         return bs_owens_t_l(h, a)
     }
+
+    // Mixed promotions with Float80 → Float80
+    @inlinable static func owensT(h: Float80, a: Double) throws -> Float80 { try owensT(h: h, a: Float80(a)) }
+    @inlinable static func owensT(h: Double, a: Float80) throws -> Float80 { try owensT(h: Float80(h), a: a) }
+    @inlinable static func owensT(h: Float80, a: Float) throws -> Float80 { try owensT(h: h, a: Float80(a)) }
+    @inlinable static func owensT(h: Float, a: Float80) throws -> Float80 { try owensT(h: Float80(h), a: a) }
 #endif
     
 }

@@ -1,5 +1,5 @@
 //
-//  Created by VT on 17.10.25.
+//  Created by Volker Thieme 2025.
 //  Copyright © 2025 Volker Thieme.
 //  License: MIT (see project root)
 //
@@ -72,6 +72,12 @@ public extension SpecialFunctions {
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return T(bs_gegenbauer(UInt32(n), dl, dx))
     }
+
+    // Mixed-precision promotions (Float ↔ Double) → Double
+    /// Gegenbauer C_n^(λ)(x) with mixed `Float`/`Double` inputs; returns `Double`.
+    @inlinable static func gegenbauer(n: Int, lambda: Float, x: Double) throws -> Double { try gegenbauer(n: n, lambda: Double(lambda), x: x) }
+    /// Gegenbauer C_n^(λ)(x) with mixed `Double`/`Float` inputs; returns `Double`.
+    @inlinable static func gegenbauer(n: Int, lambda: Double, x: Float) throws -> Double { try gegenbauer(n: n, lambda: lambda, x: Double(x)) }
     
     /// First derivative (with respect to x) of the Gegenbauer polynomial, d/dx Cₙ^(λ)(x).
     ///
@@ -95,6 +101,12 @@ public extension SpecialFunctions {
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return T(bs_gegenbauer_prime(UInt32(n), dl, dx))
     }
+
+    // Mixed-precision promotions (Float ↔ Double) → Double
+    /// d/dx C_n^(λ)(x) with mixed `Float`/`Double` inputs; returns `Double`.
+    @inlinable static func gegenbauerPrime(n: Int, lambda: Float, x: Double) throws -> Double { try gegenbauerPrime(n: n, lambda: Double(lambda), x: x) }
+    /// d/dx C_n^(λ)(x) with mixed `Double`/`Float` inputs; returns `Double`.
+    @inlinable static func gegenbauerPrime(n: Int, lambda: Double, x: Float) throws -> Double { try gegenbauerPrime(n: n, lambda: lambda, x: Double(x)) }
     
     /// k-th derivative (with respect to x) of the Gegenbauer polynomial, dᵏ/dxᵏ Cₙ^(λ)(x).
     ///
@@ -123,6 +135,12 @@ public extension SpecialFunctions {
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return T(bs_gegenbauer_derivative(UInt32(n), dl, dx, UInt32(k)))
     }
+
+    // Mixed-precision promotions (Float ↔ Double) → Double
+    /// d^k/dx^k C_n^(λ)(x) with mixed `Float`/`Double` inputs; returns `Double`.
+    @inlinable static func gegenbauerDerivative(n: Int, lambda: Float, x: Double, k: Int) throws -> Double { try gegenbauerDerivative(n: n, lambda: Double(lambda), x: x, k: k) }
+    /// d^k/dx^k C_n^(λ)(x) with mixed `Double`/`Float` inputs; returns `Double`.
+    @inlinable static func gegenbauerDerivative(n: Int, lambda: Double, x: Float, k: Int) throws -> Double { try gegenbauerDerivative(n: n, lambda: lambda, x: Double(x), k: k) }
     
     
     // MARK: - Float overloads
@@ -168,6 +186,12 @@ public extension SpecialFunctions {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_gegenbauer_l(UInt32(n), lambda, x)
     }
+
+    // Mixed promotions with Float80 → Float80
+    @inlinable static func gegenbauer(n: Int, lambda: Float80, x: Double) throws -> Float80 { try gegenbauer(n: n, lambda: lambda, x: Float80(x)) }
+    @inlinable static func gegenbauer(n: Int, lambda: Double, x: Float80) throws -> Float80 { try gegenbauer(n: n, lambda: Float80(lambda), x: x) }
+    @inlinable static func gegenbauer(n: Int, lambda: Float80, x: Float) throws -> Float80 { try gegenbauer(n: n, lambda: lambda, x: Float80(x)) }
+    @inlinable static func gegenbauer(n: Int, lambda: Float, x: Float80) throws -> Float80 { try gegenbauer(n: n, lambda: Float80(lambda), x: x) }
     
     /// d/dx Cₙ^(λ)(x) for `Float80` (x86_64 only). Requires `n ≥ 0`, finite `lambda` and `x`.
     @inlinable static func gegenbauerPrime(n: Int, lambda: Float80, x: Float80) throws -> Float80 {
@@ -177,6 +201,12 @@ public extension SpecialFunctions {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_gegenbauer_prime_l(UInt32(n), lambda, x)
     }
+
+    // Mixed promotions with Float80 → Float80
+    @inlinable static func gegenbauerPrime(n: Int, lambda: Float80, x: Double) throws -> Float80 { try gegenbauerPrime(n: n, lambda: lambda, x: Float80(x)) }
+    @inlinable static func gegenbauerPrime(n: Int, lambda: Double, x: Float80) throws -> Float80 { try gegenbauerPrime(n: n, lambda: Float80(lambda), x: x) }
+    @inlinable static func gegenbauerPrime(n: Int, lambda: Float80, x: Float) throws -> Float80 { try gegenbauerPrime(n: n, lambda: lambda, x: Float80(x)) }
+    @inlinable static func gegenbauerPrime(n: Int, lambda: Float, x: Float80) throws -> Float80 { try gegenbauerPrime(n: n, lambda: Float80(lambda), x: x) }
     
     /// dᵏ/dxᵏ Cₙ^(λ)(x) for `Float80` (x86_64 only). Requires `n, k ≥ 0`, finite `lambda` and `x`.
     @inlinable static func gegenbauerDerivative(n: Int, lambda: Float80, x: Float80, k: Int) throws -> Float80 {
@@ -188,5 +218,11 @@ public extension SpecialFunctions {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return bs_gegenbauer_derivative_l(UInt32(n), lambda, x, UInt32(k))
     }
+
+    // Mixed promotions with Float80 → Float80
+    @inlinable static func gegenbauerDerivative(n: Int, lambda: Float80, x: Double, k: Int) throws -> Float80 { try gegenbauerDerivative(n: n, lambda: lambda, x: Float80(x), k: k) }
+    @inlinable static func gegenbauerDerivative(n: Int, lambda: Double, x: Float80, k: Int) throws -> Float80 { try gegenbauerDerivative(n: n, lambda: Float80(lambda), x: x, k: k) }
+    @inlinable static func gegenbauerDerivative(n: Int, lambda: Float80, x: Float, k: Int) throws -> Float80 { try gegenbauerDerivative(n: n, lambda: lambda, x: Float80(x), k: k) }
+    @inlinable static func gegenbauerDerivative(n: Int, lambda: Float, x: Float80, k: Int) throws -> Float80 { try gegenbauerDerivative(n: n, lambda: Float80(lambda), x: x, k: k) }
 #endif
 }

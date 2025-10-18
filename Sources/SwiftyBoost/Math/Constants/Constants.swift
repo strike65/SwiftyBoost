@@ -1,5 +1,5 @@
 //
-//  Created by VT on 16.10.25.
+//  Created by Volker Thieme 2025.
 //  Copyright © 2025 Volker Thieme.
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal

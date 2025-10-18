@@ -1,3 +1,25 @@
+//
+//  Created by Volker Thieme 2025.
+//  Copyright © 2025 Volker Thieme.
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
+//
 // Exponential integrals, special helpers, trig helpers, and Airy
 #include <boost/math/special_functions/expint.hpp>
 #include <boost/math/special_functions/expm1.hpp>
@@ -11,8 +33,10 @@
 #include <boost/math/special_functions/sin_pi.hpp>
 #include <boost/math/special_functions/cos_pi.hpp>
 #include <boost/math/special_functions/airy.hpp>
-#include "../internal/bs_internal.hpp"
+#include <boost/math/special_functions/rsqrt.hpp>
 
+#include "../internal/bs_internal.hpp"
+//
 extern "C" {
 
 // Exponential integrals and related
@@ -25,6 +49,7 @@ double bs_powm1(double x, double y)  { return bs_wrap<double>([&] { return boost
 double bs_cbrt(double x)             { return bs_wrap<double>([&] { return boost::math::cbrt(x); }); }
 double bs_sqrt1pm1(double x)         { return bs_wrap<double>([&] { return boost::math::sqrt1pm1(x); }); }
 double bs_hypot(double x, double y)  { return bs_wrap<double>([&] { return boost::math::hypot(x, y); }); }
+double bs_rsqrt(const double x)      { return bs_wrap<double>([&] { return boost::math::rsqrt(x); }); }
 
 float bs_expint_Ei_f(float x)        { return bs_wrap<float>([&] { return boost::math::expint(x); }); }
 float bs_expint_En_f(int n, float x) { return bs_wrap<float>([&] { return boost::math::expint(n, x); }); }
@@ -35,6 +60,7 @@ float bs_powm1_f(float x, float y)   { return bs_wrap<float>([&] { return boost:
 float bs_cbrt_f(float x)             { return bs_wrap<float>([&] { return boost::math::cbrt(x); }); }
 float bs_sqrt1pm1_f(float x)         { return bs_wrap<float>([&] { return boost::math::sqrt1pm1(x); }); }
 float bs_hypot_f(float x, float y)   { return bs_wrap<float>([&] { return boost::math::hypot(x, y); }); }
+float bs_rsqrt_f(const float x)      { return bs_wrap<float>([&] { return boost::math::rsqrt(x); }); }
 
 long double bs_expint_Ei_l(long double x)          { return bs_wrap<long double>([&] { return boost::math::expint(x); }); }
 long double bs_expint_En_l(int n, long double x)   { return bs_wrap<long double>([&] { return boost::math::expint(n, x); }); }
@@ -45,6 +71,7 @@ long double bs_powm1_l(long double x, long double y) { return bs_wrap<long doubl
 long double bs_cbrt_l(long double x)               { return bs_wrap<long double>([&] { return boost::math::cbrt(x); }); }
 long double bs_sqrt1pm1_l(long double x)           { return bs_wrap<long double>([&] { return boost::math::sqrt1pm1(x); }); }
 long double bs_hypot_l(long double x, long double y)  { return bs_wrap<long double>([&] { return boost::math::hypot(x, y); }); }
+long double bs_rsqrt_l(const long double x)      { return bs_wrap<long double>([&] { return boost::math::rsqrt(x); }); }
 
 // Trig helpers
 double bs_sin_pi(double x)             { return bs_wrap<double>([&] { return boost::math::sin_pi(x); }); }

@@ -1,6 +1,6 @@
 //
-//  Created by VT on 16.10.25.
-//  Copyright © 2025 Volker Thieme. All rights reserved.
+//  Created by Volker Thieme 2025.
+//  Copyright © 2025 Volker Thieme.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ import CBoostBridge
 ///
 /// Overview:
 /// - Provides overloads for `Double`, `Float`, and (on x86_64) `Float80`.
-/// - Returns complex results as project-specific complex types: ``ComplexD``, ``ComplexF``, and ``ComplexX``.
+/// - Returns complex results as project-specific complex types: ``ComplexD``, ``ComplexF``, and ``ComplexL``.
 /// - Convenience functions expose the real and imaginary parts directly.
 ///
 /// Mathematical conventions:
@@ -44,8 +44,8 @@ import CBoostBridge
 /// SeeAlso:
 /// - ``ComplexD``
 /// - ``ComplexF``
-/// - ``ComplexX``
-public enum SphericalHarmonics {
+/// - ``ComplexL``
+public extension SpecialFunctions {
 
     /// Computes the complex spherical harmonic Y_l^m(θ, φ) for `Double`.
     ///
@@ -64,10 +64,22 @@ public enum SphericalHarmonics {
     /// Notes:
     /// - Follows the physics convention with the Condon–Shortley phase and Boost.Math normalization.
     @inlinable
-    public static func sphericalHarmonic(n: UInt, m: Int, theta: Double, phi: Double) -> ComplexD {
+    static func sphericalHarmonic(n: UInt, m: Int, theta: Double, phi: Double) -> ComplexD {
         guard m <= n else { return ComplexD(.zero, .zero)}
         let z = bs_spherical_harmonic(UInt32(n), Int32(m), theta, phi)
         return ComplexD(z.re, z.im)
+    }
+
+    // Mixed-precision promotions (Float ↔ Double) → Double/ComplexD
+    /// Y_l^m(θ, φ) with mixed `Float`/`Double` angles; returns `ComplexD`.
+    @inlinable
+    static func sphericalHarmonic(n: UInt, m: Int, theta: Float, phi: Double) -> ComplexD {
+        sphericalHarmonic(n: n, m: m, theta: Double(theta), phi: phi)
+    }
+    /// Y_l^m(θ, φ) with mixed `Double`/`Float` angles; returns `ComplexD`.
+    @inlinable
+    static func sphericalHarmonic(n: UInt, m: Int, theta: Double, phi: Float) -> ComplexD {
+        sphericalHarmonic(n: n, m: m, theta: theta, phi: Double(phi))
     }
 
     /// Returns the real part of the spherical harmonic Y_l^m(θ, φ) for `Double`.
@@ -81,8 +93,19 @@ public enum SphericalHarmonics {
     /// Returns:
     /// - The real component Re{Y_l^m(θ, φ)} as a `Double`.
     @inlinable
-    public static func Y_real(n: UInt, m: Int, theta: Double, phi: Double) -> Double {
+    static func Y_real(n: UInt, m: Int, theta: Double, phi: Double) -> Double {
         return sphericalHarmonic(n: n, m: m, theta: theta, phi: phi).real
+    }
+
+    /// Real part with mixed `Float`/`Double` angles; returns `Double`.
+    @inlinable
+    static func Y_real(n: UInt, m: Int, theta: Float, phi: Double) -> Double {
+        sphericalHarmonic(n: n, m: m, theta: Double(theta), phi: phi).real
+    }
+    /// Real part with mixed `Double`/`Float` angles; returns `Double`.
+    @inlinable
+    static func Y_real(n: UInt, m: Int, theta: Double, phi: Float) -> Double {
+        sphericalHarmonic(n: n, m: m, theta: theta, phi: Double(phi)).real
     }
 
     /// Returns the imaginary part of the spherical harmonic Y_l^m(θ, φ) for `Double`.
@@ -96,8 +119,19 @@ public enum SphericalHarmonics {
     /// Returns:
     /// - The imaginary component Im{Y_l^m(θ, φ)} as a `Double`.
     @inlinable
-    public static func Y_imag(n: UInt, m: Int, theta: Double, phi: Double) -> Double {
+    static func Y_imag(n: UInt, m: Int, theta: Double, phi: Double) -> Double {
         return sphericalHarmonic(n: n, m: m, theta: theta, phi: phi).imag
+    }
+
+    /// Imag part with mixed `Float`/`Double` angles; returns `Double`.
+    @inlinable
+    static func Y_imag(n: UInt, m: Int, theta: Float, phi: Double) -> Double {
+        sphericalHarmonic(n: n, m: m, theta: Double(theta), phi: phi).imag
+    }
+    /// Imag part with mixed `Double`/`Float` angles; returns `Double`.
+    @inlinable
+    static func Y_imag(n: UInt, m: Int, theta: Double, phi: Float) -> Double {
+        sphericalHarmonic(n: n, m: m, theta: theta, phi: Double(phi)).imag
     }
 
     /// Computes the complex spherical harmonic Y_l^m(θ, φ) for `Float`.
@@ -114,7 +148,7 @@ public enum SphericalHarmonics {
     /// Returns:
     /// - The complex value Y_l^m(θ, φ) as a ``ComplexF``.
     @inlinable
-    public static func Y(n: UInt, m: Int, theta: Float, phi: Float) -> ComplexF {
+    static func Y(n: UInt, m: Int, theta: Float, phi: Float) -> ComplexF {
         let r = sphericalHarmonic(n: n , m: m, theta: Double(theta), phi: Double(phi))
         return ComplexF(Float(r.real), Float(r.imag))
     }
@@ -130,7 +164,7 @@ public enum SphericalHarmonics {
     /// Returns:
     /// - The real component Re{Y_l^m(θ, φ)} as a `Float`.
     @inlinable
-    public static func Y_real(n: UInt, m: Int, theta: Float, phi: Float) -> Float {
+    static func Y_real(n: UInt, m: Int, theta: Float, phi: Float) -> Float {
         return Y(n: n, m: m, theta: theta, phi: phi).real
     }
 
@@ -145,7 +179,7 @@ public enum SphericalHarmonics {
     /// Returns:
     /// - The imaginary component Im{Y_l^m(θ, φ)} as a `Float`.
     @inlinable
-    public static func Y_imag(n: UInt, m: Int, theta: Float, phi: Float) -> Float {
+    static func Y_imag(n: UInt, m: Int, theta: Float, phi: Float) -> Float {
         return Y(n: n, m: m, theta: theta, phi: phi).imag
     }
 
@@ -162,11 +196,33 @@ public enum SphericalHarmonics {
     /// - phi: The azimuthal angle φ in radians, typically in [0, 2π).
     ///
     /// Returns:
-    /// - The complex value Y_l^m(θ, φ) as a ``ComplexX``.
+    /// - The complex value Y_l^m(θ, φ) as a ``ComplexL``.
     @inlinable
-    public static func Y(n: UInt, m: Int, theta: Float80, phi: Float80) -> ComplexX {
+    static func Y(n: UInt, m: Int, theta: Float80, phi: Float80) -> ComplexL {
         let r = Y(n: n, m: m, theta: Double(theta), phi: Double(phi))
-        return ComplexX(Float80(r.real), Float80(r.imag))
+        return ComplexL(Float80(r.real), Float80(r.imag))
+    }
+
+    // Mixed promotions with Float80 → ComplexL / Float80
+    @inlinable
+    static func Y(n: UInt, m: Int, theta: Float80, phi: Double) -> ComplexL {
+        let r = sphericalHarmonic(n: n, m: m, theta: Double(theta), phi: phi)
+        return ComplexL(Float80(r.real), Float80(r.imag))
+    }
+    @inlinable
+    static func Y(n: UInt, m: Int, theta: Double, phi: Float80) -> ComplexL {
+        let r = sphericalHarmonic(n: n, m: m, theta: theta, phi: Double(phi))
+        return ComplexL(Float80(r.real), Float80(r.imag))
+    }
+    @inlinable
+    static func Y(n: UInt, m: Int, theta: Float80, phi: Float) -> ComplexL {
+        let r = sphericalHarmonic(n: n, m: m, theta: Double(theta), phi: Double(phi))
+        return ComplexL(Float80(r.real), Float80(r.imag))
+    }
+    @inlinable
+    static func Y(n: UInt, m: Int, theta: Float, phi: Float80) -> ComplexL {
+        let r = sphericalHarmonic(n: n, m: m, theta: Double(theta), phi: Double(phi))
+        return ComplexL(Float80(r.real), Float80(r.imag))
     }
 
     /// Returns the real part of the spherical harmonic Y_l^m(θ, φ) for `Float80` (x86_64 only).
@@ -180,8 +236,25 @@ public enum SphericalHarmonics {
     /// Returns:
     /// - The real component Re{Y_l^m(θ, φ)} as a `Float80`.
     @inlinable
-    public static func Y_real(n l: UInt, m: Int, theta: Float80, phi: Float80) -> Float80 {
+    static func Y_real(n l: UInt, m: Int, theta: Float80, phi: Float80) -> Float80 {
         return Y(n: n, m: m, theta: theta, phi: phi).real
+    }
+
+    @inlinable
+    static func Y_real(n: UInt, m: Int, theta: Float80, phi: Double) -> Float80 {
+        return Y(n: n, m: m, theta: theta, phi: Float80(phi)).real
+    }
+    @inlinable
+    static func Y_real(n: UInt, m: Int, theta: Double, phi: Float80) -> Float80 {
+        return Y(n: n, m: m, theta: Float80(theta), phi: phi).real
+    }
+    @inlinable
+    static func Y_real(n: UInt, m: Int, theta: Float80, phi: Float) -> Float80 {
+        return Y(n: n, m: m, theta: theta, phi: Float80(phi)).real
+    }
+    @inlinable
+    static func Y_real(n: UInt, m: Int, theta: Float, phi: Float80) -> Float80 {
+        return Y(n: n, m: m, theta: Float80(theta), phi: phi).real
     }
 
     /// Returns the imaginary part of the spherical harmonic Y_l^m(θ, φ) for `Float80` (x86_64 only).
@@ -195,8 +268,24 @@ public enum SphericalHarmonics {
     /// Returns:
     /// - The imaginary component Im{Y_l^m(θ, φ)} as a `Float80`.
     @inlinable
-    public static func Y_imag(n: UInt, m: Int, theta: Float80, phi: Float80) -> Float80 {
+    static func Y_imag(n: UInt, m: Int, theta: Float80, phi: Float80) -> Float80 {
         return Y(n: n, m: m, theta: theta, phi: phi).imag
+    }
+    @inlinable
+    static func Y_imag(n: UInt, m: Int, theta: Float80, phi: Double) -> Float80 {
+        return Y(n: n, m: m, theta: theta, phi: Float80(phi)).imag
+    }
+    @inlinable
+    static func Y_imag(n: UInt, m: Int, theta: Double, phi: Float80) -> Float80 {
+        return Y(n: n, m: m, theta: Float80(theta), phi: phi).imag
+    }
+    @inlinable
+    static func Y_imag(n: UInt, m: Int, theta: Float80, phi: Float) -> Float80 {
+        return Y(n: n, m: m, theta: theta, phi: Float80(phi)).imag
+    }
+    @inlinable
+    static func Y_imag(n: UInt, m: Int, theta: Float, phi: Float80) -> Float80 {
+        return Y(n: n, m: m, theta: Float80(theta), phi: phi).imag
     }
     #endif
 }

@@ -1,6 +1,6 @@
 //
-//  Created by Volker Thieme 2025.
-//  Copyright © 2025 Volker Thieme.
+//  Created by VT on 18.10.25.
+//  Copyright © 2025 Volker Thieme. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -19,33 +19,25 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
-//
+//  
+
 #pragma once
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// Elliptic integrals (Carlson symmetric forms)
-double bs_ellint_rc(double x, double y);
-double bs_ellint_rf(double x, double y, double z);
-double bs_ellint_rd(double x, double y, double z);
-double bs_ellint_rj(double x, double y, double z, double p);
-double bs_ellint_rg(double x, double y, double z);
+double bs_acosh(const double x);
+double bs_asinh(const double x);
+double bs_atanh(const double x);
+float bs_acosh_f(const float x);
+float bs_asinh_f(const float x);
+float bs_atanh_f(const float x);
+long double bs_acosh_l(const long double x);
+long double bs_asinh_l(const long double x);
+long double bs_atanh_l(const long double x);
 
-float bs_ellint_rc_f(float x, float y);
-float bs_ellint_rf_f(float x, float y, float z);
-float bs_ellint_rd_f(float x, float y, float z);
-float bs_ellint_rj_f(float x, float y, float z, float p);
-float bs_ellint_rg_f(float x, float y, float z);
-
-long double bs_ellint_rc_l(long double x, long double y);
-long double bs_ellint_rf_l(long double x, long double y, long double z);
-long double bs_ellint_rd_l(long double x, long double y, long double z);
-long double bs_ellint_rj_l(long double x, long double y, long double z, long double p);
-long double bs_ellint_rg_l(long double x, long double y, long double z);
 
 #ifdef __cplusplus
 }
 #endif
-
