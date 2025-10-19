@@ -89,7 +89,7 @@ float bs_gamma_hazard_f(const void* handle, float x) {
     return d / p;
 }
 double bs_gamma_hazard(const void* handle, double x) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+    auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     double p = bs_wrap<double>([&]{ return cdf(complement(h->dist, x)); });
     double d = bs_wrap<double>([&]{ return pdf(h -> dist, x); });
@@ -102,7 +102,7 @@ double bs_gamma_hazard(const void* handle, double x) {
     return d / p;
 }
 long double bs_gamma_hazard_l(const void* handle, long double x)  {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+    auto h = static_cast<const bs_gamma_l_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     long double p = bs_wrap<long double>([&]{ return cdf(complement(h->dist, x)); });
     long double d = bs_wrap<long double>([&]{ return pdf(h -> dist, x); });
@@ -123,14 +123,14 @@ float bs_gamma_chf_f(const void* handle, float x) {
     return -log(p);
 }
 double     bs_gamma_chf(const void* handle, double x) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+    auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     double p = bs_wrap<double>([&]{ return cdf(complement(h->dist, x)); });
     return -log(p);
 }
 
 long double bs_gamma_chf_l(const void* handle, long double x)  {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+    auto h = static_cast<const bs_gamma_l_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     long double p = bs_wrap<long double>([&]{ return cdf(complement(h->dist, x)); });
     return -log(p);
@@ -190,12 +190,12 @@ float bs_gamma_median_f(const void* handle) {
     return bs_wrap<float>([&]{ return median(h->dist); });
 }
 double bs_gamma_median (const void* handle) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+    auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<long double>([&]{ return median(h->dist); });
 }
 long double bs_gamma_median_l(const void* handle) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+    auto h = static_cast<const bs_gamma_l_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     return bs_wrap<long double>([&]{ return median(h->dist); });
 }
