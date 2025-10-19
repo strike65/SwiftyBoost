@@ -86,7 +86,7 @@ float bs_arcsine_hazard_f(const void* handle, float x) {
     return d / p;
 }
 double bs_arcsine_hazard(const void* handle, double x) {
-    auto h = static_cast<const bs_arcsine_f_handle*>(handle);
+    auto h = static_cast<const bs_arcsine_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     double p = bs_wrap<double>([&]{ return cdf(complement(h->dist, x)); });
     double d = bs_wrap<double>([&]{ return pdf(h -> dist, x); });
