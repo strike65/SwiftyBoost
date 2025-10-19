@@ -39,5 +39,5 @@ let package = Package(
             dependencies: ["SwiftyBoost", "CBoostBridge"]
         ),
     ],
-    cxxLanguageStandard: .cxx17
+    cxxLanguageStandard: .cxx20
 )

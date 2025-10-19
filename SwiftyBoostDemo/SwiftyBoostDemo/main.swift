@@ -23,8 +23,9 @@
 
 import Foundation
 import SwiftyBoost
-import CBoostBridge
+//import CBoostBridge
 
+print("\(try Distribution.GammaDistribution(shape: 3.0, scale: 0.5).cdf(1.0))")
 print("\(try SpecialFunctions.besselJ_f(v: 0, x: 1.0))")
 print("\(SpecialFunctions.bernoulli_b2n(100))")
 print("\(SpecialFunctions.tangent_t2n(count: 10, startIndex: 22))")

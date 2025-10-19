@@ -21,7 +21,8 @@
 //  THE SOFTWARE.
 //
 
-#include "CBoostBridge.h"
+// Bring public headers into this TU (aggregate)
+#include "include/CBoostBridge.h"
 
 #include "internal/bs_internal.hpp"
 
@@ -36,3 +37,6 @@
 #include "impl/numbers_factorials_polys_splines.hxx"
 #include "impl/bs_sin_cardinal.hxx"
 #include "impl/bs_a_hyper.hxx"
+// Distributions
+#include "impl/bs_gamma_distribution.hxx"
+#include "impl/bs_students_t_distribution.hxx"

@@ -1,0 +1,5 @@
+module CBoostBridge {
+    umbrella "."
+    export *
+    module * { export * }
+}

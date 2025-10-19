@@ -22,4 +22,6 @@
 import CBoostBridge
 
 public enum SpecialFunctions {}
+public enum Distribution {
+}
 public enum Constants<T: BinaryFloatingPoint> {}
