@@ -14,3 +14,20 @@ Use this documentation catalog with DocC to explore how to configure Boost-backe
 
 - <doc:UsingSpecialFunctions>
 - <doc:ResultTypePromotions>
+
+### Complex Numbers
+
+- <doc:ComplexNumbers>
+
+### Special Functions
+
+- <doc:SinusCardinalis>
+- <doc:CommonHelpers>
+
+### Distribution APIs
+
+- ``Distribution/Gamma``
+- ``Distribution/StudentT``
+- ``Distribution/FisherF``
+- ``Distribution/Arcsine``
+- <doc:Distributions>

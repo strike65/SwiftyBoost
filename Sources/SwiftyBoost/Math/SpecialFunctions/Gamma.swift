@@ -200,7 +200,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.poleAtNonPositiveInteger(name: "a + delta")` if `a + δ` is a non‑positive integer.
     ///
     /// SeeAlso:
-    /// - ``SpecialFunctions/gammaRatio(_:_:)`` for Γ(a)/Γ(b) with independent parameters.
+    /// - ``SpecialFunctions/gammaRatio(_:_:)->T`` for Γ(a)/Γ(b) with independent parameters.
     ///
     /// References:
     /// - Boost.Math `tgamma_delta_ratio`
@@ -581,7 +581,7 @@ public extension SpecialFunctions {
     /// - Direct `gamma(a)/gamma(b)` is unstable; this wrapper calls the Boost routine
     ///   designed for stable evaluation.
     ///
-    /// See ``SpecialFunctions/gammaRatio(_:_:)`` for domain, behavior, and references.
+    /// See ``SpecialFunctions/gammaRatio(_:_:)->T`` for domain, behavior, and references.
     @inlinable static func gammaRatio(_ a: Float, _ b: Float) throws -> Float {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }

@@ -1,82 +1,74 @@
 //
 //  Created by Volker Thieme 2025.
-//  Gamma distribution bridge (Boost.Math) — implementation TU include
+//  Students t distribution bridge (Boost.Math) — implementation TU include
 //
 #include "../internal/bs_internal.hpp"
-#include "../include/distributions/bs_gamma_distribution.h"
+#include "../include/distributions/bs_fisher_f_distribution.h"
 
-#include <boost/math/distributions/gamma.hpp>
+#include <boost/math/distributions/fisher_f.hpp>
 #include <boost/math/distributions/complement.hpp>
-#include <boost/math/tools/numeric_limits.hpp>
+#include <boost/math/distributions/detail/derived_accessors.hpp>
 
-// no std::pair in C API; returning C PODs defined in public header
-
-using boost::math::gamma_distribution;
+using boost::math::fisher_f_distribution;
 using boost::math::complement;
 
 // -----------------------
 // Handle-based API
 // -----------------------
 
-struct bs_gamma_f_handle { gamma_distribution<float> dist; explicit bs_gamma_f_handle(float k, float th) : dist(k, th) {} };
-struct bs_gamma_d_handle { gamma_distribution<double> dist; explicit bs_gamma_d_handle(double k, double th) : dist(k, th) {} };
-struct bs_gamma_l_handle { gamma_distribution<long double> dist; explicit bs_gamma_l_handle(long double k, long double th) : dist(k, th) {} };
+struct bs_fisher_f_f_handle { fisher_f_distribution<float> dist; explicit bs_fisher_f_f_handle(float df1, float df2) : dist(df1, df2) {} };
+struct bs_fisher_f_d_handle { fisher_f_distribution<double> dist; explicit bs_fisher_f_d_handle(double df1, double df2) : dist(df1, df2) {} };
+struct bs_fisher_f_l_handle { fisher_f_distribution<long double> dist; explicit bs_fisher_f_l_handle(long double df1, long double df2) : dist(df1, df2) {} };
 
 extern "C" {
-void* bs_gamma_make_f(float k, float theta) {
-    try { return new bs_gamma_f_handle(k, theta); } catch (...) { return nullptr; }
+void* bs_fisher_f_make_f(float df1, float df2) {
+    try { return new bs_fisher_f_f_handle(df1, df2); } catch (...) { return nullptr; }
 }
-void* bs_gamma_make(double k, double theta) {
-    try { return new bs_gamma_d_handle(k, theta); } catch (...) { return nullptr; }
+void* bs_fisher_f_make(double df1, double df2) {
+    try { return new bs_fisher_f_d_handle(df1, df2); } catch (...) { return nullptr; }
 }
-void* bs_gamma_make_l(long double k, long double theta) {
-    try { return new bs_gamma_l_handle(k, theta); } catch (...) { return nullptr; }
+void* bs_fisher_f_make_l(long double df1, long double df2) {
+    try { return new bs_fisher_f_l_handle(df1, df2); } catch (...) { return nullptr; }
 }
-void bs_gamma_free_f(void* handle) {
-    delete static_cast<bs_gamma_f_handle*>(handle);
-}
-void bs_gamma_free(void* handle) {
-    delete static_cast<bs_gamma_d_handle*>(handle);
-}
-void bs_gamma_free_l(void* handle) {
-    delete static_cast<bs_gamma_l_handle*>(handle);
-}
+void bs_fisher_f_free_f(void* handle) { delete static_cast<bs_fisher_f_f_handle*>(handle); }
+void bs_fisher_f_free(void* handle) { delete static_cast<bs_fisher_f_d_handle*>(handle); }
+void bs_fisher_f_free_l(void* handle) { delete static_cast<bs_fisher_f_l_handle*>(handle); }
 
-float bs_gamma_cdf_f(const void* handle, float x) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+float bs_fisher_f_cdf_f(const void* handle, float x) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return cdf(h->dist, x); });
 }
-double bs_gamma_cdf(const void* handle, double x) {
-    auto h = static_cast<const bs_gamma_d_handle*>(handle);
+double bs_fisher_f_cdf(const void* handle, double x) {
+    auto h = static_cast<const bs_fisher_f_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return cdf(h->dist, x); });
 }
-long double bs_gamma_cdf_l(const void* handle, long double x) {
-    auto h = static_cast<const bs_gamma_l_handle*>(handle);
+long double bs_fisher_f_cdf_l(const void* handle, long double x) {
+    auto h = static_cast<const bs_fisher_f_l_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     return bs_wrap<long double>([&]{ return cdf(h->dist, x); });
 }
 
-float bs_gamma_ccdf_f(const void* handle, float x) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+float bs_fisher_f_ccdf_f(const void* handle, float x) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return cdf(complement(h->dist, x)); });
 }
-double bs_gamma_ccdf(const void* handle, double x) {
-    auto h = static_cast<const bs_gamma_d_handle*>(handle);
+double bs_fisher_f_ccdf(const void* handle, double x) {
+    auto h = static_cast<const bs_fisher_f_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return cdf(complement(h->dist, x)); });
 }
-long double bs_gamma_ccdf_l(const void* handle, long double x) {
-    auto h = static_cast<const bs_gamma_l_handle*>(handle);
+long double bs_fisher_f_ccdf_l(const void* handle, long double x) {
+    auto h = static_cast<const bs_fisher_f_l_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     return bs_wrap<long double>([&]{ return cdf(complement(h->dist, x)); });
 }
 /// MARK: hazard function
 
-float bs_gamma_hazard_f(const void* handle, float x) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+float bs_fisher_f_hazard_f(const void* handle, float x) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     float p = bs_wrap<float>([&]{ return cdf(complement(h->dist, x)); });
     float d = bs_wrap<float>([&]{ return pdf(h -> dist, x); });
@@ -88,8 +80,8 @@ float bs_gamma_hazard_f(const void* handle, float x) {
     }
     return d / p;
 }
-double bs_gamma_hazard(const void* handle, double x) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+double bs_fisher_f_hazard(const void* handle, double x) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     double p = bs_wrap<double>([&]{ return cdf(complement(h->dist, x)); });
     double d = bs_wrap<double>([&]{ return pdf(h -> dist, x); });
@@ -101,8 +93,8 @@ double bs_gamma_hazard(const void* handle, double x) {
     }
     return d / p;
 }
-long double bs_gamma_hazard_l(const void* handle, long double x)  {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+long double bs_fisher_f_hazard_l(const void* handle, long double x)  {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     long double p = bs_wrap<long double>([&]{ return cdf(complement(h->dist, x)); });
     long double d = bs_wrap<long double>([&]{ return pdf(h -> dist, x); });
@@ -116,124 +108,124 @@ long double bs_gamma_hazard_l(const void* handle, long double x)  {
 }
 
 /// MARK: cumulative hazard function
-float bs_gamma_chf_f(const void* handle, float x) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+float bs_fisher_f_chf_f(const void* handle, float x) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     float p = bs_wrap<float>([&]{ return cdf(complement(h->dist, x)); });
     return -log(p);
 }
-double     bs_gamma_chf(const void* handle, double x) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+double     bs_fisher_f_chf(const void* handle, double x) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     double p = bs_wrap<double>([&]{ return cdf(complement(h->dist, x)); });
     return -log(p);
 }
 
-long double bs_gamma_chf_l(const void* handle, long double x)  {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+long double bs_fisher_f_chf_l(const void* handle, long double x)  {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     long double p = bs_wrap<long double>([&]{ return cdf(complement(h->dist, x)); });
     return -log(p);
 }
 
-float bs_gamma_kurtosis_f(const void* handle) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+float bs_fisher_f_kurtosis_f(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis(h->dist); });
 }
-double bs_gamma_kurtosis(const void* handle) {
-    auto h = static_cast<const bs_gamma_d_handle*>(handle);
+double bs_fisher_f_kurtosis(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis(h->dist); });
 }
-long double bs_gamma_kurtosis_l(const void* handle) {
-    auto h = static_cast<const bs_gamma_l_handle*>(handle);
+long double bs_fisher_f_kurtosis_l(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_l_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis(h->dist); });
 }
 
-float bs_gamma_kurtosis_excess_f(const void* handle) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+float bs_fisher_f_kurtosis_excess_f(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis_excess(h->dist); });
 }
-double bs_gamma_kurtosis_excess(const void* handle) {
-    auto h = static_cast<const bs_gamma_d_handle*>(handle);
+double bs_fisher_f_kurtosis_excess(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis_excess(h->dist); });
 }
-long double bs_gamma_kurtosis_excess_l(const void* handle) {
-    auto h = static_cast<const bs_gamma_l_handle*>(handle);
+long double bs_fisher_f_kurtosis_excess_l(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_l_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis_excess(h->dist); });
 }
 
-float bs_gamma_mean_f(const void* handle) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+float bs_fisher_f_mean_f(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return mean(h->dist); });
 }
-double bs_gamma_mean(const void* handle) {
-    auto h = static_cast<const bs_gamma_d_handle*>(handle);
+double bs_fisher_f_mean(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return mean(h->dist); });
 }
-long double bs_gamma_mean_l(const void* handle) {
-    auto h = static_cast<const bs_gamma_l_handle*>(handle);
+long double bs_fisher_f_mean_l(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_l_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     return bs_wrap<long double>([&]{ return mean(h->dist); });
 }
 
-float bs_gamma_median_f(const void* handle) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+float bs_fisher_f_median_f(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return median(h->dist); });
 }
-double bs_gamma_median (const void* handle) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+double bs_fisher_f_median (const void* handle) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<long double>([&]{ return median(h->dist); });
 }
-long double bs_gamma_median_l(const void* handle) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+long double bs_fisher_f_median_l(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     return bs_wrap<long double>([&]{ return median(h->dist); });
 }
 
-float bs_gamma_mode_f(const void* handle) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+float bs_fisher_f_mode_f(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return mode(h->dist); });
 }
-double bs_gamma_mode(const void* handle) {
-    auto h = static_cast<const bs_gamma_d_handle*>(handle);
+double bs_fisher_f_mode(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return mode(h->dist); });
 }
-long double bs_gamma_mode_l(const void* handle) {
-    auto h = static_cast<const bs_gamma_l_handle*>(handle);
+long double bs_fisher_f_mode_l(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_l_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     return bs_wrap<long double>([&]{ return mode(h->dist); });
 }
 
-float bs_gamma_pdf_f(const void* handle, float x) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+float bs_fisher_f_pdf_f(const void* handle, float x) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return pdf(h->dist, x); });
 }
-double bs_gamma_pdf(const void* handle, double x) {
-    auto h = static_cast<const bs_gamma_d_handle*>(handle);
+double bs_fisher_f_pdf(const void* handle, double x) {
+    auto h = static_cast<const bs_fisher_f_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return pdf(h->dist, x); });
 }
-long double bs_gamma_pdf_l(const void* handle, long double x) {
-    auto h = static_cast<const bs_gamma_l_handle*>(handle);
+long double bs_fisher_f_pdf_l(const void* handle, long double x) {
+    auto h = static_cast<const bs_fisher_f_l_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     return bs_wrap<long double>([&]{ return pdf(h->dist, x); });
 }
 
-bs_range_f bs_gamma_range_f(const void* handle) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+bs_range_f bs_fisher_f_range_f(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) {
         float nan = std::numeric_limits<float>::quiet_NaN();
         return bs_range_f{ nan, nan };
@@ -242,8 +234,8 @@ bs_range_f bs_gamma_range_f(const void* handle) {
     return bs_range_f{ static_cast<float>(pr.first), static_cast<float>(pr.second) };
 }
 
-bs_range_d bs_gamma_range(const void* handle) {
-    auto h = static_cast<const bs_gamma_d_handle*>(handle);
+bs_range_d bs_fisher_f_range(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_d_handle*>(handle);
     if (!h) {
         double nan = std::numeric_limits<double>::quiet_NaN();
         return bs_range_d{ nan, nan };
@@ -252,8 +244,8 @@ bs_range_d bs_gamma_range(const void* handle) {
     return bs_range_d{ static_cast<double>(pr.first), static_cast<double>(pr.second) };
 }
 
-bs_range_l bs_gamma_range_l(const void* handle) {
-    auto h = static_cast<const bs_gamma_l_handle*>(handle);
+bs_range_l bs_fisher_f_range_l(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_l_handle*>(handle);
     if (!h) {
         long double nan = std::numeric_limits<long double>::quiet_NaN();
         return bs_range_l{ nan, nan };
@@ -262,8 +254,8 @@ bs_range_l bs_gamma_range_l(const void* handle) {
     return bs_range_l{ static_cast<long double>(pr.first), static_cast<long double>(pr.second) };
 }
 
-bs_range_f bs_gamma_support_f(const void* handle) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+bs_range_f bs_fisher_f_support_f(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) {
         float nan = std::numeric_limits<float>::quiet_NaN();
         return bs_range_f{ nan, nan };
@@ -272,8 +264,8 @@ bs_range_f bs_gamma_support_f(const void* handle) {
     return bs_range_f{ static_cast<float>(pr.first), static_cast<float>(pr.second) };
 }
 
-bs_range_d bs_gamma_support(const void* handle) {
-    auto h = static_cast<const bs_gamma_d_handle*>(handle);
+bs_range_d bs_fisher_f_support(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_d_handle*>(handle);
     if (!h) {
         double nan = std::numeric_limits<double>::quiet_NaN();
         return bs_range_d{ nan, nan };
@@ -282,8 +274,8 @@ bs_range_d bs_gamma_support(const void* handle) {
     return bs_range_d{ static_cast<double>(pr.first), static_cast<double>(pr.second) };
 }
 
-bs_range_l bs_gamma_support_l(const void* handle) {
-    auto h = static_cast<const bs_gamma_l_handle*>(handle);
+bs_range_l bs_fisher_f_support_l(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_l_handle*>(handle);
     if (!h) {
         long double nan = std::numeric_limits<long double>::quiet_NaN();
         return bs_range_l{ nan, nan };
@@ -292,101 +284,84 @@ bs_range_l bs_gamma_support_l(const void* handle) {
     return bs_range_l{ static_cast<long double>(pr.first), static_cast<long double>(pr.second) };
 }
 
-float bs_gamma_quantile_f(const void* handle, float p) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+float bs_fisher_f_quantile_f(const void* handle, float p) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return quantile(h->dist, p); });
 }
-double bs_gamma_quantile(const void* handle, double p) {
-    auto h = static_cast<const bs_gamma_d_handle*>(handle);
+double bs_fisher_f_quantile(const void* handle, double p) {
+    auto h = static_cast<const bs_fisher_f_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return quantile(h->dist, p); });
 }
-long double bs_gamma_quantile_l(const void* handle, long double p) {
-    auto h = static_cast<const bs_gamma_l_handle*>(handle);
+long double bs_fisher_f_quantile_l(const void* handle, long double p) {
+    auto h = static_cast<const bs_fisher_f_l_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     return bs_wrap<long double>([&]{ return quantile(h->dist, p); });
 }
 
-float bs_gamma_quantile_complement_f(const void* handle, float q) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+float bs_fisher_f_quantile_complement_f(const void* handle, float q) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return quantile(complement(h->dist, q)); });
 }
-double bs_gamma_quantile_complement(const void* handle, double q) {
-    auto h = static_cast<const bs_gamma_d_handle*>(handle);
+double bs_fisher_f_quantile_complement(const void* handle, double q) {
+    auto h = static_cast<const bs_fisher_f_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return quantile(complement(h->dist, q)); });
 }
-long double bs_gamma_quantile_complement_l(const void* handle, long double q) {
-    auto h = static_cast<const bs_gamma_l_handle*>(handle);
+long double bs_fisher_f_quantile_complement_l(const void* handle, long double q) {
+    auto h = static_cast<const bs_fisher_f_l_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     return bs_wrap<long double>([&]{ return quantile(complement(h->dist, q)); });
 }
 
-float bs_gamma_skewness_f(const void* handle) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+float bs_fisher_f_skewness_f(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return skewness(h->dist); });
 }
-double      bs_gamma_skewness (const void* handle) {
-    auto h = static_cast<const bs_gamma_d_handle*>(handle);
+double      bs_fisher_f_skewness (const void* handle) {
+    auto h = static_cast<const bs_fisher_f_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return skewness(h->dist); });
 }
-long double bs_gamma_skewness_l(const void* handle) {
-    auto h = static_cast<const bs_gamma_l_handle*>(handle);
+long double bs_fisher_f_skewness_l(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_l_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     return bs_wrap<long double>([&]{ return skewness(h->dist); });
 }
 
-float       bs_gamma_standard_deviation_f(const void* handle) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+float       bs_fisher_f_standard_deviation_f(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return standard_deviation(h->dist); });
 }
-double      bs_gamma_standard_deviation (const void* handle) {
-    auto h = static_cast<const bs_gamma_l_handle*>(handle);
+double      bs_fisher_f_standard_deviation (const void* handle) {
+    auto h = static_cast<const bs_fisher_f_l_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return standard_deviation(h->dist); });
 }
-long double bs_gamma_standard_deviation_l(const void* handle) {
-    auto h = static_cast<const bs_gamma_l_handle*>(handle);
+long double bs_fisher_f_standard_deviation_l(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_l_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     return bs_wrap<long double>([&]{ return standard_deviation(h->dist); });
 }
 
-float bs_gamma_variance_f(const void* handle) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
+float bs_fisher_f_variance_f(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_f_handle*>(handle);
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return variance(h->dist); });
 }
-double bs_gamma_variance(const void* handle) {
-    auto h = static_cast<const bs_gamma_d_handle*>(handle);
+double bs_fisher_f_variance(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return variance(h->dist); });
 }
-long double bs_gamma_variance_l(const void* handle) {
-    auto h = static_cast<const bs_gamma_l_handle*>(handle);
+long double bs_fisher_f_variance_l(const void* handle) {
+    auto h = static_cast<const bs_fisher_f_l_handle*>(handle);
     if (!h) return std::numeric_limits<long double>::quiet_NaN();
     return bs_wrap<long double>([&]{ return variance(h->dist); });
 }
-
-float bs_gamma_entropy_f(const void* handle) {
-    auto h = static_cast<const bs_gamma_f_handle*>(handle);
-    if (!h) return std::numeric_limits<float>::quiet_NaN();
-    return bs_wrap<float>([&]{ return entropy(h->dist); });
-}
-double bs_gamma_entropy(const void* handle) {
-    auto h = static_cast<const bs_gamma_d_handle*>(handle);
-    if (!h) return std::numeric_limits<double>::quiet_NaN();
-    return bs_wrap<double>([&]{ return entropy(h->dist); });
-}
-long double bs_gamma_entropy_l(const void* handle) {
-    auto h = static_cast<const bs_gamma_l_handle*>(handle);
-    if (!h) return std::numeric_limits<long double>::quiet_NaN();
-    return bs_wrap<long double>([&]{ return entropy(h->dist); });
-}
-
 
 } // extern "C"

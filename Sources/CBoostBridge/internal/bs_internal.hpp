@@ -60,3 +60,5 @@ static inline std::complex<T> bs_wrap_complex(F&& f) noexcept {
     }
 }
 
+
+// Range PODs are declared in public headers where needed.

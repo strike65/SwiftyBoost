@@ -1,5 +1,5 @@
 //
-//  Created by VT on 18.10.25.
+//  Created by Volker Thieme
 //  Copyright © 2025 Volker Thieme. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -55,7 +55,7 @@ public extension SpecialFunctions {
     ///     `Float80`. The computation is performed in `Double` precision and converted
     ///     back to `T`.
     ///   - Propagates IEEE-754 `NaN` and `±∞` according to the underlying implementation.
-    /// - SeeAlso: ``sinc_pi(_:)-6q5q`` (Double), ``sinc_pi(_:)-1r2p8`` (Float)
+    /// - SeeAlso: ``SpecialFunctions/sinc_pi(_:)->T`` (generic), ``SpecialFunctions/sinc_pi(_:)->Double`` (Double), ``SpecialFunctions/sinc_pi(_:)->Float`` (Float)
     @inlinable
     static func sinc_pi<T: BinaryFloatingPoint>(_ x: T) -> T {
             return T(bs_sinc_pi(Double(x)))
@@ -92,7 +92,7 @@ public extension SpecialFunctions {
     ///     `Float80`. The computation is performed in `Double` precision and converted
     ///     back to `T`.
     ///   - Propagates IEEE-754 `NaN` and `±∞` according to the underlying implementation.
-    /// - SeeAlso: ``sinhc_pi(_:)-4u3x3`` (Double), ``sinhc_pi(_:)-9z8d2`` (Float)
+    /// - SeeAlso: ``SpecialFunctions/sinhc_pi(_:)->T`` (generic), ``SpecialFunctions/sinhc_pi(_:)->Double`` (Double), ``SpecialFunctions/sinhc_pi(_:)->Float`` (Float)
     @inlinable
     static func sinhc_pi<T: BinaryFloatingPoint>(_ x: T) -> T {
             return T(bs_sinhc_pi(Double(x)))

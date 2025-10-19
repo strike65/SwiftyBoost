@@ -60,6 +60,47 @@ public enum SpecialFunctionError: Error & Equatable {
     case parameterExceedsMaximumIntegerValue(name: String, max: Int)
 }
 
+/// Errors thrown by special functions when inputs are invalid or outside the domain.
+///
+/// Use these errors to understand why a computation failed (e.g., an argument
+/// is not finite, violates domain restrictions, or the function has a
+/// mathematical pole at the requested input).
+///
+/// You can pattern match on the associated values (e.g., parameter name or
+/// min/max bounds) to build user-facing diagnostics.
+public enum DistributionError: Error & Equatable {
+    /// Parameter must be strictly positive (e.g., `n >= 0`).
+    ///
+    /// - Parameter name: The name of the offending parameter.
+    case parameterNotPositive(name: String)
+    /// Parameter is outside the valid range [min, max].
+    ///
+    /// - Parameters:
+    ///   - name: The name of the offending parameter.
+    ///   - min: The inclusive lower bound.
+    ///   - max: The inclusive upper bound.
+    case parameterOutOfRange(name: String, min: Double, max: Double)
+    /// Parameter is not finite (NaN or ±∞).
+    ///
+    /// - Parameter name: The name of the offending parameter.
+    case parameterNotFinite(name: String)
+    /// A simple pole occurs at a non-positive integer for this function (e.g., Γ(x)).
+    ///
+    /// - Parameter name: The name of the offending parameter.
+    case poleAtNonPositiveInteger(name: String)
+    /// Inputs form an invalid combination for the real-valued function.
+    ///
+    /// - Parameter message: A human-readable explanation of the invalid combination.
+    case invalidCombination(message: String)
+    /// Parameter is greater than the maximum allowed integer value.
+    ///
+    /// - Parameters:
+    ///   - name: The name of the offending parameter.
+    ///   - max: The maximum allowed integer value.
+    case parameterExceedsMaximumIntegerValue(name: String, max: Int)
+    case generalError(msg: String)
+}
+
 // MARK: - Helper casts
 
 /// Converts a generic `BinaryFloatingPoint` to `Double`.

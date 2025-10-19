@@ -23,6 +23,18 @@ All notable changes to this project are tracked here, following the principles o
 - Documentation:
   - New DocC page “Result-Type Promotions” (policy, supported APIs, and guidance).
   - README quick reference and usage examples for promotions, `rsqrt`, and Sinus cardinalis.
+  - New DocC page “Complex Numbers” documenting `Complex<T>` construction, arithmetic, polar/phase, and Boost-backed elementary functions; linked from the module index.
+  - Fixed README typealias to match code: `ComplexL` (Float80) instead of `ComplexX`; clarified spherical harmonics return types.
+  - Added distribution reference pages: “Distribution/FisherF” and “Distribution/Arcsine” with definitions, API overview, usage, and notes.
+  - Added special-function references: “Sinus Cardinalis (π-Normalized)” for `sinc_pi`/`sinhc_pi` and complex variants; “Common Helpers and Stable Transforms” for `rsqrt`, `expm1`, `log1p`, `log1pmx`, `powm1`, `cbrt`, `sqrt1pm1`.
+  
+  Distributions:
+  - Added distribution types bridged from Boost:
+    - `Distribution.Gamma<T>` (shape/scale) with PDF/CDF/SF, quantiles, hazards, and moments.
+    - `Distribution.StudentT<T>` (ν) with PDF/CDF/SF, quantiles, hazards, moments, and power-planning helper.
+    - `Distribution.FisherF<T>` (df1, df2) with PDF/CDF/SF, quantiles, hazards, and moments.
+    - `Distribution.Arcsine<T>` (minX, maxX) with PDF/CDF/SF, quantiles, hazards, and moments.
+  - All distributions are generic over `BinaryFloatingPoint` with `Double`/`Float` overloads and `Float80` on x86_64.
 - Tests:
   - Added suites for mixed promotions across modules and for new helpers.
   - Real and complex tests for `sinc_pi`, `sinhc_pi`, and `sincc_pi` with identity checks and tolerances.

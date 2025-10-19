@@ -6,6 +6,8 @@ SwiftyBoost gives Swift developers direct access to Boost.Math special functions
 
 ## Features
 - Gamma, Beta, error, Bessel, Legendre, elliptic (Legendre and Carlson), Lambert W, Owen's T, and other high-precision helpers.
+- Probability distributions with Boost-backed implementations:
+  - Gamma, Student’s t, Fisher’s F, and Arcsine (PDF/CDF/SF, quantiles, hazards, moments).
 - `CBoostBridge` target that forwards Swift calls into the vendored Boost headers under `extern/boost`.
 - Architectural awareness with dedicated `Float`, `Double`, and (x86_64) `Float80` overloads plus generic `BinaryFloatingPoint` entry points.
 - Generic `Complex<T: BinaryFloatingPoint>` type with arithmetic, polar helpers, and elementary complex functions (`exp`, `log`, `sin`, `cos`, `tan`, `sinh`, `cosh`, `tanh`, `atan`). Double/Float/(x86_64) Float80 specializations call Boost-backed bridge functions (`bs_*`).
@@ -68,6 +70,19 @@ let z    = ComplexD(0, 0.7)
 let sc   = SpecialFunctions.sincc_pi(z)                  // equals sinhc_pi(0.7)
 ```
 
+// Distributions
+// Student’s t (ν = 5)
+let t = try Distribution.StudentT<Double>(degreesOfFreedom: 5)
+let t_q975 = try t.quantile(0.975)
+
+// Fisher’s F (df1 = 10, df2 = 20)
+let f = try Distribution.FisherF<Double>(degreesOfFreedom1: 10, degreesOfFreedom2: 20)
+let f_cdf = try f.cdf(2.5)
+
+// Arcsine on [0, 1]
+let a = try Distribution.Arcsine<Double>(minX: 0, maxX: 1)
+let a_pdf = try a.pdf(0.2)
+
 APIs throw `SpecialFunctionError` for invalid inputs or domain violations. See DocC symbol docs for function‑specific bounds mirrored from Boost.Math.
 
 ### Complex Numbers
@@ -99,7 +114,7 @@ let sn = z1.sin
 let cs = z1.cos
 ```
 
-Typealiases are provided for convenience: `ComplexD` (`Double`), `ComplexF` (`Float`), and `ComplexX` (`Float80`, x86_64 only).
+Typealiases are provided for convenience: `ComplexD` (`Double`), `ComplexF` (`Float`), and `ComplexL` (`Float80`, x86_64 only).
 
 ## Development
 - Core Swift sources reside in `Sources/SwiftyBoost`, grouped by namespace under `Math/SpecialFunctions`.
@@ -134,7 +149,7 @@ Supported mixed promotions (high level):
 - Elliptic: Legendre F/E/Π (incomplete + complete Π), Carlson RC/RF/RD/RJ/RG
 - Chebyshev series: Clenshaw recursion mixes `[coefficients]` and `x` types
 - Owen’s T: all pairs
-- Spherical harmonics: mixed angle types (ComplexD/ComplexX return types)
+- Spherical harmonics: mixed angle types (ComplexD/ComplexL return types)
 - Hypergeometric: 1F0, 0F1 (full), 1F1/2F0 (selected single‑parameter mixes), pFq (arrays and z)
 
 Advice:

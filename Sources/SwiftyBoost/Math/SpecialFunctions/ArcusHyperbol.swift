@@ -1,5 +1,5 @@
 //
-//  Created by VT on 18.10.25.
+//  Created by Volker Thieme
 //  Copyright © 2025 Volker Thieme. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy

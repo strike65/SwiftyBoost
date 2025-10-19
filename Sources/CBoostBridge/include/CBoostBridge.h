@@ -56,4 +56,6 @@
 
 // Distributions
 #include "distributions/bs_gamma_distribution.h"
-#include "distributions/bs_students_t_distribution.h"
+#include "distributions/bs_student_t_distribution.h"
+#include "distributions/bs_fisher_f_distribution.h"
+#include "distributions/bs_arcsine_distribution.h"
