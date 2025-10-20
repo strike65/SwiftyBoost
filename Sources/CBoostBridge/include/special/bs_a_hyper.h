@@ -26,10 +26,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-double bs_acosh(const double x);
-double bs_asinh(const double x);
-double bs_atanh(const double x);
+double bs_acosh_d(const double x);
+double bs_asinh_d(const double x);
+double bs_atanh_d(const double x);
 float bs_acosh_f(const float x);
 float bs_asinh_f(const float x);
 float bs_atanh_f(const float x);

@@ -27,10 +27,10 @@ extern "C" {
 #endif
 
 // Digamma / Polygamma / Zeta
-double bs_digamma(double x);
-double bs_trigamma(double x);
-double bs_polygamma(int n, double x);
-double bs_riemann_zeta(double x);
+double bs_digamma_d(double x);
+double bs_trigamma_d(double x);
+double bs_polygamma_d(int n, double x);
+double bs_riemann_zeta_d(double x);
 
 float bs_digamma_f(float x);
 float bs_trigamma_f(float x);

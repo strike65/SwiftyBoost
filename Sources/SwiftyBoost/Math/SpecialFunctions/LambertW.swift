@@ -60,7 +60,7 @@ public extension SpecialFunctions {
     @inlinable static func lambertW0<T: BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        let minX = -1.0 / bs_const_e()
+        let minX = -1.0 / bs_const_e_d()
         guard dx >= minX else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: minX, max: Double.infinity) }
         return T(bs_lambert_w0(dx))
     }
@@ -82,7 +82,7 @@ public extension SpecialFunctions {
     @inlinable static func lambertWm1<T: BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        let minX = -1.0 / bs_const_e()
+        let minX = -1.0 / bs_const_e_d()
         guard dx >= minX && dx < 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: minX, max: 0.0) }
         return T(bs_lambert_wm1(dx))
     }

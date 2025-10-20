@@ -38,7 +38,7 @@ public extension SpecialFunctions {
     @inlinable static func exponentialIntegralEi<T: BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_expint_Ei(dx))
+        return T(bs_expint_Ei_d(dx))
     }
     
     /// Exponential integral Ei(x) for `Float`.
@@ -93,7 +93,7 @@ public extension SpecialFunctions {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_expint_En(Int32(n), dx))
+        return T(bs_expint_En_d(Int32(n), dx))
     }
     
     /// Generalized exponential integral E_n(x) for `Float`.

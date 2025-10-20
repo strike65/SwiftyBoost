@@ -58,7 +58,7 @@ public extension SpecialFunctions {
     /// - SeeAlso: ``SpecialFunctions/sinc_pi(_:)->T`` (generic), ``SpecialFunctions/sinc_pi(_:)->Double`` (Double), ``SpecialFunctions/sinc_pi(_:)->Float`` (Float)
     @inlinable
     static func sinc_pi<T: BinaryFloatingPoint>(_ x: T) -> T {
-            return T(bs_sinc_pi(Double(x)))
+            return T(bs_sinc_pi_d(Double(x)))
     }
 
     /// Normalized cardinal sine, π-scaled, specialized for `Double`.
@@ -67,7 +67,7 @@ public extension SpecialFunctions {
     /// - Returns: `sin(πx) / (πx)`, or `1` when `x == 0`.
     @inlinable
     static func sinc_pi(_ x: Double) -> Double {
-            return bs_sinc_pi(x)
+            return bs_sinc_pi_d(x)
     }
 
     /// Normalized cardinal sine, π-scaled, specialized for `Float`.
@@ -95,7 +95,7 @@ public extension SpecialFunctions {
     /// - SeeAlso: ``SpecialFunctions/sinhc_pi(_:)->T`` (generic), ``SpecialFunctions/sinhc_pi(_:)->Double`` (Double), ``SpecialFunctions/sinhc_pi(_:)->Float`` (Float)
     @inlinable
     static func sinhc_pi<T: BinaryFloatingPoint>(_ x: T) -> T {
-            return T(bs_sinhc_pi(Double(x)))
+            return T(bs_sinhc_pi_d(Double(x)))
     }
 
     /// Normalized hyperbolic cardinal sine, π-scaled, specialized for `Double`.
@@ -104,7 +104,7 @@ public extension SpecialFunctions {
     /// - Returns: `sinh(πx) / (πx)`, or `1` when `x == 0`.
     @inlinable
     static func sinhc_pi(_ x: Double) -> Double {
-            return bs_sinhc_pi(x)
+            return bs_sinhc_pi_d(x)
     }
 
     /// Normalized hyperbolic cardinal sine, π-scaled, specialized for `Float`.
@@ -127,7 +127,7 @@ public extension SpecialFunctions {
     /// - Note: Delegates to a Boost-based implementation via `CBoostBridge`.
     @inlinable
     static func sincc_pi(_ z: ComplexD) -> ComplexD {
-        let r = bs_sincc_pi(bs_complex_d(re: z.real, im: z.imag))
+        let r = bs_sincc_pi_d(bs_complex_d(re: z.real, im: z.imag))
         return ComplexD(r.re, r.im)
     }
 
@@ -151,7 +151,7 @@ public extension SpecialFunctions {
     /// - Returns: The complex value of `sinh(πz) / (πz)`, or `1 + 0i` when `z == 0`.
     @inlinable
     static func sinhcc_pi(_ z: ComplexD) -> ComplexD {
-        let r = bs_sinhcc_pi(bs_complex_d(re: z.real, im: z.imag))
+        let r = bs_sinhcc_pi_d(bs_complex_d(re: z.real, im: z.imag))
         return ComplexD(r.re, r.im)
     }
 

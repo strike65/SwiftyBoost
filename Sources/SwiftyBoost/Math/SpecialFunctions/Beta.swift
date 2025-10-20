@@ -62,7 +62,7 @@ public extension SpecialFunctions {
         guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
-        return T(bs_beta(D(a), D(b)))
+        return T(bs_beta_d(D(a), D(b)))
     }
 
     // MARK: - Mixed-precision promotions (Float ↔ Double)
@@ -86,7 +86,7 @@ public extension SpecialFunctions {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
-        return T(bs_fullBeta(D(a), D(b), D(x)))
+        return T(bs_fullBeta_d(D(a), D(b), D(x)))
     }
 
     /// Unnormalized incomplete Beta B_x(a, b) with mixed `Float`/`Double`; returns `Double`.
@@ -110,7 +110,7 @@ public extension SpecialFunctions {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
-        return T(bs_ibeta(D(a), D(b), D(x)))
+        return T(bs_ibeta_d(D(a), D(b), D(x)))
     }
 
     /// Regularized I_x(a, b) with mixed `Float`/`Double`; returns `Double`.
@@ -134,7 +134,7 @@ public extension SpecialFunctions {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
-        return T(bs_ibetac(D(a), D(b), D(x)))
+        return T(bs_ibetac_d(D(a), D(b), D(x)))
     }
 
     /// Complementary 1 − I_x(a, b) with mixed `Float`/`Double`; returns `Double`.
@@ -158,7 +158,7 @@ public extension SpecialFunctions {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard p >= 0 && p <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
-        return T(bs_ibeta_inv(D(a), D(b), D(p)))
+        return T(bs_ibeta_inv_d(D(a), D(b), D(p)))
     }
 
     /// Inverse I_x(a, b) with mixed `Float`/`Double`; returns `Double`.
@@ -182,7 +182,7 @@ public extension SpecialFunctions {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard p >= 0 && p <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
-        return T(bs_ibetac_inv(D(a), D(b), D(p)))
+        return T(bs_ibetac_inv_d(D(a), D(b), D(p)))
     }
 
     /// Inverse 1 − I_x(a, b) with mixed `Float`/`Double`; returns `Double`.
@@ -194,7 +194,7 @@ public extension SpecialFunctions {
     
     /// Solve for a in I_x(a, b) = p, given b, x, p. No throws; see notes.
     @inlinable static func solveAForRegularizedIncompleteBeta<T: BinaryFloatingPoint>(b: T, x: T, p: T) -> T {
-        T(bs_ibeta_inva(D(b), D(x), D(p)))
+        T(bs_ibeta_inva_d(D(b), D(x), D(p)))
     }
 
     /// Solve for a in I_x(a, b) = p with mixed `Float`/`Double` inputs; returns `Double`.
@@ -206,7 +206,7 @@ public extension SpecialFunctions {
     
     /// Solve for b in I_x(a, b) = p, given a, x, p. No throws; see notes.
     @inlinable static func solveBForRegularizedIncompleteBeta<T: BinaryFloatingPoint>(a: T, x: T, p: T) -> T {
-        T(bs_ibeta_invb(D(a), D(x), D(p)))
+        T(bs_ibeta_invb_d(D(a), D(x), D(p)))
     }
 
     /// Solve for b in I_x(a, b) = p with mixed `Float`/`Double` inputs; returns `Double`.
@@ -232,7 +232,7 @@ public extension SpecialFunctions {
         guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
-        return T(bs_ibeta_derivative(D(a), D(b), D(x)))
+        return T(bs_ibeta_derivative_d(D(a), D(b), D(x)))
     }
     
     // MARK: - Float overloads (Beta)

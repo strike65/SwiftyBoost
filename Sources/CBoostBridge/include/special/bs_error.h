@@ -27,10 +27,10 @@ extern "C" {
 #endif
 
 // Error functions and inverses
-double bs_erf(double x);
-double bs_erfc(double x);
-double bs_erf_inv(double p);
-double bs_erfc_inv(double p);
+double bs_erf_d(double x);
+double bs_erfc_d(double x);
+double bs_erf_inv_d(double p);
+double bs_erfc_inv_d(double p);
 
 float bs_erf_f(float x);
 float bs_erfc_f(float x);

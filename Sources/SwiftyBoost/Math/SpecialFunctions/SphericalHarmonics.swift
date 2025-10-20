@@ -66,7 +66,7 @@ public extension SpecialFunctions {
     @inlinable
     static func sphericalHarmonic(n: UInt, m: Int, theta: Double, phi: Double) -> ComplexD {
         guard m <= n else { return ComplexD(.zero, .zero)}
-        let z = bs_spherical_harmonic(UInt32(n), Int32(m), theta, phi)
+        let z = bs_spherical_harmonic_d(UInt32(n), Int32(m), theta, phi)
         return ComplexD(z.re, z.im)
     }
 

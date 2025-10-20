@@ -126,7 +126,7 @@ public extension SpecialFunctions {
             throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(limit))
         }
         // Evaluate via Double-backed backend and cast to T.
-        return T(bs_factorial(n))
+        return T(bs_factorial_d(n))
     }
     
     /// Compute the factorial n! as `Double`. Throws if `n` > 170.
@@ -144,7 +144,7 @@ public extension SpecialFunctions {
         guard n <= limit else {
             throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(limit))
         }
-        return bs_factorial(n)
+        return bs_factorial_d(n)
     }
     
     /// Compute the factorial n! as `Float`. Throws if `n` > 34.
@@ -270,8 +270,8 @@ public extension SpecialFunctions {
         if risingFactorialIsExactlyZero(dx, n: n) { return T(0) }
         
         // Compute S = ln Γ(x+n) − ln Γ(x) in Double
-        let lnGammaXN = bs_lgamma(dx + Double(n))
-        let lnGammaX  = bs_lgamma(dx)
+        let lnGammaXN = bs_lgamma_d(dx + Double(n))
+        let lnGammaX  = bs_lgamma_d(dx)
         let S = lnGammaXN - lnGammaX
         
         // Overflow check
@@ -286,7 +286,7 @@ public extension SpecialFunctions {
             return T(0)
         }
         
-        return T(bs_rising_factorial(dx, n))
+        return T(bs_rising_factorial_d(dx, n))
     }
     
     /// Rising factorial (x)_n for `Double` with magnitude checks.
@@ -309,7 +309,7 @@ public extension SpecialFunctions {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         if risingFactorialIsExactlyZero(x, n: n) { return 0 }
         
-        let S = bs_lgamma(x + Double(n)) - bs_lgamma(x)
+        let S = bs_lgamma_d(x + Double(n)) - bs_lgamma_d(x)
         if S > 709.782712893384 { // log(Double.greatestFiniteMagnitude)
             throw SpecialFunctionError.invalidCombination(message: "rising_factorial overflows for given x and n in Double")
         }
@@ -317,7 +317,7 @@ public extension SpecialFunctions {
             return 0
         }
         
-        return bs_rising_factorial(x, n)
+        return bs_rising_factorial_d(x, n)
     }
     
     /// Rising factorial (x)_n for `Float` with magnitude checks.
@@ -443,14 +443,14 @@ public extension SpecialFunctions {
         
         // Compute S = ln Γ(n+1) − ln Γ(k+1) − ln Γ(n−k+1) in Double.
         let dn = Double(n), dk = Double(k), dnk = Double(n - k)
-        let S = bs_lgamma(dn + 1) - bs_lgamma(dk + 1) - bs_lgamma(dnk + 1)
+        let S = bs_lgamma_d(dn + 1) - bs_lgamma_d(dk + 1) - bs_lgamma_d(dnk + 1)
         
         let lnMax = logMaxFinite(for: T.self)
         if S > lnMax {
             throw SpecialFunctionError.invalidCombination(message: "binomial_coeff overflows for given n and k in the target type")
         }
         
-        return T(bs_binomial_coefficient(n, k))
+        return T(bs_binomial_coefficient_d(n, k))
     }
     
     /// Compute the binomial coefficient C(n, k) as `Double`.
@@ -470,12 +470,12 @@ public extension SpecialFunctions {
         if k == 0 || k == n { return 1 }
         
         let dn = Double(n), dk = Double(k), dnk = Double(n - k)
-        let S = bs_lgamma(dn + 1) - bs_lgamma(dk + 1) - bs_lgamma(dnk + 1)
+        let S = bs_lgamma_d(dn + 1) - bs_lgamma_d(dk + 1) - bs_lgamma_d(dnk + 1)
         if S > 709.782712893384 { // log(Double.greatestFiniteMagnitude)
             throw SpecialFunctionError.invalidCombination(message: "binomial_coeff overflows for given n and k in Double")
         }
         
-        return bs_binomial_coefficient(n, k)
+        return bs_binomial_coefficient_d(n, k)
     }
     
     /// Compute the binomial coefficient C(n, k) as `Float`.
@@ -552,11 +552,11 @@ public extension SpecialFunctions {
         if n % 2 == 0 {
             // n = 2k: (2k)!! = 2^k * k!
             let k = Double(n / 2)
-            return k * log(2.0) + bs_lgamma(k + 1.0)
+            return k * log(2.0) + bs_lgamma_d(k + 1.0)
         } else {
             // n = 2k - 1: (2k-1)!! = 2^k * Γ(k + 1/2) / √π
             let k = Double((n + 1) / 2) // integer ceil(n/2)
-            return k * log(2.0) + bs_lgamma(k + 0.5) - 0.5 * log(Double.pi)
+            return k * log(2.0) + bs_lgamma_d(k + 0.5) - 0.5 * log(Double.pi)
         }
     }
     
@@ -581,7 +581,7 @@ public extension SpecialFunctions {
         if S > lnMax {
             throw SpecialFunctionError.invalidCombination(message: "double_factorial overflows for given n in the target type")
         }
-        return T(bs_double_factorial(n))
+        return T(bs_double_factorial_d(n))
     }
     
     /// Compute the double factorial n!! as `Double`, with overflow checking.
@@ -599,7 +599,7 @@ public extension SpecialFunctions {
         if S > 709.782712893384 { // log(Double.greatestFiniteMagnitude)
             throw SpecialFunctionError.invalidCombination(message: "double_factorial overflows for given n in Double")
         }
-        return bs_double_factorial(n)
+        return bs_double_factorial_d(n)
     }
     
     /// Compute the double factorial n!! as `Float`, with overflow checking.

@@ -38,10 +38,10 @@ typedef struct {
 } bs_complex_l;
 
 // Elementary complex arithmetic
-bs_complex_d bs_cadd(bs_complex_d a, bs_complex_d b);
-bs_complex_d bs_csub(bs_complex_d a, bs_complex_d b);
-bs_complex_d bs_cmul(bs_complex_d a, bs_complex_d b);
-bs_complex_d bs_cdiv(bs_complex_d a, bs_complex_d b);
+bs_complex_d bs_cadd_d(bs_complex_d a, bs_complex_d b);
+bs_complex_d bs_csub_d(bs_complex_d a, bs_complex_d b);
+bs_complex_d bs_cmul_d(bs_complex_d a, bs_complex_d b);
+bs_complex_d bs_cdiv_d(bs_complex_d a, bs_complex_d b);
 
 bs_complex_f bs_cadd_f(bs_complex_f a, bs_complex_f b);
 bs_complex_f bs_csub_f(bs_complex_f a, bs_complex_f b);
@@ -54,16 +54,16 @@ bs_complex_l bs_cmul_l(bs_complex_l a, bs_complex_l b);
 bs_complex_l bs_cdiv_l(bs_complex_l a, bs_complex_l b);
 
 // Elementary complex functions
-bs_complex_d bs_cexp(bs_complex_d z);
-bs_complex_d bs_clog(bs_complex_d z);
-bs_complex_d bs_csqrt(bs_complex_d z);
-bs_complex_d bs_csin(bs_complex_d z);
-bs_complex_d bs_ccos(bs_complex_d z);
-bs_complex_d bs_ctan(bs_complex_d z);
-bs_complex_d bs_csinh(bs_complex_d z);
-bs_complex_d bs_ccosh(bs_complex_d z);
-bs_complex_d bs_ctanh(bs_complex_d z);
-bs_complex_d bs_catan(bs_complex_d z);
+bs_complex_d bs_cexp_d(bs_complex_d z);
+bs_complex_d bs_clog_d(bs_complex_d z);
+bs_complex_d bs_csqrt_d(bs_complex_d z);
+bs_complex_d bs_csin_d(bs_complex_d z);
+bs_complex_d bs_ccos_d(bs_complex_d z);
+bs_complex_d bs_ctan_d(bs_complex_d z);
+bs_complex_d bs_csinh_d(bs_complex_d z);
+bs_complex_d bs_ccosh_d(bs_complex_d z);
+bs_complex_d bs_ctanh_d(bs_complex_d z);
+bs_complex_d bs_catan_d(bs_complex_d z);
 
 bs_complex_f bs_cexp_f(bs_complex_f z);
 bs_complex_f bs_clog_f(bs_complex_f z);

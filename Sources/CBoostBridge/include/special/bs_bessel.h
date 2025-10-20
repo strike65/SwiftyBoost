@@ -27,12 +27,12 @@ extern "C" {
 #endif
 
 // Bessel (cylindrical, real)
-double bs_cyl_bessel_j(double v, double x);
-double bs_cyl_neumann(double v, double x);
-double bs_cyl_bessel_i(double v, double x);
-double bs_cyl_bessel_k(double v, double x);
-double bs_cyl_bessel_j_zero(double v, int m);
-void bs_cyl_bessel_j_zeros(double v, int start_index,
+double bs_cyl_bessel_j_d(double v, double x);
+double bs_cyl_neumann_d(double v, double x);
+double bs_cyl_bessel_i_d(double v, double x);
+double bs_cyl_bessel_k_d(double v, double x);
+double bs_cyl_bessel_j_zero_d(double v, int m);
+void bs_cyl_bessel_j_zeros_d(double v, int start_index,
                            unsigned int number_of_zeros, double *out);
 
 float bs_cyl_bessel_j_f(float v, float x);
@@ -49,19 +49,17 @@ long double bs_cyl_bessel_i_l(long double v, long double x);
 long double bs_cyl_bessel_k_l(long double v, long double x);
 
 // Spherical Bessel/Neumann (real)
-double bs_sph_bessel(unsigned int n, double x);
+double bs_sph_bessel_d(unsigned int n, double x);
 float bs_sph_bessel_f(unsigned int n, float x);
 long double bs_sph_bessel_l(unsigned int n, long double x);
-
-double bs_sph_neumann(unsigned int n, double x);
+double bs_sph_neumann_d(unsigned int n, double x);
 float bs_sph_neumann_f(unsigned int n, float x);
 long double bs_sph_neumann_l(unsigned int n, long double x);
-
-double bs_cyl_bessel_j_prime(double v, double x);
-double bs_cyl_bessel_i_prime(double v, double x);
-double bs_cyl_bessel_k_prime(double v, double x);
-double bs_sph_bessel_prime(unsigned int n, double x);
-double bs_sph_neumann_prime(unsigned int n, double x);
+double bs_cyl_bessel_j_prime_d(double v, double x);
+double bs_cyl_bessel_i_prime_d(double v, double x);
+double bs_cyl_bessel_k_prime_d(double v, double x);
+double bs_sph_bessel_prime_d(unsigned int n, double x);
+double bs_sph_neumann_prime_d(unsigned int n, double x);
 
 float bs_cyl_bessel_j_prime_f(float v, float x);
 float bs_cyl_bessel_i_prime_f(float v, float x);

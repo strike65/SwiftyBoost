@@ -135,7 +135,7 @@ public extension SpecialFunctions {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_chebyshev_T(UInt32(n), dx))
+        return T(bs_chebyshev_T_d(UInt32(n), dx))
     }
 
     /// Compute the Chebyshev polynomial of the second kind Uₙ(x).
@@ -163,7 +163,7 @@ public extension SpecialFunctions {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_chebyshev_U(UInt32(n), dx))
+        return T(bs_chebyshev_U_d(UInt32(n), dx))
     }
 
     // MARK: - Chebyshev T-series via Clenshaw recurrence
@@ -198,7 +198,7 @@ public extension SpecialFunctions {
             cD[0] *= 2.0
         }
         let result: Double = cD.withUnsafeBufferPointer { bp in
-            bs_chebyshev_clenshaw(bp.baseAddress, bp.count, Double(x))
+            bs_chebyshev_clenshaw_d(bp.baseAddress, bp.count, Double(x))
         }
         return T(result)
     }
@@ -232,13 +232,13 @@ public extension SpecialFunctions {
         if coefficients.isEmpty { return 0 }
         if halfWeightC0 {
             return coefficients.map(Double.init).withUnsafeBufferPointer { bp in
-                bs_chebyshev_clenshaw(bp.baseAddress, bp.count, x)
+                bs_chebyshev_clenshaw_d(bp.baseAddress, bp.count, x)
             }
         } else {
             var coeffs = coefficients.map(Double.init)
             coeffs[0] *= 2
             return coeffs.withUnsafeBufferPointer { bp in
-                bs_chebyshev_clenshaw(bp.baseAddress, bp.count, x)
+                bs_chebyshev_clenshaw_d(bp.baseAddress, bp.count, x)
             }
         }
     }
@@ -250,13 +250,13 @@ public extension SpecialFunctions {
         if coefficients.isEmpty { return 0 }
         if halfWeightC0 {
             return coefficients.withUnsafeBufferPointer { bp in
-                bs_chebyshev_clenshaw(bp.baseAddress, bp.count, Double(x))
+                bs_chebyshev_clenshaw_d(bp.baseAddress, bp.count, Double(x))
             }
         } else {
             var coeffs = coefficients
             coeffs[0] *= 2
             return coeffs.withUnsafeBufferPointer { bp in
-                bs_chebyshev_clenshaw(bp.baseAddress, bp.count, Double(x))
+                bs_chebyshev_clenshaw_d(bp.baseAddress, bp.count, Double(x))
             }
         }
     }

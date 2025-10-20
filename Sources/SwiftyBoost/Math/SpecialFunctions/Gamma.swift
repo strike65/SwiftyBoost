@@ -65,7 +65,7 @@ public extension SpecialFunctions {
         if dx <= 0, dx == dx.rounded(.towardZero) {
             throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x")
         }
-        return T(bs_tgamma(dx))
+        return T(bs_tgamma_d(dx))
     }
 
     // MARK: - Mixed-precision promotions (Float ↔ Double) for binary-argument APIs
@@ -114,7 +114,7 @@ public extension SpecialFunctions {
         if dx <= 0, dx == dx.rounded(.towardZero) {
             throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x")
         }
-        return T(bs_lgamma(dx))
+        return T(bs_lgamma_d(dx))
     }
 
     // Single-argument `logGamma` does not require mixed-precision overloads.
@@ -162,7 +162,7 @@ public extension SpecialFunctions {
         guard db.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
         if da <= 0, da == da.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a") }
         if db <= 0, db == db.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "b") }
-        return T(bs_tgamma_ratio(da, db))
+        return T(bs_tgamma_ratio_d(da, db))
     }
 
     // Mixed Float/Double → Double
@@ -211,7 +211,7 @@ public extension SpecialFunctions {
         let adb = da + dd
         if da <= 0, da == da.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a") }
         if adb <= 0, adb == adb.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a + delta") }
-        return T(bs_tgamma_delta_ratio(da, dd))
+        return T(bs_tgamma_delta_ratio_d(da, dd))
     }
 
     // Mixed Float/Double → Double
@@ -258,7 +258,7 @@ public extension SpecialFunctions {
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard dx >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
-        return T(bs_tgamma_lower(da, dx))
+        return T(bs_tgamma_lower_d(da, dx))
     }
 
     // Mixed Float/Double → Double
@@ -302,7 +302,7 @@ public extension SpecialFunctions {
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard dx >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
-        return T(bs_tgamma_upper(da, dx))
+        return T(bs_tgamma_upper_d(da, dx))
     }
 
     // Mixed Float/Double → Double
@@ -347,7 +347,7 @@ public extension SpecialFunctions {
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard dx >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
-        return T(bs_gamma_p(da, dx))
+        return T(bs_gamma_p_d(da, dx))
     }
 
     // Mixed Float/Double → Double
@@ -391,7 +391,7 @@ public extension SpecialFunctions {
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard dx >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
-        return T(bs_gamma_q(da, dx))
+        return T(bs_gamma_q_d(da, dx))
     }
 
     // Mixed Float/Double → Double
@@ -428,7 +428,7 @@ public extension SpecialFunctions {
         guard dp.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p") }
         guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard dp >= 0 && dp <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
-        return T(bs_gamma_p_inv(da, dp))
+        return T(bs_gamma_p_inv_d(da, dp))
     }
 
     // Mixed Float/Double → Double
@@ -465,7 +465,7 @@ public extension SpecialFunctions {
         guard dq.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "q") }
         guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard dq >= 0 && dq <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "q", min: 0.0, max: 1.0) }
-        return T(bs_gamma_q_inv(da, dq))
+        return T(bs_gamma_q_inv_d(da, dq))
     }
 
     // Mixed Float/Double → Double
@@ -515,7 +515,7 @@ public extension SpecialFunctions {
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
         guard dx >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
-        return T(bs_gamma_p_derivative(da, dx))
+        return T(bs_gamma_p_derivative_d(da, dx))
     }
 
     // Mixed Float/Double → Double

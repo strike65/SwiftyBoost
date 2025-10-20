@@ -67,7 +67,7 @@ public extension SpecialFunctions {
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dy.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
         guard dy > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "y") }
-        return T(bs_ellint_rc(dx, dy))
+        return T(bs_ellint_rc_d(dx, dy))
     }
 
     // Mixed-precision promotions (Float ↔ Double) → Double
@@ -100,7 +100,7 @@ public extension SpecialFunctions {
         guard dx >= 0, dy >= 0, dz >= 0 else {
             throw SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: Double.infinity)
         }
-        return T(bs_ellint_rf(dx, dy, dz))
+        return T(bs_ellint_rf_d(dx, dy, dz))
     }
 
     // Mixed-precision promotions (Float ↔ Double) → Double
@@ -134,7 +134,7 @@ public extension SpecialFunctions {
         guard dx >= 0, dy >= 0, dz >= 0 else {
             throw SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: Double.infinity)
         }
-        return T(bs_ellint_rd(dx, dy, dz))
+        return T(bs_ellint_rd_d(dx, dy, dz))
     }
 
     // Mixed-precision promotions (Float ↔ Double) → Double
@@ -169,7 +169,7 @@ public extension SpecialFunctions {
         guard dx >= 0, dy >= 0, dz >= 0, dp >= 0 else {
             throw SpecialFunctionError.parameterOutOfRange(name: "x/y/z/p", min: 0, max: Double.infinity)
         }
-        return T(bs_ellint_rj(dx, dy, dz, dp))
+        return T(bs_ellint_rj_d(dx, dy, dz, dp))
     }
 
     // Mixed-precision promotions (Float ↔ Double) → Double
@@ -202,7 +202,7 @@ public extension SpecialFunctions {
         guard dx >= 0, dy >= 0, dz >= 0 else {
             throw SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: Double.infinity)
         }
-        return T(bs_ellint_rg(dx, dy, dz))
+        return T(bs_ellint_rg_d(dx, dy, dz))
     }
 
     // Mixed-precision promotions (Float ↔ Double) → Double

@@ -27,11 +27,11 @@ extern "C" {
 #endif
 
 // Elliptic integrals (Carlson symmetric forms)
-double bs_ellint_rc(double x, double y);
-double bs_ellint_rf(double x, double y, double z);
-double bs_ellint_rd(double x, double y, double z);
-double bs_ellint_rj(double x, double y, double z, double p);
-double bs_ellint_rg(double x, double y, double z);
+double bs_ellint_rc_d(double x, double y);
+double bs_ellint_rf_d(double x, double y, double z);
+double bs_ellint_rd_d(double x, double y, double z);
+double bs_ellint_rj_d(double x, double y, double z, double p);
+double bs_ellint_rg_d(double x, double y, double z);
 
 float bs_ellint_rc_f(float x, float y);
 float bs_ellint_rf_f(float x, float y, float z);

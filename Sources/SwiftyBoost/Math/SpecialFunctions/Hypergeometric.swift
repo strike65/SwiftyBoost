@@ -334,7 +334,7 @@ public extension SpecialFunctions {
     @inlinable static func hypergeometricPFQ(a: [Double], b: [Double], z: Double) -> Double {
         a.withUnsafeBufferPointer { ap in
             b.withUnsafeBufferPointer { bp in
-                bs_hypergeometric_pFq(ap.baseAddress, ap.count, bp.baseAddress, bp.count, z)
+                bs_hypergeometric_pFq_d(ap.baseAddress, ap.count, bp.baseAddress, bp.count, z)
             }
         }
     }

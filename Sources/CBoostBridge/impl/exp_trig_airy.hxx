@@ -40,16 +40,16 @@
 extern "C" {
 
 // Exponential integrals and related
-double bs_expint_Ei(double x)        { return bs_wrap<double>([&] { return boost::math::expint(x); }); }
-double bs_expint_En(int n, double x) { return bs_wrap<double>([&] { return boost::math::expint(n, x); }); }
+double bs_expint_Ei_d(double x)        { return bs_wrap<double>([&] { return boost::math::expint(x); }); }
+double bs_expint_En_d(int n, double x) { return bs_wrap<double>([&] { return boost::math::expint(n, x); }); }
 double bs_expm1(double x)            { return bs_wrap<double>([&] { return boost::math::expm1(x); }); }
 double bs_log1p(double x)            { return bs_wrap<double>([&] { return boost::math::log1p(x); }); }
 double bs_log1pmx(double x)          { return bs_wrap<double>([&] { return boost::math::log1pmx(x); }); }
 double bs_powm1(double x, double y)  { return bs_wrap<double>([&] { return boost::math::powm1(x, y); }); }
-double bs_cbrt(double x)             { return bs_wrap<double>([&] { return boost::math::cbrt(x); }); }
+double bs_cbrt_d(double x)             { return bs_wrap<double>([&] { return boost::math::cbrt(x); }); }
 double bs_sqrt1pm1(double x)         { return bs_wrap<double>([&] { return boost::math::sqrt1pm1(x); }); }
-double bs_hypot(double x, double y)  { return bs_wrap<double>([&] { return boost::math::hypot(x, y); }); }
-double bs_rsqrt(const double x)      { return bs_wrap<double>([&] { return boost::math::rsqrt(x); }); }
+double bs_hypot_d(double x, double y)  { return bs_wrap<double>([&] { return boost::math::hypot(x, y); }); }
+double bs_rsqrt_d(const double x)      { return bs_wrap<double>([&] { return boost::math::rsqrt(x); }); }
 
 float bs_expint_Ei_f(float x)        { return bs_wrap<float>([&] { return boost::math::expint(x); }); }
 float bs_expint_En_f(int n, float x) { return bs_wrap<float>([&] { return boost::math::expint(n, x); }); }
@@ -74,8 +74,8 @@ long double bs_hypot_l(long double x, long double y)  { return bs_wrap<long doub
 long double bs_rsqrt_l(const long double x)      { return bs_wrap<long double>([&] { return boost::math::rsqrt(x); }); }
 
 // Trig helpers
-double bs_sin_pi(double x)             { return bs_wrap<double>([&] { return boost::math::sin_pi(x); }); }
-double bs_cos_pi(double x)             { return bs_wrap<double>([&] { return boost::math::cos_pi(x); }); }
+double bs_sin_pi_d(double x)             { return bs_wrap<double>([&] { return boost::math::sin_pi(x); }); }
+double bs_cos_pi_d(double x)             { return bs_wrap<double>([&] { return boost::math::cos_pi(x); }); }
 
 float bs_sin_pi_f(float x)             { return bs_wrap<float>([&] { return boost::math::sin_pi(x); }); }
 float bs_cos_pi_f(float x)             { return bs_wrap<float>([&] { return boost::math::cos_pi(x); }); }
@@ -84,10 +84,10 @@ long double bs_sin_pi_l(long double x) { return bs_wrap<long double>([&] { retur
 long double bs_cos_pi_l(long double x) { return bs_wrap<long double>([&] { return boost::math::cos_pi(x); }); }
 
 // Airy
-double bs_airy_ai(double x)            { return bs_wrap<double>([&] { return boost::math::airy_ai(x); }); }
-double bs_airy_bi(double x)            { return bs_wrap<double>([&] { return boost::math::airy_bi(x); }); }
-double bs_airy_ai_prime(double x)      { return bs_wrap<double>([&] { return boost::math::airy_ai_prime(x); }); }
-double bs_airy_bi_prime(double x)      { return bs_wrap<double>([&] { return boost::math::airy_bi_prime(x); }); }
+double bs_airy_ai_d(double x)            { return bs_wrap<double>([&] { return boost::math::airy_ai(x); }); }
+double bs_airy_bi_d(double x)            { return bs_wrap<double>([&] { return boost::math::airy_bi(x); }); }
+double bs_airy_ai_prime_d(double x)      { return bs_wrap<double>([&] { return boost::math::airy_ai_prime(x); }); }
+double bs_airy_bi_prime_d(double x)      { return bs_wrap<double>([&] { return boost::math::airy_bi_prime(x); }); }
 
 float bs_airy_ai_f(float x)            { return bs_wrap<float>([&] { return boost::math::airy_ai(x); }); }
 float bs_airy_bi_f(float x)            { return bs_wrap<float>([&] { return boost::math::airy_bi(x); }); }

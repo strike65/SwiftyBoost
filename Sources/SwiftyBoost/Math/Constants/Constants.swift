@@ -60,128 +60,128 @@ public extension Constants where T == Double {
 
     /// The mathematical constant π (pi) ≈ 3.14159...
     ///
-    /// Backed by: `bs_const_pi()`
-    static var pi: Double { bs_const_pi() }
+    /// Backed by: `bs_const_pi_d()`
+    static var pi: Double { bs_const_pi_d() }
 
     /// Euler’s number e ≈ 2.71828...
     ///
-    /// Backed by: `bs_const_e()`
-    static var e: Double { bs_const_e() }
+    /// Backed by: `bs_const_e_d()`
+    static var e: Double { bs_const_e_d() }
 
     /// 2π (tau), often used as a full rotation in radians.
     ///
-    /// Backed by: `bs_const_two_pi()`
-    static var twoPi: Double { bs_const_two_pi() }
+    /// Backed by: `bs_const_two_pi_d()`
+    static var twoPi: Double { bs_const_two_pi_d() }
 
     /// π/2 (half-pi), i.e. 90 degrees in radians.
     ///
-    /// Backed by: `bs_const_half_pi()`
-    static var halfPi: Double { bs_const_half_pi() }
+    /// Backed by: `bs_const_half_pi_d()`
+    static var halfPi: Double { bs_const_half_pi_d() }
 
     /// π/4 (quarter-pi), i.e. 45 degrees in radians.
     ///
-    /// Backed by: `bs_const_quarter_pi()`
-    static var quarterPi: Double { bs_const_quarter_pi() }
+    /// Backed by: `bs_const_quarter_pi_d()`
+    static var quarterPi: Double { bs_const_quarter_pi_d() }
 
     /// π/3 (third-pi), i.e. 60 degrees in radians.
     ///
-    /// Backed by: `bs_const_third_pi()`
-    static var thirdPi: Double { bs_const_third_pi() }
+    /// Backed by: `bs_const_third_pi_d()`
+    static var thirdPi: Double { bs_const_third_pi_d() }
 
     /// 2π/3 (two-thirds-pi), i.e. 120 degrees in radians.
     ///
-    /// Backed by: `bs_const_two_thirds_pi()`
-    static var twoThirdsPi: Double { bs_const_two_thirds_pi() }
+    /// Backed by: `bs_const_two_thirds_pi_d()`
+    static var twoThirdsPi: Double { bs_const_two_thirds_pi_d() }
 
     /// 3π/4 (three-quarters-pi), i.e. 135 degrees in radians.
     ///
-    /// Backed by: `bs_const_three_quarters_pi()`
-    static var threeQuartersPi: Double { bs_const_three_quarters_pi() }
+    /// Backed by: `bs_const_three_quarters_pi_d()`
+    static var threeQuartersPi: Double { bs_const_three_quarters_pi_d() }
 
     /// π/6 (sixth-pi), i.e. 30 degrees in radians.
     ///
-    /// Backed by: `bs_const_sixth_pi()`
-    static var sixthPi: Double { bs_const_sixth_pi() }
+    /// Backed by: `bs_const_sixth_pi_d()`
+    static var sixthPi: Double { bs_const_sixth_pi_d() }
 
     /// π² (pi squared).
     ///
-    /// Backed by: `bs_const_pi_sqr()`
-    static var piSqr: Double { bs_const_pi_sqr() }
+    /// Backed by: `bs_const_pi_sqr_d()`
+    static var piSqr: Double { bs_const_pi_sqr_d() }
 
     /// √2 (square root of 2).
     ///
-    /// Backed by: `bs_const_root_two()`
-    static var rootTwo: Double { bs_const_root_two() }
+    /// Backed by: `bs_const_root_two_d()`
+    static var rootTwo: Double { bs_const_root_two_d() }
 
     /// √3 (square root of 3).
     ///
-    /// Backed by: `bs_const_root_three()`
-    static var rootThree: Double { bs_const_root_three() }
+    /// Backed by: `bs_const_root_three_d()`
+    static var rootThree: Double { bs_const_root_three_d() }
 
     /// √π (square root of pi).
     ///
-    /// Backed by: `bs_const_root_pi()`
-    static var rootPi: Double { bs_const_root_pi() }
+    /// Backed by: `bs_const_root_pi_d()`
+    static var rootPi: Double { bs_const_root_pi_d() }
 
     /// 1/π (reciprocal of pi).
     ///
-    /// Backed by: `bs_const_one_div_pi()`
-    static var oneDivPi: Double { bs_const_one_div_pi() }
+    /// Backed by: `bs_const_one_div_pi_d()`
+    static var oneDivPi: Double { bs_const_one_div_pi_d() }
 
     /// 1/(2π) (one over two-pi).
     ///
-    /// Backed by: `bs_const_one_div_two_pi()`
-    static var oneDivTwoPi: Double { bs_const_one_div_two_pi() }
+    /// Backed by: `bs_const_one_div_two_pi_d()`
+    static var oneDivTwoPi: Double { bs_const_one_div_two_pi_d() }
 
     /// 1/√π (reciprocal of root-pi).
     ///
-    /// Backed by: `bs_const_one_div_root_pi()`
-    static var oneDivRootPi: Double { bs_const_one_div_root_pi() }
+    /// Backed by: `bs_const_one_div_root_pi_d()`
+    static var oneDivRootPi: Double { bs_const_one_div_root_pi_d() }
 
     /// 2/π (two over pi).
     ///
-    /// Backed by: `bs_const_two_div_pi()`
-    static var twoDivPi: Double { bs_const_two_div_pi() }
+    /// Backed by: `bs_const_two_div_pi_d()`
+    static var twoDivPi: Double { bs_const_two_div_pi_d() }
 
     /// 2/√π (two over root-pi).
     ///
-    /// Backed by: `bs_const_two_div_root_pi()`
-    static var twoDivRootPi: Double { bs_const_two_div_root_pi() }
+    /// Backed by: `bs_const_two_div_root_pi_d()`
+    static var twoDivRootPi: Double { bs_const_two_div_root_pi_d() }
 
     /// ln(2) (natural logarithm of 2).
     ///
-    /// Backed by: `bs_const_ln_two()`
-    static var lnTwo: Double { bs_const_ln_two() }
+    /// Backed by: `bs_const_ln_two_d()`
+    static var lnTwo: Double { bs_const_ln_two_d() }
 
     /// ln(10) (natural logarithm of 10).
     ///
-    /// Backed by: `bs_const_ln_ten()`
-    static var lnTen: Double { bs_const_ln_ten() }
+    /// Backed by: `bs_const_ln_ten_d()`
+    static var lnTen: Double { bs_const_ln_ten_d() }
 
     /// ln(ln(2)) (natural logarithm of ln(2)).
     ///
-    /// Backed by: `bs_const_ln_ln_two()`
-    static var lnLnTwo: Double { bs_const_ln_ln_two() }
+    /// Backed by: `bs_const_ln_ln_two_d()`
+    static var lnLnTwo: Double { bs_const_ln_ln_two_d() }
 
     /// Euler–Mascheroni constant γ ≈ 0.57721...
     ///
-    /// Backed by: `bs_const_euler()`
-    static var euler: Double { bs_const_euler() }
+    /// Backed by: `bs_const_euler_d()`
+    static var euler: Double { bs_const_euler_d() }
 
     /// Catalan’s constant G ≈ 0.91596...
     ///
-    /// Backed by: `bs_const_catalan()`
-    static var catalan: Double { bs_const_catalan() }
+    /// Backed by: `bs_const_catalan_d()`
+    static var catalan: Double { bs_const_catalan_d() }
 
     /// Apery’s constant ζ(3) ≈ 1.2020569...
     ///
-    /// Backed by: `bs_const_zeta_three()`
-    static var zetaThree: Double { bs_const_zeta_three() }
+    /// Backed by: `bs_const_zeta_three_d()`
+    static var zetaThree: Double { bs_const_zeta_three_d() }
 
     /// Golden ratio φ = (1 + √5)/2 ≈ 1.61803...
     ///
-    /// Backed by: `bs_const_phi()`
-    static var phi: Double { bs_const_phi() }
+    /// Backed by: `bs_const_phi_d()`
+    static var phi: Double { bs_const_phi_d() }
 }
 
 

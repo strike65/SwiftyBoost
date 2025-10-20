@@ -27,9 +27,9 @@ extern "C" {
 #endif
 
 // Gegenbauer polynomials
-double bs_gegenbauer(unsigned int n, double lambda, double x);
-double bs_gegenbauer_prime(unsigned int n, double lambda, double x);
-double bs_gegenbauer_derivative(unsigned int n, double lambda, double x, unsigned int k);
+double bs_gegenbauer_d(unsigned int n, double lambda, double x);
+double bs_gegenbauer_prime_d(unsigned int n, double lambda, double x);
+double bs_gegenbauer_derivative_d(unsigned int n, double lambda, double x, unsigned int k);
 float bs_gegenbauer_f(unsigned int n, float lambda, float x);
 float bs_gegenbauer_prime_f(unsigned int n, float lambda, float x);
 float bs_gegenbauer_derivative_f(unsigned int n, float lambda, float x, unsigned int k);

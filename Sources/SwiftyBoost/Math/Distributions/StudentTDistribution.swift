@@ -51,10 +51,10 @@ public extension Distribution {
             guard v > 0 else { throw DistributionError.parameterNotPositive(name: "degreesOfFreedom") }
             self.degreesOfFreedom = v
             if T.self == Double.self {
-                guard let h = bs_student_t_make(Double(v)) else {
+                guard let h = bs_student_t_make_d(Double(v)) else {
                     throw DistributionError.generalError(msg: "Distribution not initialized")
                 }
-                self.box = Box(raw: UnsafeRawPointer(h), free: { bs_student_t_free($0) })
+                self.box = Box(raw: UnsafeRawPointer(h), free: { bs_student_t_free_d($0) })
             } else if T.self == Float.self {
                 guard let h = bs_student_t_make_f(Float(v)) else {
                     throw DistributionError.generalError(msg: "Distribution not initialized")
@@ -67,51 +67,51 @@ public extension Distribution {
                 }
                 self.box = Box(raw: UnsafeRawPointer(h), free: { bs_student_t_free_l($0) })
                 #else
-                guard let h = bs_student_t_make(Double(v)) else {
+                guard let h = bs_student_t_make_d(Double(v)) else {
                     throw DistributionError.generalError(msg: "Distribution not initialized")
                 }
-                self.box = Box(raw: UnsafeRawPointer(h), free: { bs_student_t_free($0) })
+                self.box = Box(raw: UnsafeRawPointer(h), free: { bs_student_t_free_d($0) })
                 #endif
             }
         }
 
         // MARK: DistributionProtocol — Support
         public var supportLowerBound: T {
-            if T.self == Double.self { let r = bs_student_t_range(box.raw); return T(r.lower) }
+            if T.self == Double.self { let r = bs_student_t_range_d(box.raw); return T(r.lower) }
             if T.self == Float.self  { let r = bs_student_t_range_f(box.raw); return T(r.lower) }
             #if arch(x86_64) || arch(i386)
             let r = bs_student_t_range_l(box.raw); return T(r.lower)
             #else
-            let r = bs_student_t_range(box.raw);  return T(r.lower)
+            let r = bs_student_t_range_d(box.raw);  return T(r.lower)
             #endif
         }
         public var supportUpperBound: T {
-            if T.self == Double.self { let r = bs_student_t_range(box.raw); return T(r.upper) }
+            if T.self == Double.self { let r = bs_student_t_range_d(box.raw); return T(r.upper) }
             if T.self == Float.self  { let r = bs_student_t_range_f(box.raw); return T(r.upper) }
             #if arch(x86_64) || arch(i386)
             let r = bs_student_t_range_l(box.raw); return T(r.upper)
             #else
-            let r = bs_student_t_range(box.raw);  return T(r.upper)
+            let r = bs_student_t_range_d(box.raw);  return T(r.upper)
             #endif
         }
         public var range: (lower: T, upper: T) {
-            if T.self == Double.self { let r = bs_student_t_range(box.raw);   return (T(r.lower), T(r.upper)) }
+            if T.self == Double.self { let r = bs_student_t_range_d(box.raw);   return (T(r.lower), T(r.upper)) }
             if T.self == Float.self  { let r = bs_student_t_range_f(box.raw); return (T(r.lower), T(r.upper)) }
             #if arch(x86_64) || arch(i386)
             let r = bs_student_t_range_l(box.raw); return (T(r.lower), T(r.upper))
             #else
-            let r = bs_student_t_range(box.raw);   return (T(r.lower), T(r.upper))
+            let r = bs_student_t_range_d(box.raw);   return (T(r.lower), T(r.upper))
             #endif
         }
 
         // MARK: PDF/CDF/SF/Quantile
         public func pdf(_ x: T) throws -> T {
-            if T.self == Double.self { return T(bs_student_t_pdf(box.raw, Double(x))) }
+            if T.self == Double.self { return T(bs_student_t_pdf_d(box.raw, Double(x))) }
             if T.self == Float.self { return T(bs_student_t_pdf_f(box.raw, Float(x))) }
             #if arch(x86_64) || arch(i386)
             return T(bs_student_t_pdf_l(box.raw, Float80(x)))
             #else
-            return T(bs_student_t_pdf(box.raw, Double(x)))
+            return T(bs_student_t_pdf_d(box.raw, Double(x)))
             #endif
         }
 
@@ -121,42 +121,42 @@ public extension Distribution {
         }
 
         public func cdf(_ x: T) throws -> T {
-            if T.self == Double.self { return T(bs_student_t_cdf(box.raw, Double(x))) }
+            if T.self == Double.self { return T(bs_student_t_cdf_d(box.raw, Double(x))) }
             if T.self == Float.self { return T(bs_student_t_cdf_f(box.raw, Float(x))) }
             #if arch(x86_64) || arch(i386)
             return T(bs_student_t_cdf_l(box.raw, Float80(x)))
             #else
-            return T(bs_student_t_cdf(box.raw, Double(x)))
+            return T(bs_student_t_cdf_d(box.raw, Double(x)))
             #endif
         }
 
         public func sf(_ x: T) throws -> T {
-            if T.self == Double.self { return T(bs_student_t_ccdf(box.raw, Double(x))) }
+            if T.self == Double.self { return T(bs_student_t_ccdf_d(box.raw, Double(x))) }
             if T.self == Float.self { return T(bs_student_t_ccdf_f(box.raw, Float(x))) }
             #if arch(x86_64) || arch(i386)
             return T(bs_student_t_ccdf_l(box.raw, Float80(x)))
             #else
-            return T(bs_student_t_ccdf(box.raw, Double(x)))
+            return T(bs_student_t_ccdf_d(box.raw, Double(x)))
             #endif
         }
 
         public func quantile(_ p: T) throws -> T {
-            if T.self == Double.self { return T(bs_student_t_quantile(box.raw, Double(p))) }
+            if T.self == Double.self { return T(bs_student_t_quantile_d(box.raw, Double(p))) }
             if T.self == Float.self { return T(bs_student_t_quantile_f(box.raw, Float(p))) }
             #if arch(x86_64) || arch(i386)
             return T(bs_student_t_quantile_l(box.raw, Float80(p)))
             #else
-            return T(bs_student_t_quantile(box.raw, Double(p)))
+            return T(bs_student_t_quantile_d(box.raw, Double(p)))
             #endif
         }
 
         public func quantileComplement(_ q: T) throws -> T {
-            if T.self == Double.self { return T(bs_student_t_quantile_complement(box.raw, Double(q))) }
+            if T.self == Double.self { return T(bs_student_t_quantile_complement_d(box.raw, Double(q))) }
             if T.self == Float.self { return T(bs_student_t_quantile_complement_f(box.raw, Float(q))) }
             #if arch(x86_64) || arch(i386)
             return T(bs_student_t_quantile_complement_l(box.raw, Float80(q)))
             #else
-            return T(bs_student_t_quantile_complement(box.raw, Double(q)))
+            return T(bs_student_t_quantile_complement_d(box.raw, Double(q)))
             #endif
         }
 
@@ -164,12 +164,12 @@ public extension Distribution {
         public var mean: T? { degreesOfFreedom > 1 ? T(0) : nil }
         public var variance: T? {
             let v: T = {
-                if T.self == Double.self { return T(bs_student_t_variance(box.raw)) }
+                if T.self == Double.self { return T(bs_student_t_variance_d(box.raw)) }
                 if T.self == Float.self  { return T(bs_student_t_variance_f(box.raw)) }
                 #if arch(x86_64) || arch(i386)
                 return T(bs_student_t_variance_l(box.raw))
                 #else
-                return T(bs_student_t_variance(box.raw))
+                return T(bs_student_t_variance_d(box.raw))
                 #endif
             }()
             return v.isFinite ? v : nil
@@ -178,36 +178,36 @@ public extension Distribution {
         public var median: T { 0 }
         public var skewness: T? {
             let s: T = {
-                if T.self == Double.self { return T(bs_student_t_skewness(box.raw)) }
+                if T.self == Double.self { return T(bs_student_t_skewness_d(box.raw)) }
                 if T.self == Float.self  { return T(bs_student_t_skewness_f(box.raw)) }
                 #if arch(x86_64) || arch(i386)
                 return T(bs_student_t_skewness_l(box.raw))
                 #else
-                return T(bs_student_t_skewness(box.raw))
+                return T(bs_student_t_skewness_d(box.raw))
                 #endif
             }()
             return s.isFinite ? s : nil
         }
         public var kurtosis: T? {
             let k: T = {
-                if T.self == Double.self { return T(bs_student_t_kurtosis(box.raw)) }
+                if T.self == Double.self { return T(bs_student_t_kurtosis_d(box.raw)) }
                 if T.self == Float.self  { return T(bs_student_t_kurtosis_f(box.raw)) }
                 #if arch(x86_64) || arch(i386)
                 return T(bs_student_t_kurtosis_l(box.raw))
                 #else
-                return T(bs_student_t_kurtosis(box.raw))
+                return T(bs_student_t_kurtosis_d(box.raw))
                 #endif
             }()
             return k.isFinite ? k : nil
         }
         public var kurtosisExcess: T? {
             let e: T = {
-                if T.self == Double.self { return T(bs_student_t_kurtosis_excess(box.raw)) }
+                if T.self == Double.self { return T(bs_student_t_kurtosis_excess_d(box.raw)) }
                 if T.self == Float.self  { return T(bs_student_t_kurtosis_excess_f(box.raw)) }
                 #if arch(x86_64) || arch(i386)
                 return T(bs_student_t_kurtosis_excess_l(box.raw))
                 #else
-                return T(bs_student_t_kurtosis_excess(box.raw))
+                return T(bs_student_t_kurtosis_excess_d(box.raw))
                 #endif
             }()
             return e.isFinite ? e : nil
@@ -215,21 +215,21 @@ public extension Distribution {
 
         // MARK: Hazards
         public func hazard(_ x: T) throws -> T {
-            if T.self == Double.self { return T(bs_student_t_hazard(box.raw, Double(x))) }
+            if T.self == Double.self { return T(bs_student_t_hazard_d(box.raw, Double(x))) }
             if T.self == Float.self  { return T(bs_student_t_hazard_f(box.raw, Float(x))) }
             #if arch(x86_64) || arch(i386)
             return T(bs_student_t_hazard_l(box.raw, Float80(x)))
             #else
-            return T(bs_student_t_hazard(box.raw, Double(x)))
+            return T(bs_student_t_hazard_d(box.raw, Double(x)))
             #endif
         }
         public func chf(_ x: T) throws -> T {
-            if T.self == Double.self { return T(bs_student_t_chf(box.raw, Double(x))) }
+            if T.self == Double.self { return T(bs_student_t_chf_d(box.raw, Double(x))) }
             if T.self == Float.self  { return T(bs_student_t_chf_f(box.raw, Float(x))) }
             #if arch(x86_64) || arch(i386)
             return T(bs_student_t_chf_l(box.raw, Float80(x)))
             #else
-            return T(bs_student_t_chf(box.raw, Double(x)))
+            return T(bs_student_t_chf_d(box.raw, Double(x)))
             #endif
         }
         
@@ -237,12 +237,12 @@ public extension Distribution {
         public var latticeStep: T? { nil }
         public var latticeOrigin: T? { nil }
         public var entropy: T? {
-            if T.self == Double.self { return T(bs_student_t_entropy(box.raw)) }
+            if T.self == Double.self { return T(bs_student_t_entropy_d(box.raw)) }
             if T.self == Float.self  { return T(bs_student_t_entropy_f(box.raw)) }
             #if arch(x86_64) || arch(i386)
             return T(bs_student_t_entropy_l(box.raw))
             #else
-            return T(bs_student_t_entropy(box.raw))
+            return T(bs_student_t_entropy_d(box.raw))
             #endif
         }
 
@@ -251,7 +251,7 @@ public extension Distribution {
         /// Find degrees of freedom ν given effect size, α, β, and σ.
         public static func findDegreesOfFreedom(differenceFromMean: T, alpha: T, beta: T, sd: T, hint: T = 1) -> T {
             if T.self == Double.self {
-                return T(bs_student_t_find_degrees_of_freedom(Double(differenceFromMean), Double(alpha), Double(beta), Double(sd), Double(hint)))
+                return T(bs_student_t_find_degrees_of_freedom_d(Double(differenceFromMean), Double(alpha), Double(beta), Double(sd), Double(hint)))
             }
             if T.self == Float.self {
                 return T(bs_student_t_find_degrees_of_freedom_f(Float(differenceFromMean), Float(alpha), Float(beta), Float(sd), Float(hint)))
@@ -259,7 +259,7 @@ public extension Distribution {
             #if arch(x86_64) || arch(i386)
             return T(bs_student_t_find_degrees_of_freedom_l(Float80(differenceFromMean), Float80(alpha), Float80(beta), Float80(sd), Float80(hint)))
             #else
-            return T(bs_student_t_find_degrees_of_freedom(Double(differenceFromMean), Double(alpha), Double(beta), Double(sd), Double(hint)))
+            return T(bs_student_t_find_degrees_of_freedom_d(Double(differenceFromMean), Double(alpha), Double(beta), Double(sd), Double(hint)))
             #endif
         }
     }

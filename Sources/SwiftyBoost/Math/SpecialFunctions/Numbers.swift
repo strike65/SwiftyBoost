@@ -280,7 +280,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterExceedsMaximumIntegerValue` if `n` exceeds the supported limit.
     ///
     /// Notes:
-    /// - This wrapper forwards to `bs_prime` in the C bridge. A simple upper-bound check is applied
+    /// - This wrapper forwards to `bs_prime_d` in the C bridge. A simple upper-bound check is applied
     ///   to guard the underlying implementation (currently 10000).
     ///
     /// Example:

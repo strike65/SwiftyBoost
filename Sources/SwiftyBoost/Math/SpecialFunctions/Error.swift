@@ -54,7 +54,7 @@ public extension SpecialFunctions {
     @inlinable static func errorFunction<T: BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_erf(dx))
+        return T(bs_erf_d(dx))
     }
     
     /// Compute the complementary error function erfc(x) = 1 − erf(x).
@@ -73,7 +73,7 @@ public extension SpecialFunctions {
     @inlinable static func complementaryErrorFunction<T: BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_erfc(dx))
+        return T(bs_erfc_d(dx))
     }
     
     /// Compute the inverse Gaussian error function erf⁻¹(z).
@@ -106,7 +106,7 @@ public extension SpecialFunctions {
                 max: (1.0).nextDown
             )
         }
-        return T(bs_erf_inv(dp))
+        return T(bs_erf_inv_d(dp))
     }
     
     

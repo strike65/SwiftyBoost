@@ -23,14 +23,14 @@ extern "C" {
 void* bs_student_t_make_f(float v) {
     try { return new bs_student_t_f_handle(v); } catch (...) { return nullptr; }
 }
-void* bs_student_t_make(double v) {
+void* bs_student_t_make_d(double v) {
     try { return new bs_student_t_d_handle(v); } catch (...) { return nullptr; }
 }
 void* bs_student_t_make_l(long double v) {
     try { return new bs_student_t_l_handle(v); } catch (...) { return nullptr; }
 }
 void bs_student_t_free_f(void* handle) { delete static_cast<bs_student_t_f_handle*>(handle); }
-void bs_student_t_free(void* handle) { delete static_cast<bs_student_t_d_handle*>(handle); }
+void bs_student_t_free_d(void* handle) { delete static_cast<bs_student_t_d_handle*>(handle); }
 void bs_student_t_free_l(void* handle) { delete static_cast<bs_student_t_l_handle*>(handle); }
 
 float bs_student_t_cdf_f(const void* handle, float x) {
@@ -38,7 +38,7 @@ float bs_student_t_cdf_f(const void* handle, float x) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return cdf(h->dist, x); });
 }
-double bs_student_t_cdf(const void* handle, double x) {
+double bs_student_t_cdf_d(const void* handle, double x) {
     auto h = static_cast<const bs_student_t_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return cdf(h->dist, x); });
@@ -54,7 +54,7 @@ float bs_student_t_ccdf_f(const void* handle, float x) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return cdf(complement(h->dist, x)); });
 }
-double bs_student_t_ccdf(const void* handle, double x) {
+double bs_student_t_ccdf_d(const void* handle, double x) {
     auto h = static_cast<const bs_student_t_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return cdf(complement(h->dist, x)); });
@@ -79,7 +79,7 @@ float bs_student_t_hazard_f(const void* handle, float x) {
     }
     return d / p;
 }
-double bs_student_t_hazard(const void* handle, double x) {
+double bs_student_t_hazard_d(const void* handle, double x) {
     auto h = static_cast<const bs_student_t_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     double p = bs_wrap<double>([&]{ return cdf(complement(h->dist, x)); });
@@ -113,7 +113,7 @@ float bs_student_t_chf_f(const void* handle, float x) {
     float p = bs_wrap<float>([&]{ return cdf(complement(h->dist, x)); });
     return -log(p);
 }
-double     bs_student_t_chf(const void* handle, double x) {
+double     bs_student_t_chf_d(const void* handle, double x) {
     auto h = static_cast<const bs_student_t_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     double p = bs_wrap<double>([&]{ return cdf(complement(h->dist, x)); });
@@ -132,7 +132,7 @@ float bs_student_t_kurtosis_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis(h->dist); });
 }
-double bs_student_t_kurtosis(const void* handle) {
+double bs_student_t_kurtosis_d(const void* handle) {
     auto h = static_cast<const bs_student_t_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis(h->dist); });
@@ -148,7 +148,7 @@ float bs_student_t_kurtosis_excess_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis_excess(h->dist); });
 }
-double bs_student_t_kurtosis_excess(const void* handle) {
+double bs_student_t_kurtosis_excess_d(const void* handle) {
     auto h = static_cast<const bs_student_t_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis_excess(h->dist); });
@@ -164,7 +164,7 @@ float bs_student_t_mean_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return mean(h->dist); });
 }
-double bs_student_t_mean(const void* handle) {
+double bs_student_t_mean_d(const void* handle) {
     auto h = static_cast<const bs_student_t_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return mean(h->dist); });
@@ -180,7 +180,7 @@ float bs_student_t_median_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return median(h->dist); });
 }
-double bs_student_t_median (const void* handle) {
+double bs_student_t_median_d(const void* handle) {
     auto h = static_cast<const bs_student_t_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<long double>([&]{ return median(h->dist); });
@@ -196,7 +196,7 @@ float bs_student_t_mode_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return mode(h->dist); });
 }
-double bs_student_t_mode(const void* handle) {
+double bs_student_t_mode_d(const void* handle) {
     auto h = static_cast<const bs_student_t_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return mode(h->dist); });
@@ -212,7 +212,7 @@ float bs_student_t_pdf_f(const void* handle, float x) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return pdf(h->dist, x); });
 }
-double bs_student_t_pdf(const void* handle, double x) {
+double bs_student_t_pdf_d(const void* handle, double x) {
     auto h = static_cast<const bs_student_t_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return pdf(h->dist, x); });
@@ -233,7 +233,7 @@ bs_range_f bs_student_t_range_f(const void* handle) {
     return bs_range_f{ static_cast<float>(pr.first), static_cast<float>(pr.second) };
 }
 
-bs_range_d bs_student_t_range(const void* handle) {
+bs_range_d bs_student_t_range_d(const void* handle) {
     auto h = static_cast<const bs_student_t_d_handle*>(handle);
     if (!h) {
         double nan = std::numeric_limits<double>::quiet_NaN();
@@ -263,7 +263,7 @@ bs_range_f bs_student_t_support_f(const void* handle) {
     return bs_range_f{ static_cast<float>(pr.first), static_cast<float>(pr.second) };
 }
 
-bs_range_d bs_student_t_support(const void* handle) {
+bs_range_d bs_student_t_support_d(const void* handle) {
     auto h = static_cast<const bs_student_t_d_handle*>(handle);
     if (!h) {
         double nan = std::numeric_limits<double>::quiet_NaN();
@@ -288,7 +288,7 @@ float bs_student_t_quantile_f(const void* handle, float p) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return quantile(h->dist, p); });
 }
-double bs_student_t_quantile(const void* handle, double p) {
+double bs_student_t_quantile_d(const void* handle, double p) {
     auto h = static_cast<const bs_student_t_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return quantile(h->dist, p); });
@@ -304,7 +304,7 @@ float bs_student_t_quantile_complement_f(const void* handle, float q) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return quantile(complement(h->dist, q)); });
 }
-double bs_student_t_quantile_complement(const void* handle, double q) {
+double bs_student_t_quantile_complement_d(const void* handle, double q) {
     auto h = static_cast<const bs_student_t_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return quantile(complement(h->dist, q)); });
@@ -320,7 +320,7 @@ float bs_student_t_skewness_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return skewness(h->dist); });
 }
-double      bs_student_t_skewness (const void* handle) {
+double      bs_student_t_skewness_d(const void* handle) {
     auto h = static_cast<const bs_student_t_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return skewness(h->dist); });
@@ -336,7 +336,7 @@ float       bs_student_t_standard_deviation_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return standard_deviation(h->dist); });
 }
-double      bs_student_t_standard_deviation (const void* handle) {
+double      bs_student_t_standard_deviation_d(const void* handle) {
     auto h = static_cast<const bs_student_t_l_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return standard_deviation(h->dist); });
@@ -352,7 +352,7 @@ float bs_student_t_variance_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return variance(h->dist); });
 }
-double bs_student_t_variance(const void* handle) {
+double bs_student_t_variance_d(const void* handle) {
     auto h = static_cast<const bs_student_t_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return variance(h->dist); });
@@ -368,7 +368,7 @@ float bs_student_t_entropy_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return entropy(h->dist); });
 }
-double bs_student_t_entropy(const void* handle) {
+double bs_student_t_entropy_d(const void* handle) {
     auto h = static_cast<const bs_student_t_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return entropy(h->dist); });
@@ -383,7 +383,7 @@ long double bs_student_t_entropy_l(const void* handle) {
 float bs_student_t_find_degrees_of_freedom_f(float difference_from_mean, float alpha, float beta, float sd, float hint) {
     return bs_wrap<float>([&]{ return students_t_distribution<float>::find_degrees_of_freedom(difference_from_mean, alpha, beta, sd, hint); });
 }
-double bs_student_t_find_degrees_of_freedom(double difference_from_mean, double alpha, double beta, double sd, double hint) {
+double bs_student_t_find_degrees_of_freedom_d(double difference_from_mean, double alpha, double beta, double sd, double hint) {
     return bs_wrap<double>([&]{ return students_t_distribution<double>::find_degrees_of_freedom(difference_from_mean, alpha, beta, sd, hint); });
 }
 long double bs_student_t_find_degrees_of_freedom_l(long double difference_from_mean, long double alpha, long double beta, long double sd, long double hint) {

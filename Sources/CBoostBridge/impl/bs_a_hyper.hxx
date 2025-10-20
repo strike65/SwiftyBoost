@@ -28,13 +28,13 @@
 extern "C"
 {
 #endif
-    double bs_acosh(const double x) {
+double bs_acosh_d(const double x) {
         return boost::math::acosh(x);
     }
-    double bs_asinh(const double x) {
+double bs_asinh_d(const double x) {
         return boost::math::asinh(x);
     }
-    double bs_atanh(const double x) {
+double bs_atanh_d(const double x) {
         return boost::math::atanh(x);
     }
     float bs_acosh_f(const float x) {

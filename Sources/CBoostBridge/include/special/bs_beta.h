@@ -27,16 +27,16 @@ extern "C" {
 #endif
 
 // Beta family
-double bs_beta(double a, double b);
-double bs_fullBeta(double a, double b, double x);
-double bs_ibeta(double a, double b, double x);
-double bs_ibetac(double a, double b, double x);
-double bs_ibeta_inv(double a, double b, double p);
-double bs_ibetac_inv(double a, double b, double p);
-double bs_ibeta_inva(double b, double x, double p);
-double bs_ibeta_invb(double a, double x, double p);
+double bs_beta_d(double a, double b);
+double bs_fullBeta_d(double a, double b, double x);
+double bs_ibeta_d(double a, double b, double x);
+double bs_ibetac_d(double a, double b, double x);
+double bs_ibeta_inv_d(double a, double b, double p);
+double bs_ibetac_inv_d(double a, double b, double p);
+double bs_ibeta_inva_d(double b, double x, double p);
+double bs_ibeta_invb_d(double a, double x, double p);
 // Derivative of regularized incomplete Beta I_x(a, b) w.r.t. x
-double bs_ibeta_derivative(double a, double b, double x);
+double bs_ibeta_derivative_d(double a, double b, double x);
 
 float bs_beta_f(float a, float b);
 float bs_fullBeta_f(float a, float b, float x);

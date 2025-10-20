@@ -27,10 +27,10 @@ extern "C" {
 #endif
 
 // Gamma and log-gamma
-double bs_tgamma(double x);
-double bs_lgamma(double x);
-double bs_tgamma_ratio(double a, double b);
-double bs_tgamma_delta_ratio(double a, double delta);
+double bs_tgamma_d(double x);
+double bs_lgamma_d(double x);
+double bs_tgamma_ratio_d(double a, double b);
+double bs_tgamma_delta_ratio_d(double a, double delta);
 
 float bs_tgamma_f(float x);
 float bs_lgamma_f(float x);
@@ -43,15 +43,15 @@ long double bs_tgamma_ratio_l(long double a, long double b);
 long double bs_tgamma_delta_ratio_l(long double a, long double delta);
 
 // Incomplete gamma (lower/upper, regularized, and inverses)
-double bs_tgamma_lower(double a, double x);
-double bs_tgamma_upper(double a, double x);
-double bs_gamma_p(double a, double x);
-double bs_gamma_q(double a, double x);
-double bs_gamma_p_inv(double a, double p);
-double bs_gamma_q_inv(double a, double q);
+double bs_tgamma_lower_d(double a, double x);
+double bs_tgamma_upper_d(double a, double x);
+double bs_gamma_p_d(double a, double x);
+double bs_gamma_q_d(double a, double x);
+double bs_gamma_p_inv_d(double a, double p);
+double bs_gamma_q_inv_d(double a, double q);
 
 // Derivatives of regularized incomplete gamma (w.r.t. x)
-double bs_gamma_p_derivative(double a, double x);
+double bs_gamma_p_derivative_d(double a, double x);
 
 float bs_tgamma_lower_f(float a, float x);
 float bs_tgamma_upper_f(float a, float x);

@@ -78,10 +78,10 @@ extension Distribution {
             self.scale = scale
             
             if T.self == Double.self {
-                guard let h = bs_gamma_make(Double(shape), Double(scale)) else {
+                guard let h = bs_gamma_make_d(Double(shape), Double(scale)) else {
                     throw DistributionError.generalError(msg: "Distribution not initialized")
                 }
-                self.box = Box(raw: UnsafeRawPointer(h), free: { bs_gamma_free($0) })
+                self.box = Box(raw: UnsafeRawPointer(h), free: { bs_gamma_free_d($0) })
             } else if T.self == Float.self {
                 guard let h = bs_gamma_make_f(Float(shape), Float(scale)) else {
                     throw DistributionError.generalError(msg: "Distribution not initialized")
@@ -97,10 +97,10 @@ extension Distribution {
                 self.box = Box(raw: UnsafeRawPointer(h), free: { bs_gamma_free_l($0) })
 #else
                 // Fallback via Double handle when Float80 is unavailable
-                guard let h = bs_gamma_make(Double(shape), Double(scale)) else {
+                guard let h = bs_gamma_make_d(Double(shape), Double(scale)) else {
                     throw DistributionError.generalError(msg: "Distribution not initialized")
                 }
-                self.box = Box(raw: UnsafeRawPointer(h), free: { bs_gamma_free($0) })
+                self.box = Box(raw: UnsafeRawPointer(h), free: { bs_gamma_free_d($0) })
 #endif
             }
         }
@@ -110,7 +110,7 @@ extension Distribution {
         /// The lower bound of the support. For Γ(k, θ), this is 0.
         public var supportLowerBound: T {
             if T.self == Double.self {
-                let r = bs_gamma_support(box.raw)
+                let r = bs_gamma_support_d(box.raw)
                 return T(r.lower)
             }
             if T.self == Float.self {
@@ -121,7 +121,7 @@ extension Distribution {
             let r = bs_gamma_support_l(box.raw)
             return T(r.lower)
             #else
-            let r = bs_gamma_support(box.raw)
+            let r = bs_gamma_support_d(box.raw)
             return T(r.lower)
             #endif
         }
@@ -129,7 +129,7 @@ extension Distribution {
         /// The upper bound of the support. For Γ(k, θ), this is +∞.
         public var supportUpperBound: T {
             if T.self == Double.self {
-                let r = bs_gamma_support(box.raw)
+                let r = bs_gamma_support_d(box.raw)
                 return T(r.upper)
             }
             if T.self == Float.self {
@@ -140,7 +140,7 @@ extension Distribution {
             let r = bs_gamma_support_l(box.raw)
             return T(r.upper)
             #else
-            let r = bs_gamma_support(box.raw)
+            let r = bs_gamma_support_d(box.raw)
             return T(r.upper)
             #endif
         }
@@ -151,7 +151,7 @@ extension Distribution {
         /// internal policies for numerical underflow/overflow reporting.
         public var range: (lower: T, upper: T) {
             if T.self == Double.self {
-                let r = bs_gamma_range(box.raw)
+                let r = bs_gamma_range_d(box.raw)
                 return (T(r.lower), T(r.upper))
             }
             if T.self == Float.self {
@@ -162,7 +162,7 @@ extension Distribution {
             let r = bs_gamma_range_l(box.raw)
             return (T(r.lower), T(r.upper))
             #else
-            let r = bs_gamma_range(box.raw)
+            let r = bs_gamma_range_d(box.raw)
             return (T(r.lower), T(r.upper))
             #endif
         }
@@ -176,12 +176,12 @@ extension Distribution {
         /// - Throws: `DistributionError.parameterOutOfRange` if `x < 0`.
         public func pdf(_ x: T) throws -> T {
             guard x >= 0 else { throw DistributionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
-            if T.self == Double.self { return T(bs_gamma_pdf(box.raw, Double(x))) }
+            if T.self == Double.self { return T(bs_gamma_pdf_d(box.raw, Double(x))) }
             if T.self == Float.self { return T(bs_gamma_pdf_f(box.raw, Float(x))) }
 #if arch(x86_64) || arch(i386)
             return T(bs_gamma_pdf_l(box.raw, Float80(x)))
 #else
-            return T(bs_gamma_pdf(box.raw, Double(x)))
+            return T(bs_gamma_pdf_d(box.raw, Double(x)))
 #endif
         }
         
@@ -193,12 +193,12 @@ extension Distribution {
         public func cdf(_ x: T) throws -> T {
             guard x >= 0 else { throw DistributionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
             if x == 0 { return 0 }
-            if T.self == Double.self { return T(bs_gamma_cdf(box.raw, Double(x))) }
+            if T.self == Double.self { return T(bs_gamma_cdf_d(box.raw, Double(x))) }
             if T.self == Float.self { return T(bs_gamma_cdf_f(box.raw, Float(x))) }
 #if arch(x86_64) || arch(i386)
             return T(bs_gamma_cdf_l(box.raw, Float80(x)))
 #else
-            return T(bs_gamma_cdf(box.raw, Double(x)))
+            return T(bs_gamma_cdf_d(box.raw, Double(x)))
 #endif
         }
         
@@ -210,12 +210,12 @@ extension Distribution {
         public func sf(_ x: T) throws -> T {
             guard x >= 0 else { throw DistributionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
             if x == 0 { return 1 }
-            if T.self == Double.self { return T(bs_gamma_ccdf(box.raw, Double(x))) }
+            if T.self == Double.self { return T(bs_gamma_ccdf_d(box.raw, Double(x))) }
             if T.self == Float.self { return T(bs_gamma_ccdf_f(box.raw, Float(x))) }
 #if arch(x86_64) || arch(i386)
             return T(bs_gamma_ccdf_l(box.raw, Float80(x)))
 #else
-            return T(bs_gamma_ccdf(box.raw, Double(x)))
+            return T(bs_gamma_ccdf_d(box.raw, Double(x)))
 #endif
         }
         
@@ -228,12 +228,12 @@ extension Distribution {
             guard p >= 0 && p <= 1 else { throw DistributionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
             if p == 0 { return 0 }
             if p == 1 { return T.infinity }
-            if T.self == Double.self { return T(bs_gamma_quantile(box.raw, Double(p))) }
+            if T.self == Double.self { return T(bs_gamma_quantile_d(box.raw, Double(p))) }
             if T.self == Float.self { return T(bs_gamma_quantile_f(box.raw, Float(p))) }
 #if arch(x86_64) || arch(i386)
             return T(bs_gamma_quantile_l(box.raw, Float80(p)))
 #else
-            return T(bs_gamma_quantile(box.raw, Double(p)))
+            return T(bs_gamma_quantile_d(box.raw, Double(p)))
 #endif
         }
         
@@ -246,12 +246,12 @@ extension Distribution {
             guard q >= 0 && q <= 1 else { throw DistributionError.parameterOutOfRange(name: "q", min: 0.0, max: 1.0) }
             if q == 1 { return 0 }
             if q == 0 { return T.infinity }
-            if T.self == Double.self { return T(bs_gamma_quantile_complement(box.raw, Double(q))) }
+            if T.self == Double.self { return T(bs_gamma_quantile_complement_d(box.raw, Double(q))) }
             if T.self == Float.self { return T(bs_gamma_quantile_complement_f(box.raw, Float(q))) }
 #if arch(x86_64) || arch(i386)
             return T(bs_gamma_quantile_complement_l(box.raw, Float80(q)))
 #else
-            return T(bs_gamma_quantile_complement(box.raw, Double(q)))
+            return T(bs_gamma_quantile_complement_d(box.raw, Double(q)))
 #endif
         }
         
@@ -259,23 +259,23 @@ extension Distribution {
         
         /// The mean E[X] = kθ.
         public var mean: T? {
-            if T.self == Double.self { return T(bs_gamma_mean(box.raw)) }
+            if T.self == Double.self { return T(bs_gamma_mean_d(box.raw)) }
             if T.self == Float.self { return T(bs_gamma_mean_f(box.raw)) }
 #if arch(x86_64) || arch(i386)
             return T(bs_gamma_mean_l(box.raw))
 #else
-            return T(bs_gamma_mean(box.raw))
+            return T(bs_gamma_mean_d(box.raw))
 #endif
         }
         
         /// The variance Var[X] = kθ².
         public var variance: T? {
-            if T.self == Double.self { return T(bs_gamma_variance(box.raw)) }
+            if T.self == Double.self { return T(bs_gamma_variance_d(box.raw)) }
             if T.self == Float.self { return T(bs_gamma_variance_f(box.raw)) }
 #if arch(x86_64) || arch(i386)
             return T(bs_gamma_variance_l(box.raw))
 #else
-            return T(bs_gamma_variance(box.raw))
+            return T(bs_gamma_variance_d(box.raw))
 #endif
         }
         
@@ -285,12 +285,12 @@ extension Distribution {
         /// Returns `nil` when not finite or undefined.
         public var mode: T? {
             let m: T = {
-                if T.self == Double.self { return T(bs_gamma_mode(box.raw)) }
+                if T.self == Double.self { return T(bs_gamma_mode_d(box.raw)) }
                 if T.self == Float.self { return T(bs_gamma_mode_f(box.raw)) }
 #if arch(x86_64) || arch(i386)
                 return T(bs_gamma_mode_l(box.raw))
 #else
-                return T(bs_gamma_mode(box.raw))
+                return T(bs_gamma_mode_d(box.raw))
 #endif
             }()
             return m.isFinite ? m : nil
@@ -303,12 +303,12 @@ extension Distribution {
         /// - Throws: `DistributionError.parameterOutOfRange` if `x < 0`.
         public func hazard(_ x: T) throws -> T {
             guard x >= 0 else { throw DistributionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
-            if T.self == Double.self { return T(bs_gamma_hazard(box.raw, Double(x))) }
+            if T.self == Double.self { return T(bs_gamma_hazard_d(box.raw, Double(x))) }
             if T.self == Float.self { return T(bs_gamma_hazard_f(box.raw, Float(x))) }
 #if arch(x86_64) || arch(i386)
             return T(bs_gamma_hazard_l(box.raw, Float80(x)))
 #else
-            return T(bs_gamma_hazard(box.raw, Double(x)))
+            return T(bs_gamma_hazard_d(box.raw, Double(x)))
 #endif
         }
 
@@ -319,12 +319,12 @@ extension Distribution {
         /// - Throws: `DistributionError.parameterOutOfRange` if `x < 0`.
         public func chf(_ x: T) throws -> T {
             guard x >= 0 else { throw DistributionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
-            if T.self == Double.self { return T(bs_gamma_chf(box.raw, Double(x))) }
+            if T.self == Double.self { return T(bs_gamma_chf_d(box.raw, Double(x))) }
             if T.self == Float.self { return T(bs_gamma_chf_f(box.raw, Float(x))) }
 #if arch(x86_64) || arch(i386)
             return T(bs_gamma_chf_l(box.raw, Float80(x)))
 #else
-            return T(bs_gamma_chf(box.raw, Double(x)))
+            return T(bs_gamma_chf_d(box.raw, Double(x)))
 #endif
         }
 
@@ -342,12 +342,12 @@ extension Distribution {
         
         /// The median of the distribution (numerically evaluated by Boost).
         public var median: T {
-            if T.self == Double.self { return T(bs_gamma_median(box.raw)) }
+            if T.self == Double.self { return T(bs_gamma_median_d(box.raw)) }
             if T.self == Float.self { return T(bs_gamma_median_f(box.raw)) }
 #if arch(x86_64) || arch(i386)
             return T(bs_gamma_median_l(box.raw))
 #else
-            return T(bs_gamma_median(box.raw))
+            return T(bs_gamma_median_d(box.raw))
 #endif
         }
         
@@ -355,12 +355,12 @@ extension Distribution {
         ///
         /// For Γ(k, θ), γ₁ = 2 / √k.
         public var skewness: T? {
-            if T.self == Double.self { return T(bs_gamma_skewness(box.raw)) }
+            if T.self == Double.self { return T(bs_gamma_skewness_d(box.raw)) }
             if T.self == Float.self { return T(bs_gamma_skewness_f(box.raw)) }
 #if arch(x86_64) || arch(i386)
             return T(bs_gamma_skewness_l(box.raw))
 #else
-            return T(bs_gamma_skewness(box.raw))
+            return T(bs_gamma_skewness_d(box.raw))
 #endif
         }
         
@@ -368,12 +368,12 @@ extension Distribution {
         ///
         /// For Γ(k, θ), β₂ = 3 + 6/k. Equals 3 for a normal distribution.
         public var kurtosis: T? {
-            if T.self == Double.self { return T(bs_gamma_kurtosis(box.raw)) }
+            if T.self == Double.self { return T(bs_gamma_kurtosis_d(box.raw)) }
             if T.self == Float.self { return T(bs_gamma_kurtosis_f(box.raw)) }
 #if arch(x86_64) || arch(i386)
             return T(bs_gamma_kurtosis_l(box.raw))
 #else
-            return T(bs_gamma_kurtosis(box.raw))
+            return T(bs_gamma_kurtosis_d(box.raw))
 #endif
         }
         
@@ -381,12 +381,12 @@ extension Distribution {
         ///
         /// For Γ(k, θ), γ₂ = 6/k. Equals 0 for a normal distribution.
         public var kurtosisExcess: T? {
-            if T.self == Double.self { return T(bs_gamma_kurtosis_excess(box.raw)) }
+            if T.self == Double.self { return T(bs_gamma_kurtosis_excess_d(box.raw)) }
             if T.self == Float.self { return T(bs_gamma_kurtosis_excess_f(box.raw)) }
 #if arch(x86_64) || arch(i386)
             return T(bs_gamma_kurtosis_excess_l(box.raw))
 #else
-            return T(bs_gamma_kurtosis_excess(box.raw))
+            return T(bs_gamma_kurtosis_excess_d(box.raw))
 #endif
         }
         
@@ -397,12 +397,12 @@ extension Distribution {
         
         /// Entropy H[X] (Shannon), where defined.
         public var entropy: T? {
-            if T.self == Double.self { return T(bs_gamma_entropy(box.raw)) }
+            if T.self == Double.self { return T(bs_gamma_entropy_d(box.raw)) }
             if T.self == Float.self { return T(bs_gamma_entropy_f(box.raw)) }
 #if arch(x86_64) || arch(i386)
             return T(bs_gamma_entropy_l(box.raw))
 #else
-            return T(bs_gamma_entropy(box.raw))
+            return T(bs_gamma_entropy_d(box.raw))
 #endif
         }
     }

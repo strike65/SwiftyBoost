@@ -70,7 +70,7 @@ public extension SpecialFunctions {
         let dl = D(lambda), dx = D(x)
         guard dl.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_gegenbauer(UInt32(n), dl, dx))
+        return T(bs_gegenbauer_d(UInt32(n), dl, dx))
     }
 
     // Mixed-precision promotions (Float ↔ Double) → Double
@@ -99,7 +99,7 @@ public extension SpecialFunctions {
         let dl = D(lambda), dx = D(x)
         guard dl.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_gegenbauer_prime(UInt32(n), dl, dx))
+        return T(bs_gegenbauer_prime_d(UInt32(n), dl, dx))
     }
 
     // Mixed-precision promotions (Float ↔ Double) → Double
@@ -133,7 +133,7 @@ public extension SpecialFunctions {
         let dl = D(lambda), dx = D(x)
         guard dl.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_gegenbauer_derivative(UInt32(n), dl, dx, UInt32(k)))
+        return T(bs_gegenbauer_derivative_d(UInt32(n), dl, dx, UInt32(k)))
     }
 
     // Mixed-precision promotions (Float ↔ Double) → Double

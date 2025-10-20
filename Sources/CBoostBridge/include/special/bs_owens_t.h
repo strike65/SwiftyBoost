@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 // Owen's T
-double bs_owens_t(double h, double a);
+double bs_owens_t_d(double h, double a);
 float bs_owens_t_f(float h, float a);
 long double bs_owens_t_l(long double h, long double a);
 

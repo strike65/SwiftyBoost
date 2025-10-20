@@ -176,49 +176,48 @@ unsigned long long bs_fibonacci_ull(unsigned long long n) { return bs_wrap<unsig
 unsigned int bs_prime(unsigned int n) { return bs_wrap<unsigned int>([&] { return boost::math::prime(n); }); }
 
 // Factorials
-double bs_factorial(unsigned int i) { return bs_wrap<double>([&] { return boost::math::factorial<double>(i); }); }
+double bs_factorial_d(unsigned int i) { return bs_wrap<double>([&] { return boost::math::factorial<double>(i); }); }
 float bs_factorial_f(unsigned int i) { return bs_wrap<float>([&] { return boost::math::factorial<float>(i); }); }
 long double bs_factorial_l(unsigned int i) { return bs_wrap<long double>([&] { return boost::math::factorial<long double>(i); }); }
 
 // Pochhammer (rising factorial)
-double bs_rising_factorial(double x, unsigned int i) { return bs_wrap<double>([&] { return boost::math::rising_factorial<double>(x, i); }); }
+double bs_rising_factorial_d(double x, unsigned int i) { return bs_wrap<double>([&] { return boost::math::rising_factorial<double>(x, i); }); }
 float bs_rising_factorial_f(float x, unsigned int i) { return bs_wrap<float>([&] { return boost::math::rising_factorial<float>(x, i); }); }
 long double bs_rising_factorial_l(long double x, unsigned int i) { return bs_wrap<long double>([&] { return boost::math::rising_factorial<long double>(x, i); }); }
 
 // Binomial coefficients
-double bs_binomial_coefficient(unsigned int n, unsigned int k) { return bs_wrap<double>([&] { return boost::math::binomial_coefficient<double>(n, k); }); }
+double bs_binomial_coefficient_d(unsigned int n, unsigned int k) { return bs_wrap<double>([&] { return boost::math::binomial_coefficient<double>(n, k); }); }
 float bs_binomial_coefficient_f(unsigned int n, unsigned int k) { return bs_wrap<float>([&] { return boost::math::binomial_coefficient<float>(n, k); }); }
 long double bs_binomial_coefficient_l(unsigned int n, unsigned int k) { return bs_wrap<long double>([&] { return boost::math::binomial_coefficient<long double>(n, k); }); }
 
 // double factorial
-double bs_double_factorial(unsigned int i) { return bs_wrap<double>([&] { return boost::math::double_factorial<double>(i); }); }
+double bs_double_factorial_d(unsigned int i) { return bs_wrap<double>([&] { return boost::math::double_factorial<double>(i); }); }
 float bs_double_factorial_f(unsigned int i) { return bs_wrap<float>([&] { return boost::math::double_factorial<float>(i); }); }
 long double bs_double_factorial_l(unsigned int i) { return bs_wrap<long double>([&] { return boost::math::double_factorial<long double>(i); }); }
 
 // Laguerre
-double bs_laguerre(unsigned int n, double x) { return bs_wrap<double>([&] { return boost::math::laguerre(n, x); }); }
+double bs_laguerre_d(unsigned int n, double x) { return bs_wrap<double>([&] { return boost::math::laguerre(n, x); }); }
 float bs_laguerre_f(unsigned int n, float x) { return bs_wrap<float>([&] { return boost::math::laguerre(n, x); }); }
 long double bs_laguerre_l(unsigned int n, long double x) { return bs_wrap<long double>([&] { return boost::math::laguerre(n, x); }); }
-
-double bs_assoc_laguerre(unsigned int n, unsigned int m, double x) { return bs_wrap<double>([&] { return boost::math::laguerre(n, m, x); }); }
+double bs_assoc_laguerre_d(unsigned int n, unsigned int m, double x) { return bs_wrap<double>([&] { return boost::math::laguerre(n, m, x); }); }
 float bs_assoc_laguerre_f(unsigned int n, unsigned int m, float x) { return bs_wrap<float>([&] { return boost::math::laguerre(n, m, x); }); }
 long double bs_assoc_laguerre_l(unsigned int n, unsigned int m, long double x) { return bs_wrap<long double>([&] { return boost::math::laguerre(n, m, x); }); }
 
 // Chebyshev
-double bs_chebyshev_T(unsigned int n, double x) { return bs_wrap<double>([&] { return boost::math::chebyshev_t(n, x); }); }
-double bs_chebyshev_U(unsigned int n, double x) { return bs_wrap<double>([&] { return boost::math::chebyshev_u(n, x); }); }
+double bs_chebyshev_T_d(unsigned int n, double x) { return bs_wrap<double>([&] { return boost::math::chebyshev_t(n, x); }); }
+double bs_chebyshev_U_d(unsigned int n, double x) { return bs_wrap<double>([&] { return boost::math::chebyshev_u(n, x); }); }
 float bs_chebyshev_T_f(unsigned int n, float x) { return bs_wrap<float>([&] { return boost::math::chebyshev_t(n, x); }); }
 float bs_chebyshev_U_f(unsigned int n, float x) { return bs_wrap<float>([&] { return boost::math::chebyshev_u(n, x); }); }
 long double bs_chebyshev_T_l(unsigned int n, long double x) { return bs_wrap<long double>([&] { return boost::math::chebyshev_t(n, x); }); }
 long double bs_chebyshev_U_l(unsigned int n, long double x) { return bs_wrap<long double>([&] { return boost::math::chebyshev_u(n, x); }); }
 
 // Chebyshev series evaluation via Clenshaw (first kind)
-double bs_chebyshev_clenshaw(const double* c, size_t count, double x) { return bs_wrap<double>([&] { return boost::math::chebyshev_clenshaw_recurrence(c, count, x);} ); }
+double bs_chebyshev_clenshaw_d(const double* c, size_t count, double x) { return bs_wrap<double>([&] { return boost::math::chebyshev_clenshaw_recurrence(c, count, x);} ); }
 float bs_chebyshev_clenshaw_f(const float* c, size_t count, float x) { return bs_wrap<float>([&] { return boost::math::chebyshev_clenshaw_recurrence(c, count, x);} ); }
 long double bs_chebyshev_clenshaw_l(const long double* c, size_t count, long double x) { return bs_wrap<long double>([&] { return boost::math::chebyshev_clenshaw_recurrence(c, count, x);} ); }
 
 // Spherical harmonics
-bs_complex_d bs_spherical_harmonic(unsigned int n, int m, double theta, double phi) {
+bs_complex_d bs_spherical_harmonic_d(unsigned int n, int m, double theta, double phi) {
     auto z = boost::math::spherical_harmonic(n, m, theta, phi);
     bs_complex_d r{ z.real(), z.imag() };
     return r;
@@ -235,10 +234,10 @@ bs_complex_l bs_spherical_harmonic_l(unsigned int n, int m, long double theta, l
 }
 
 // Cardinal B-spline wrappers
-double bs_cardinal_b_spline(unsigned int n, double x) { return bs_wrap<double>([&]{ return dispatch_cardinal_b_spline<double>(n, x); }); }
-double bs_cardinal_b_spline_prime(unsigned int n, double x) { return bs_wrap<double>([&]{ return dispatch_cardinal_b_spline_prime<double>(n, x); }); }
-double bs_cardinal_b_spline_double_prime(unsigned int n, double x) { return bs_wrap<double>([&]{ return dispatch_cardinal_b_spline_double_prime<double>(n, x); }); }
-double bs_forward_cardinal_b_spline(unsigned int n, double x) { return bs_wrap<double>([&]{ return dispatch_forward_cardinal_b_spline<double>(n, x); }); }
+double bs_cardinal_b_spline_d(unsigned int n, double x) { return bs_wrap<double>([&]{ return dispatch_cardinal_b_spline<double>(n, x); }); }
+double bs_cardinal_b_spline_prime_d(unsigned int n, double x) { return bs_wrap<double>([&]{ return dispatch_cardinal_b_spline_prime<double>(n, x); }); }
+double bs_cardinal_b_spline_double_prime_d(unsigned int n, double x) { return bs_wrap<double>([&]{ return dispatch_cardinal_b_spline_double_prime<double>(n, x); }); }
+double bs_forward_cardinal_b_spline_d(unsigned int n, double x) { return bs_wrap<double>([&]{ return dispatch_forward_cardinal_b_spline<double>(n, x); }); }
 
 float bs_cardinal_b_spline_f(unsigned int n, float x) { return bs_wrap<float>([&]{ return dispatch_cardinal_b_spline<float>(n, x); }); }
 float bs_cardinal_b_spline_prime_f(unsigned int n, float x) { return bs_wrap<float>([&]{ return dispatch_cardinal_b_spline_prime<float>(n, x); }); }
@@ -251,9 +250,9 @@ long double bs_cardinal_b_spline_double_prime_l(unsigned int n, long double x) {
 long double bs_forward_cardinal_b_spline_l(unsigned int n, long double x) { return bs_wrap<long double>([&]{ return dispatch_forward_cardinal_b_spline<long double>(n, x); }); }
 
 // Gegenbauer polynomials
-double bs_gegenbauer(unsigned int n, double lambda, double x) { return bs_wrap<double>([&]{ return boost::math::gegenbauer(n, lambda, x); }); }
-double bs_gegenbauer_prime(unsigned int n, double lambda, double x) { return bs_wrap<double>([&]{ return boost::math::gegenbauer_prime(n, lambda, x); }); }
-double bs_gegenbauer_derivative(unsigned int n, double lambda, double x, unsigned int k) { return bs_wrap<double>([&]{ return boost::math::gegenbauer_derivative(n, lambda, x, k); }); }
+double bs_gegenbauer_d(unsigned int n, double lambda, double x) { return bs_wrap<double>([&]{ return boost::math::gegenbauer(n, lambda, x); }); }
+double bs_gegenbauer_prime_d(unsigned int n, double lambda, double x) { return bs_wrap<double>([&]{ return boost::math::gegenbauer_prime(n, lambda, x); }); }
+double bs_gegenbauer_derivative_d(unsigned int n, double lambda, double x, unsigned int k) { return bs_wrap<double>([&]{ return boost::math::gegenbauer_derivative(n, lambda, x, k); }); }
 
 float bs_gegenbauer_f(unsigned int n, float lambda, float x) { return bs_wrap<float>([&]{ return boost::math::gegenbauer(n, lambda, x); }); }
 float bs_gegenbauer_prime_f(unsigned int n, float lambda, float x) { return bs_wrap<float>([&]{ return boost::math::gegenbauer_prime(n, lambda, x); }); }

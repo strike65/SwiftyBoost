@@ -79,7 +79,7 @@ public extension SpecialFunctions {
         // Validate finiteness prior to calling the C layer.
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         // Delegate to Boost-backed implementation and convert back to T.
-        return T(bs_legendre_p(Int32(n), dx))
+        return T(bs_legendre_p_d(Int32(n), dx))
     }
     
     /// Associated Legendre function of the first kind Pₙᵐ(x) for integer n ≥ 0 and |m| ≤ n.
@@ -135,7 +135,7 @@ public extension SpecialFunctions {
         // Validate finiteness prior to calling the C layer.
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         // Delegate to Boost-backed implementation and convert back to T.
-        return T(bs_assoc_legendre_p(Int32(n), Int32(m), dx))
+        return T(bs_assoc_legendre_p_d(Int32(n), Int32(m), dx))
     }
     
     /// Derivative of the Legendre polynomial, Pₙ′(x), for integer n ≥ 0.
@@ -154,7 +154,7 @@ public extension SpecialFunctions {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_legendre_p_prime(Int32(n), dx))
+        return T(bs_legendre_p_prime_d(Int32(n), dx))
     }
     
     /// Zeros of the Legendre polynomial Pₗ(x), i.e. the l simple roots in (−1, 1) for l ≥ 1.
@@ -173,7 +173,7 @@ public extension SpecialFunctions {
         guard l > 0 else { return [] }
         var tmp = Array<Double>(repeating: .zero, count: l)
         tmp.withUnsafeMutableBufferPointer { buf in
-            bs_legendre_p_zeros(Int32(l), buf.baseAddress!)
+            bs_legendre_p_zeros_d(Int32(l), buf.baseAddress!)
         }
         return tmp.map(T.init)
     }

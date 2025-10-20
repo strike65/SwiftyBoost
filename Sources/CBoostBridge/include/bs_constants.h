@@ -29,35 +29,31 @@ extern "C" {
 #endif
 
 // Boost.Math constants (double)
-double bs_const_e(void);
-double bs_const_pi(void);
-double bs_const_two_pi(void);
-double bs_const_half_pi(void);
-double bs_const_third_pi(void);
-double bs_const_two_thirds_pi(void);
-double bs_const_quarter_pi(void);
-double bs_const_three_quarters_pi(void);
-double bs_const_sixth_pi(void);
-double bs_const_pi_sqr(void);
-
-double bs_const_root_two(void);
-double bs_const_root_three(void);
-double bs_const_root_pi(void);
-
-double bs_const_one_div_pi(void);
-double bs_const_one_div_two_pi(void);
-double bs_const_one_div_root_pi(void);
-double bs_const_two_div_pi(void);
-double bs_const_two_div_root_pi(void);
-
-double bs_const_ln_two(void);
-double bs_const_ln_ten(void);
-double bs_const_ln_ln_two(void);
-
-double bs_const_euler(void);
-double bs_const_catalan(void);
-double bs_const_zeta_three(void);
-double bs_const_phi(void);
+double bs_const_e_d(void);
+double bs_const_pi_d(void);
+double bs_const_two_pi_d(void);
+double bs_const_half_pi_d(void);
+double bs_const_third_pi_d(void);
+double bs_const_two_thirds_pi_d(void);
+double bs_const_quarter_pi_d(void);
+double bs_const_three_quarters_pi_d(void);
+double bs_const_sixth_pi_d(void);
+double bs_const_pi_sqr_d(void);
+double bs_const_root_two_d(void);
+double bs_const_root_three_d(void);
+double bs_const_root_pi_d(void);
+double bs_const_one_div_pi_d(void);
+double bs_const_one_div_two_pi_d(void);
+double bs_const_one_div_root_pi_d(void);
+double bs_const_two_div_pi_d(void);
+double bs_const_two_div_root_pi_d(void);
+double bs_const_ln_two_d(void);
+double bs_const_ln_ten_d(void);
+double bs_const_ln_ln_two_d(void);
+double bs_const_euler_d(void);
+double bs_const_catalan_d(void);
+double bs_const_zeta_three_d(void);
+double bs_const_phi_d(void);
 
 // Boost.Math constants (float)
 float bs_const_e_f(void);

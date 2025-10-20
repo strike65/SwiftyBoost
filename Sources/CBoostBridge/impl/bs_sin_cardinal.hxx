@@ -32,13 +32,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-double bs_sinc_pi(double x) {
+double bs_sinc_pi_d(double x) {
     return bs_wrap<double>([&] {
         if (x == 0.0) return 1.0;
         return boost::math::sin_pi(x) / (boost::math::constants::pi<double>() * x);
     });
 }
-bs_complex_d bs_sincc_pi(bs_complex_d x) {
+bs_complex_d bs_sincc_pi_d(bs_complex_d x) {
     auto z = to_std(x);
     if (z == std::complex<double>(0.0, 0.0)) {
         return bs_complex_d{1.0, 0.0};
@@ -83,14 +83,14 @@ bs_complex_l bs_sincc_pi_l(bs_complex_l x) {
     auto y = std::sin(denom) / denom;
     return from_std(y);
 }
-double bs_sinhc_pi(double x) {
+double bs_sinhc_pi_d(double x) {
     return bs_wrap<double>([&] {
         if (x == 0.0) return 1.0;
         const double p = boost::math::constants::pi<double>();
         return std::sinh(p * x) / (p * x);
     });
 }
-bs_complex_d bs_sinhcc_pi(bs_complex_d x) {
+bs_complex_d bs_sinhcc_pi_d(bs_complex_d x) {
     auto y = from_std(boost::math::sinhc_pi(to_std(x)));
     bs_complex_d r { static_cast<double>(y.re), static_cast<double>(y.im) };
     return r;

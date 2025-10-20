@@ -40,19 +40,19 @@ extern "C" {
 #endif
 
 // Elementary arithmetic
-bs_complex_d bs_cadd(bs_complex_d a, bs_complex_d b) {
+bs_complex_d bs_cadd_d(bs_complex_d a, bs_complex_d b) {
     auto r = bs_wrap_complex<double>([&]{ return to_std(a) + to_std(b); });
     return from_std(r);
 }
-bs_complex_d bs_csub(bs_complex_d a, bs_complex_d b) {
+bs_complex_d bs_csub_d(bs_complex_d a, bs_complex_d b) {
     auto r = bs_wrap_complex<double>([&]{ return to_std(a) - to_std(b); });
     return from_std(r);
 }
-bs_complex_d bs_cmul(bs_complex_d a, bs_complex_d b) {
+bs_complex_d bs_cmul_d(bs_complex_d a, bs_complex_d b) {
     auto r = bs_wrap_complex<double>([&]{ return to_std(a) * to_std(b); });
     return from_std(r);
 }
-bs_complex_d bs_cdiv(bs_complex_d a, bs_complex_d b) {
+bs_complex_d bs_cdiv_d(bs_complex_d a, bs_complex_d b) {
     auto r = bs_wrap_complex<double>([&]{ return to_std(a) / to_std(b); });
     return from_std(r);
 }
@@ -92,16 +92,16 @@ bs_complex_l bs_cdiv_l(bs_complex_l a, bs_complex_l b) {
 }
 
 // Elementary functions
-bs_complex_d bs_cexp(bs_complex_d z) { auto r = bs_wrap_complex<double>([&]{ return std::exp(to_std(z)); }); return from_std(r); }
-bs_complex_d bs_clog(bs_complex_d z) { auto r = bs_wrap_complex<double>([&]{ return std::log(to_std(z)); }); return from_std(r); }
-bs_complex_d bs_csqrt(bs_complex_d z){ auto r = bs_wrap_complex<double>([&]{ return std::sqrt(to_std(z)); }); return from_std(r); }
-bs_complex_d bs_csin(bs_complex_d z) { auto r = bs_wrap_complex<double>([&]{ return std::sin(to_std(z)); }); return from_std(r); }
-bs_complex_d bs_ccos(bs_complex_d z) { auto r = bs_wrap_complex<double>([&]{ return std::cos(to_std(z)); }); return from_std(r); }
-bs_complex_d bs_ctan(bs_complex_d z) { auto r = bs_wrap_complex<double>([&]{ return std::tan(to_std(z)); }); return from_std(r); }
-bs_complex_d bs_csinh(bs_complex_d z){ auto r = bs_wrap_complex<double>([&]{ return std::sinh(to_std(z)); }); return from_std(r); }
-bs_complex_d bs_ccosh(bs_complex_d z){ auto r = bs_wrap_complex<double>([&]{ return std::cosh(to_std(z)); }); return from_std(r); }
-bs_complex_d bs_ctanh(bs_complex_d z){ auto r = bs_wrap_complex<double>([&]{ return std::tanh(to_std(z)); }); return from_std(r); }
-bs_complex_d bs_catan(bs_complex_d z){ auto r = bs_wrap_complex<double>([&]{ return std::atan(to_std(z)); }); return from_std(r); }
+bs_complex_d bs_cexp_d(bs_complex_d z) { auto r = bs_wrap_complex<double>([&]{ return std::exp(to_std(z)); }); return from_std(r); }
+bs_complex_d bs_clog_d(bs_complex_d z) { auto r = bs_wrap_complex<double>([&]{ return std::log(to_std(z)); }); return from_std(r); }
+bs_complex_d bs_csqrt_d(bs_complex_d z){ auto r = bs_wrap_complex<double>([&]{ return std::sqrt(to_std(z)); }); return from_std(r); }
+bs_complex_d bs_csin_d(bs_complex_d z) { auto r = bs_wrap_complex<double>([&]{ return std::sin(to_std(z)); }); return from_std(r); }
+bs_complex_d bs_ccos_d(bs_complex_d z) { auto r = bs_wrap_complex<double>([&]{ return std::cos(to_std(z)); }); return from_std(r); }
+bs_complex_d bs_ctan_d(bs_complex_d z) { auto r = bs_wrap_complex<double>([&]{ return std::tan(to_std(z)); }); return from_std(r); }
+bs_complex_d bs_csinh_d(bs_complex_d z){ auto r = bs_wrap_complex<double>([&]{ return std::sinh(to_std(z)); }); return from_std(r); }
+bs_complex_d bs_ccosh_d(bs_complex_d z){ auto r = bs_wrap_complex<double>([&]{ return std::cosh(to_std(z)); }); return from_std(r); }
+bs_complex_d bs_ctanh_d(bs_complex_d z){ auto r = bs_wrap_complex<double>([&]{ return std::tanh(to_std(z)); }); return from_std(r); }
+bs_complex_d bs_catan_d(bs_complex_d z){ auto r = bs_wrap_complex<double>([&]{ return std::atan(to_std(z)); }); return from_std(r); }
 
 bs_complex_f bs_cexp_f(bs_complex_f z) { auto r = bs_wrap_complex<float>([&]{ return std::exp(to_std(z)); }); return from_std(r); }
 bs_complex_f bs_clog_f(bs_complex_f z) { auto r = bs_wrap_complex<float>([&]{ return std::log(to_std(z)); }); return from_std(r); }

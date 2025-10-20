@@ -73,10 +73,10 @@ public extension Distribution {
             self.degreesOfFreedom1 = df1
             self.degreesOfFreedom2 = df2
             if T.self == Double.self {
-                guard let h = bs_fisher_f_make(Double(df1), Double(df2)) else {
+                guard let h = bs_fisher_f_make_d(Double(df1), Double(df2)) else {
                     throw DistributionError.generalError(msg: "Distribution not initialized")
                 }
-                self.box = Box(raw: UnsafeRawPointer(h), free: { bs_fisher_f_free($0) })
+                self.box = Box(raw: UnsafeRawPointer(h), free: { bs_fisher_f_free_d($0) })
             } else if T.self == Float.self {
                 guard let h = bs_fisher_f_make_f(Float(df1), Float(df2)) else {
                     throw DistributionError.generalError(msg: "Distribution not initialized")
@@ -89,10 +89,10 @@ public extension Distribution {
                 }
                 self.box = Box(raw: UnsafeRawPointer(h), free: { bs_fisher_f_free_l($0) })
                 #else
-                guard let h = bs_fisher_f_make(Double(df1), Double(df2)) else {
+                guard let h = bs_fisher_f_make_d(Double(df1), Double(df2)) else {
                     throw DistributionError.generalError(msg: "Distribution not initialized")
                 }
-                self.box = Box(raw: UnsafeRawPointer(h), free: { bs_fisher_f_free($0) })
+                self.box = Box(raw: UnsafeRawPointer(h), free: { bs_fisher_f_free_d($0) })
                 #endif
             }
         }
@@ -101,12 +101,12 @@ public extension Distribution {
         ///
         /// For an F distribution, this is typically `0`.
         public var supportLowerBound: T {
-            if T.self == Double.self { let r = bs_fisher_f_range(box.raw); return T(r.lower) }
+            if T.self == Double.self { let r = bs_fisher_f_range_d(box.raw); return T(r.lower) }
             if T.self == Float.self  { let r = bs_fisher_f_range_f(box.raw); return T(r.lower) }
             #if arch(x86_64) || arch(i386)
             let r = bs_fisher_f_range_l(box.raw); return T(r.lower)
             #else
-            let r = bs_fisher_f_range(box.raw);  return T(r.lower)
+            let r = bs_fisher_f_range_d(box.raw);  return T(r.lower)
             #endif
         }
 
@@ -114,23 +114,23 @@ public extension Distribution {
         ///
         /// For an F distribution, this is typically `+∞`.
         public var supportUpperBound: T {
-            if T.self == Double.self { let r = bs_fisher_f_range(box.raw); return T(r.upper) }
+            if T.self == Double.self { let r = bs_fisher_f_range_d(box.raw); return T(r.upper) }
             if T.self == Float.self  { let r = bs_fisher_f_range_f(box.raw); return T(r.upper) }
             #if arch(x86_64) || arch(i386)
             let r = bs_fisher_f_range_l(box.raw); return T(r.upper)
             #else
-            let r = bs_fisher_f_range(box.raw);  return T(r.upper)
+            let r = bs_fisher_f_range_d(box.raw);  return T(r.upper)
             #endif
         }
 
         /// The full support range `(lower, upper)`.
         public var range: (lower: T, upper: T) {
-            if T.self == Double.self { let r = bs_fisher_f_range(box.raw);   return (T(r.lower), T(r.upper)) }
+            if T.self == Double.self { let r = bs_fisher_f_range_d(box.raw);   return (T(r.lower), T(r.upper)) }
             if T.self == Float.self  { let r = bs_fisher_f_range_f(box.raw); return (T(r.lower), T(r.upper)) }
             #if arch(x86_64) || arch(i386)
             let r = bs_fisher_f_range_l(box.raw); return (T(r.lower), T(r.upper))
             #else
-            let r = bs_fisher_f_range(box.raw);   return (T(r.lower), T(r.upper))
+            let r = bs_fisher_f_range_d(box.raw);   return (T(r.lower), T(r.upper))
             #endif
         }
 
@@ -140,12 +140,12 @@ public extension Distribution {
         /// - Returns: The density value at `x`.
         /// - Throws: Propagates any backend errors encountered during evaluation.
         public func pdf(_ x: T) throws -> T {
-            if T.self == Double.self { return T(bs_fisher_f_pdf(box.raw, Double(x))) }
+            if T.self == Double.self { return T(bs_fisher_f_pdf_d(box.raw, Double(x))) }
             if T.self == Float.self { return T(bs_fisher_f_pdf_f(box.raw, Float(x))) }
             #if arch(x86_64) || arch(i386)
             return T(bs_fisher_f_pdf_l(box.raw, Float80(x)))
             #else
-            return T(bs_fisher_f_pdf(box.raw, Double(x)))
+            return T(bs_fisher_f_pdf_d(box.raw, Double(x)))
             #endif
         }
 
@@ -166,12 +166,12 @@ public extension Distribution {
         /// - Returns: `P(X ≤ x)`.
         /// - Throws: Propagates any backend errors encountered during evaluation.
         public func cdf(_ x: T) throws -> T {
-            if T.self == Double.self { return T(bs_fisher_f_cdf(box.raw, Double(x))) }
+            if T.self == Double.self { return T(bs_fisher_f_cdf_d(box.raw, Double(x))) }
             if T.self == Float.self { return T(bs_fisher_f_cdf_f(box.raw, Float(x))) }
             #if arch(x86_64) || arch(i386)
             return T(bs_fisher_f_cdf_l(box.raw, Float80(x)))
             #else
-            return T(bs_fisher_f_cdf(box.raw, Double(x)))
+            return T(bs_fisher_f_cdf_d(box.raw, Double(x)))
             #endif
         }
 
@@ -181,12 +181,12 @@ public extension Distribution {
         /// - Returns: `P(X > x) = 1 - CDF(x)`.
         /// - Throws: Propagates any backend errors encountered during evaluation.
         public func sf(_ x: T) throws -> T {
-            if T.self == Double.self { return T(bs_fisher_f_ccdf(box.raw, Double(x))) }
+            if T.self == Double.self { return T(bs_fisher_f_ccdf_d(box.raw, Double(x))) }
             if T.self == Float.self { return T(bs_fisher_f_ccdf_f(box.raw, Float(x))) }
             #if arch(x86_64) || arch(i386)
             return T(bs_fisher_f_ccdf_l(box.raw, Float80(x)))
             #else
-            return T(bs_fisher_f_ccdf(box.raw, Double(x)))
+            return T(bs_fisher_f_ccdf_d(box.raw, Double(x)))
             #endif
         }
 
@@ -196,12 +196,12 @@ public extension Distribution {
         /// - Returns: Smallest `x` such that `CDF(x) ≥ p`.
         /// - Throws: If `p` is outside `[0, 1]` or the backend fails to converge.
         public func quantile(_ p: T) throws -> T {
-            if T.self == Double.self { return T(bs_fisher_f_quantile(box.raw, Double(p))) }
+            if T.self == Double.self { return T(bs_fisher_f_quantile_d(box.raw, Double(p))) }
             if T.self == Float.self { return T(bs_fisher_f_quantile_f(box.raw, Float(p))) }
             #if arch(x86_64) || arch(i386)
             return T(bs_fisher_f_quantile_l(box.raw, Float80(p)))
             #else
-            return T(bs_fisher_f_quantile(box.raw, Double(p)))
+            return T(bs_fisher_f_quantile_d(box.raw, Double(p)))
             #endif
         }
 
@@ -211,12 +211,12 @@ public extension Distribution {
         /// - Returns: Smallest `x` such that `SF(x) ≤ q`, i.e. `P(X > x) ≤ q`.
         /// - Throws: If `q` is outside `[0, 1]` or the backend fails to converge.
         public func quantileComplement(_ q: T) throws -> T {
-            if T.self == Double.self { return T(bs_fisher_f_quantile_complement(box.raw, Double(q))) }
+            if T.self == Double.self { return T(bs_fisher_f_quantile_complement_d(box.raw, Double(q))) }
             if T.self == Float.self { return T(bs_fisher_f_quantile_complement_f(box.raw, Float(q))) }
             #if arch(x86_64) || arch(i386)
             return T(bs_fisher_f_quantile_complement_l(box.raw, Float80(q)))
             #else
-            return T(bs_fisher_f_quantile_complement(box.raw, Double(q)))
+            return T(bs_fisher_f_quantile_complement_d(box.raw, Double(q)))
             #endif
         }
 
@@ -225,12 +225,12 @@ public extension Distribution {
         /// - Returns: The mean if finite; otherwise `nil` (e.g. undefined when `df2 ≤ 2`).
         public var mean: T? {
             let m: T = {
-                if T.self == Double.self { return T(bs_fisher_f_mean(box.raw)) }
+                if T.self == Double.self { return T(bs_fisher_f_mean_d(box.raw)) }
                 if T.self == Float.self  { return T(bs_fisher_f_mean_f(box.raw)) }
                 #if arch(x86_64) || arch(i386)
                 return T(bs_fisher_f_mean_l(box.raw))
                 #else
-                return T(bs_fisher_f_mean(box.raw))
+                return T(bs_fisher_f_mean_d(box.raw))
                 #endif
             }()
             return m.isFinite ? m : nil
@@ -241,12 +241,12 @@ public extension Distribution {
         /// - Returns: The variance if finite; otherwise `nil` (e.g. undefined when `df2 ≤ 4`).
         public var variance: T? {
             let v: T = {
-                if T.self == Double.self { return T(bs_fisher_f_variance(box.raw)) }
+                if T.self == Double.self { return T(bs_fisher_f_variance_d(box.raw)) }
                 if T.self == Float.self  { return T(bs_fisher_f_variance_f(box.raw)) }
                 #if arch(x86_64) || arch(i386)
                 return T(bs_fisher_f_variance_l(box.raw))
                 #else
-                return T(bs_fisher_f_variance(box.raw))
+                return T(bs_fisher_f_variance_d(box.raw))
                 #endif
             }()
             return v.isFinite ? v : nil
@@ -256,12 +256,12 @@ public extension Distribution {
         ///
         /// - Note: For the F distribution, the mode exists for `df1 > 2`.
         public var mode: T? {
-            if T.self == Double.self { return T(bs_fisher_f_mode(box.raw)) }
+            if T.self == Double.self { return T(bs_fisher_f_mode_d(box.raw)) }
             if T.self == Float.self  { return T(bs_fisher_f_mode_f(box.raw)) }
             #if arch(x86_64) || arch(i386)
             return T(bs_fisher_f_mode_l(box.raw))
             #else
-            return T(bs_fisher_f_mode(box.raw))
+            return T(bs_fisher_f_mode_d(box.raw))
             #endif
         }
 
@@ -269,12 +269,12 @@ public extension Distribution {
         ///
         /// - Note: There is no simple closed form; this value is computed numerically by the backend.
         public var median: T {
-            if T.self == Double.self { return T(bs_fisher_f_median(box.raw)) }
+            if T.self == Double.self { return T(bs_fisher_f_median_d(box.raw)) }
             if T.self == Float.self  { return T(bs_fisher_f_median_f(box.raw)) }
             #if arch(x86_64) || arch(i386)
             return T(bs_fisher_f_median_l(box.raw))
             #else
-            return T(bs_fisher_f_median(box.raw))
+            return T(bs_fisher_f_median_d(box.raw))
             #endif
         }
 
@@ -283,12 +283,12 @@ public extension Distribution {
         /// - Returns: The skewness if finite; otherwise `nil` (e.g. undefined when `df2 ≤ 6`).
         public var skewness: T? {
             let s: T = {
-                if T.self == Double.self { return T(bs_fisher_f_skewness(box.raw)) }
+                if T.self == Double.self { return T(bs_fisher_f_skewness_d(box.raw)) }
                 if T.self == Float.self  { return T(bs_fisher_f_skewness_f(box.raw)) }
                 #if arch(x86_64) || arch(i386)
                 return T(bs_fisher_f_skewness_l(box.raw))
                 #else
-                return T(bs_fisher_f_skewness(box.raw))
+                return T(bs_fisher_f_skewness_d(box.raw))
                 #endif
             }()
             return s.isFinite ? s : nil
@@ -299,12 +299,12 @@ public extension Distribution {
         /// - Returns: The kurtosis if finite; otherwise `nil` (e.g. undefined when `df2 ≤ 8`).
         public var kurtosis: T? {
             let k: T = {
-                if T.self == Double.self { return T(bs_fisher_f_kurtosis(box.raw)) }
+                if T.self == Double.self { return T(bs_fisher_f_kurtosis_d(box.raw)) }
                 if T.self == Float.self  { return T(bs_fisher_f_kurtosis_f(box.raw)) }
                 #if arch(x86_64) || arch(i386)
                 return T(bs_fisher_f_kurtosis_l(box.raw))
                 #else
-                return T(bs_fisher_f_kurtosis(box.raw))
+                return T(bs_fisher_f_kurtosis_d(box.raw))
                 #endif
             }()
             return k.isFinite ? k : nil
@@ -315,12 +315,12 @@ public extension Distribution {
         /// - Returns: The excess kurtosis if finite; otherwise `nil`.
         public var kurtosisExcess: T? {
             let e: T = {
-                if T.self == Double.self { return T(bs_fisher_f_kurtosis_excess(box.raw)) }
+                if T.self == Double.self { return T(bs_fisher_f_kurtosis_excess_d(box.raw)) }
                 if T.self == Float.self  { return T(bs_fisher_f_kurtosis_excess_f(box.raw)) }
                 #if arch(x86_64) || arch(i386)
                 return T(bs_fisher_f_kurtosis_excess_l(box.raw))
                 #else
-                return T(bs_fisher_f_kurtosis_excess(box.raw))
+                return T(bs_fisher_f_kurtosis_excess_d(box.raw))
                 #endif
             }()
             return e.isFinite ? e : nil
@@ -335,12 +335,12 @@ public extension Distribution {
         /// - Returns: The hazard rate at `x`.
         /// - Throws: Propagates any backend errors encountered during evaluation.
         public func hazard(_ x: T) throws -> T {
-            if T.self == Double.self { return T(bs_fisher_f_hazard(box.raw, Double(x))) }
+            if T.self == Double.self { return T(bs_fisher_f_hazard_d(box.raw, Double(x))) }
             if T.self == Float.self  { return T(bs_fisher_f_hazard_f(box.raw, Float(x))) }
             #if arch(x86_64) || arch(i386)
             return T(bs_fisher_f_hazard_l(box.raw, Float80(x)))
             #else
-            return T(bs_fisher_f_hazard(box.raw, Double(x)))
+            return T(bs_fisher_f_hazard_d(box.raw, Double(x)))
             #endif
         }
 
@@ -351,12 +351,12 @@ public extension Distribution {
         /// - Returns: The cumulative hazard at `x`.
         /// - Throws: Propagates any backend errors encountered during evaluation.
         public func chf(_ x: T) throws -> T {
-            if T.self == Double.self { return T(bs_fisher_f_chf(box.raw, Double(x))) }
+            if T.self == Double.self { return T(bs_fisher_f_chf_d(box.raw, Double(x))) }
             if T.self == Float.self  { return T(bs_fisher_f_chf_f(box.raw, Float(x))) }
             #if arch(x86_64) || arch(i386)
             return T(bs_fisher_f_chf_l(box.raw, Float80(x)))
             #else
-            return T(bs_fisher_f_chf(box.raw, Double(x)))
+            return T(bs_fisher_f_chf_d(box.raw, Double(x)))
             #endif
         }
         

@@ -51,7 +51,7 @@ public extension SpecialFunctions {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         if dx <= 0, dx == dx.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x") }
-        return T(bs_digamma(dx))
+        return T(bs_digamma_d(dx))
     }
     
     /// Compute the trigamma function ψ₁(x) = d/dx ψ(x) = d²/dx² ln Γ(x).
@@ -81,7 +81,7 @@ public extension SpecialFunctions {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         if dx <= 0, dx == dx.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x") }
-        return T(bs_trigamma(dx))
+        return T(bs_trigamma_d(dx))
     }
     
     /// Compute the polygamma function ψ⁽ⁿ⁾(x), the n-th derivative of digamma.
@@ -115,7 +115,7 @@ public extension SpecialFunctions {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         if dx <= 0, dx == dx.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x") }
-        return T(bs_polygamma(Int32(n), dx))
+        return T(bs_polygamma_d(Int32(n), dx))
     }
     
     /// Compute the Riemann zeta function ζ(x).
@@ -146,7 +146,7 @@ public extension SpecialFunctions {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dx != 1 else { throw SpecialFunctionError.invalidCombination(message: "riemannZeta has a pole at x = 1") }
-        return T(bs_riemann_zeta(dx))
+        return T(bs_riemann_zeta_d(dx))
     }
     
     // MARK: - Float overloads

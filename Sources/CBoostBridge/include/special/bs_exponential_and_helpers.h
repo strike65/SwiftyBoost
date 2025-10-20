@@ -29,16 +29,16 @@ extern "C" {
 #endif
 
 // Exponential integrals and related helpers
-double bs_expint_Ei(double x);
-double bs_expint_En(int n, double x);
+double bs_expint_Ei_d(double x);
+double bs_expint_En_d(int n, double x);
 double bs_expm1(double x);
 double bs_log1p(double x);
 double bs_log1pmx(double x);
 double bs_powm1(double x, double y);
-double bs_cbrt(double x);
+double bs_cbrt_d(double x);
 double bs_sqrt1pm1(double x);
-double bs_hypot(double x, double y);
-double bs_rsqrt(const double x);
+double bs_hypot_d(double x, double y);
+double bs_rsqrt_d(const double x);
 
 float bs_expint_Ei_f(float x);
 float bs_expint_En_f(int n, float x);

@@ -52,7 +52,7 @@ public extension SpecialFunctions {
     /// - Note: For |x| > 1 the result is NaN. As x approaches +/-1, the result tends to +/-infinity.
     @inlinable
     static func atanh<T: BinaryFloatingPoint>(_ x: T) -> T {
-        return T(bs_atanh(Double(x)))
+        return T(bs_atanh_d(Double(x)))
     }
 
     /// Inverse hyperbolic tangent for Double.
@@ -61,7 +61,7 @@ public extension SpecialFunctions {
     /// - Returns: The inverse hyperbolic tangent of `x`.
     @inlinable
     static func atanh(_ x: Double) -> Double {
-        return bs_atanh(x)
+        return bs_atanh_d(x)
     }
 
     /// Inverse hyperbolic tangent for Float.
@@ -82,7 +82,7 @@ public extension SpecialFunctions {
     /// - Returns: The inverse hyperbolic sine of `x`.
     @inlinable
     static func asinh<T: BinaryFloatingPoint>(_ x: T) -> T {
-        return T(bs_asinh(Double(x)))
+        return T(bs_asinh_d(Double(x)))
     }
 
     /// Inverse hyperbolic sine for Double.
@@ -91,7 +91,7 @@ public extension SpecialFunctions {
     /// - Returns: The inverse hyperbolic sine of `x`.
     @inlinable
     static func asinh(_ x: Double) -> Double {
-        return bs_asinh(x)
+        return bs_asinh_d(x)
     }
 
     /// Inverse hyperbolic sine for Float.
@@ -113,7 +113,7 @@ public extension SpecialFunctions {
     /// - Note: For x < 1 the result is NaN.
     @inlinable
     static func acosh<T: BinaryFloatingPoint>(_ x: T) -> T {
-        return T(bs_acosh(Double(x)))
+        return T(bs_acosh_d(Double(x)))
     }
 
     /// Inverse hyperbolic cosine for Double.
@@ -122,7 +122,7 @@ public extension SpecialFunctions {
     /// - Returns: The inverse hyperbolic cosine of `x`.
     @inlinable
     static func acosh(_ x: Double) -> Double {
-        return bs_acosh(x)
+        return bs_acosh_d(x)
     }
 
     /// Inverse hyperbolic cosine for Float.

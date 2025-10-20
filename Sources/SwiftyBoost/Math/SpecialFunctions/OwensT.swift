@@ -73,7 +73,7 @@ public extension SpecialFunctions {
         guard dh.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "h") }
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         // Delegate to Boost-backed implementation and convert back to T.
-        return T(bs_owens_t(dh, da))
+        return T(bs_owens_t_d(dh, da))
     }
 
     // Mixed-precision promotions (Float ↔ Double) → Double

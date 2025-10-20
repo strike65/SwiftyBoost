@@ -23,7 +23,7 @@ extern "C" {
 void* bs_arcsine_make_f(float x_min, float x_max) {
     try { return new bs_arcsine_f_handle(x_min, x_max); } catch (...) { return nullptr; }
 }
-void* bs_arcsine_make(double x_min, double x_max) {
+void* bs_arcsine_make_d(double x_min, double x_max) {
     try { return new bs_arcsine_d_handle(x_min, x_max); } catch (...) { return nullptr; }
 }
 void* bs_arcsine_make_l(long double x_min, long double x_max) {
@@ -32,7 +32,7 @@ void* bs_arcsine_make_l(long double x_min, long double x_max) {
 void bs_arcsine_free_f(void* handle) {
     delete static_cast<bs_arcsine_f_handle*>(handle);
 }
-void bs_arcsine_free(void* handle) {
+void bs_arcsine_free_d(void* handle) {
     delete static_cast<bs_arcsine_d_handle*>(handle);
 }
 void bs_arcsine_free_l(void* handle) {
@@ -44,7 +44,7 @@ float bs_arcsine_cdf_f(const void* handle, float x) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return cdf(h->dist, x); });
 }
-double bs_arcsine_cdf(const void* handle, double x) {
+double bs_arcsine_cdf_d(const void* handle, double x) {
     auto h = static_cast<const bs_arcsine_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return cdf(h->dist, x); });
@@ -60,7 +60,7 @@ float bs_arcsine_ccdf_f(const void* handle, float x) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return cdf(complement(h->dist, x)); });
 }
-double bs_arcsine_ccdf(const void* handle, double x) {
+double bs_arcsine_ccdf_d(const void* handle, double x) {
     auto h = static_cast<const bs_arcsine_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return cdf(complement(h->dist, x)); });
@@ -85,7 +85,7 @@ float bs_arcsine_hazard_f(const void* handle, float x) {
     }
     return d / p;
 }
-double bs_arcsine_hazard(const void* handle, double x) {
+double bs_arcsine_hazard_d(const void* handle, double x) {
     auto h = static_cast<const bs_arcsine_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     double p = bs_wrap<double>([&]{ return cdf(complement(h->dist, x)); });
@@ -119,7 +119,7 @@ float bs_arcsine_chf_f(const void* handle, float x) {
     float p = bs_wrap<float>([&]{ return cdf(complement(h->dist, x)); });
     return -log(p);
 }
-double     bs_arcsine_chf(const void* handle, double x) {
+double     bs_arcsine_chf_d(const void* handle, double x) {
     auto h = static_cast<const bs_arcsine_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     double p = bs_wrap<double>([&]{ return cdf(complement(h->dist, x)); });
@@ -138,7 +138,7 @@ float bs_arcsine_kurtosis_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis(h->dist); });
 }
-double bs_arcsine_kurtosis(const void* handle) {
+double bs_arcsine_kurtosis_d(const void* handle) {
     auto h = static_cast<const bs_arcsine_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis(h->dist); });
@@ -154,7 +154,7 @@ float bs_arcsine_kurtosis_excess_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis_excess(h->dist); });
 }
-double bs_arcsine_kurtosis_excess(const void* handle) {
+double bs_arcsine_kurtosis_excess_d(const void* handle) {
     auto h = static_cast<const bs_arcsine_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis_excess(h->dist); });
@@ -170,7 +170,7 @@ float bs_arcsine_mean_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return mean(h->dist); });
 }
-double bs_arcsine_mean(const void* handle) {
+double bs_arcsine_mean_d(const void* handle) {
     auto h = static_cast<const bs_arcsine_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return mean(h->dist); });
@@ -186,7 +186,7 @@ float bs_arcsine_median_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return median(h->dist); });
 }
-double bs_arcsine_median (const void* handle) {
+double bs_arcsine_median_d(const void* handle) {
     auto h = static_cast<const bs_arcsine_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<long double>([&]{ return median(h->dist); });
@@ -202,7 +202,7 @@ float bs_arcsine_mode_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return mode(h->dist); });
 }
-double bs_arcsine_mode(const void* handle) {
+double bs_arcsine_mode_d(const void* handle) {
     auto h = static_cast<const bs_arcsine_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return mode(h->dist); });
@@ -218,7 +218,7 @@ float bs_arcsine_pdf_f(const void* handle, float x) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return pdf(h->dist, x); });
 }
-double bs_arcsine_pdf(const void* handle, double x) {
+double bs_arcsine_pdf_d(const void* handle, double x) {
     auto h = static_cast<const bs_arcsine_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return pdf(h->dist, x); });
@@ -239,7 +239,7 @@ bs_range_f bs_arcsine_range_f(const void* handle) {
     return bs_range_f{ static_cast<float>(pr.first), static_cast<float>(pr.second) };
 }
 
-bs_range_d bs_arcsine_range(const void* handle) {
+bs_range_d bs_arcsine_range_d(const void* handle) {
     auto h = static_cast<const bs_arcsine_d_handle*>(handle);
     if (!h) {
         double nan = std::numeric_limits<double>::quiet_NaN();
@@ -269,7 +269,7 @@ bs_range_f bs_arcsine_support_f(const void* handle) {
     return bs_range_f{ static_cast<float>(pr.first), static_cast<float>(pr.second) };
 }
 
-bs_range_d bs_arcsine_support(const void* handle) {
+bs_range_d bs_arcsine_support_d(const void* handle) {
     auto h = static_cast<const bs_arcsine_d_handle*>(handle);
     if (!h) {
         double nan = std::numeric_limits<double>::quiet_NaN();
@@ -294,7 +294,7 @@ float bs_arcsine_quantile_f(const void* handle, float p) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return quantile(h->dist, p); });
 }
-double bs_arcsine_quantile(const void* handle, double p) {
+double bs_arcsine_quantile_d(const void* handle, double p) {
     auto h = static_cast<const bs_arcsine_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return quantile(h->dist, p); });
@@ -310,7 +310,7 @@ float bs_arcsine_quantile_complement_f(const void* handle, float q) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return quantile(complement(h->dist, q)); });
 }
-double bs_arcsine_quantile_complement(const void* handle, double q) {
+double bs_arcsine_quantile_complement_d(const void* handle, double q) {
     auto h = static_cast<const bs_arcsine_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return quantile(complement(h->dist, q)); });
@@ -326,7 +326,7 @@ float bs_arcsine_skewness_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return skewness(h->dist); });
 }
-double      bs_arcsine_skewness (const void* handle) {
+double      bs_arcsine_skewness_d(const void* handle) {
     auto h = static_cast<const bs_arcsine_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return skewness(h->dist); });
@@ -342,7 +342,7 @@ float       bs_arcsine_standard_deviation_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return standard_deviation(h->dist); });
 }
-double      bs_arcsine_standard_deviation (const void* handle) {
+double      bs_arcsine_standard_deviation_d(const void* handle) {
     auto h = static_cast<const bs_arcsine_l_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return standard_deviation(h->dist); });
@@ -358,7 +358,7 @@ float bs_arcsine_variance_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return variance(h->dist); });
 }
-double bs_arcsine_variance(const void* handle) {
+double bs_arcsine_variance_d(const void* handle) {
     auto h = static_cast<const bs_arcsine_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return variance(h->dist); });

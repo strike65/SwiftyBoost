@@ -58,8 +58,7 @@ long double bs_hypergeometric_2F0_l(long double a, long double b, long double z)
 double bs_hypergeometric_1F1(double a, double b, double z) { return bs_wrap<double>([&] { return boost::math::hypergeometric_1F1(a, b, z); }); }
 float  bs_hypergeometric_1F1_f(float a, float b, float z)  { return bs_wrap<float>([&] { return boost::math::hypergeometric_1F1(a, b, z); }); }
 long double bs_hypergeometric_1F1_l(long double a, long double b, long double z) { return bs_wrap<long double>([&] { return boost::math::hypergeometric_1F1(a, b, z); }); }
-
-double bs_hypergeometric_pFq(const double* a, size_t p, const double* b, size_t q, double z) {
+double bs_hypergeometric_pFq_d(const double* a, size_t p, const double* b, size_t q, double z) {
     return bs_wrap<double>([&] {
         std::vector<double> va(a, a + p);
         std::vector<double> vb(b, b + q);

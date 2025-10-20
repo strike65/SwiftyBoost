@@ -74,7 +74,7 @@ public extension SpecialFunctions {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_laguerre(UInt32(n), dx))
+        return T(bs_laguerre_d(UInt32(n), dx))
     }
 
     /// Compute the associated (generalized) Laguerre polynomial L_n^m(x).
@@ -102,7 +102,7 @@ public extension SpecialFunctions {
         guard m >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "m") }
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_assoc_laguerre(UInt32(n), UInt32(m), dx))
+        return T(bs_assoc_laguerre_d(UInt32(n), UInt32(m), dx))
     }
 
     // MARK: - Float overloads

@@ -74,7 +74,7 @@ public extension SpecialFunctions {
         let dv = D(v), dx = D(x)
         guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_cyl_bessel_j(dv, dx))
+        return T(bs_cyl_bessel_j_d(dv, dx))
     }
     
     /// Cylindrical Bessel function of the second kind Y_v(x) (Neumann function).
@@ -110,7 +110,7 @@ public extension SpecialFunctions {
         guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dx > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
-        return T(bs_cyl_neumann(dv, dx))
+        return T(bs_cyl_neumann_d(dv, dx))
     }
     
     /// Modified Bessel function of the first kind I_v(x).
@@ -140,7 +140,7 @@ public extension SpecialFunctions {
         let dv = D(v), dx = D(x)
         guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_cyl_bessel_i(dv, dx))
+        return T(bs_cyl_bessel_i_d(dv, dx))
     }
     
     /// Modified Bessel function of the second kind K_v(x) (Macdonald function).
@@ -175,7 +175,7 @@ public extension SpecialFunctions {
         guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dx > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
-        return T(bs_cyl_bessel_k(dv, dx))
+        return T(bs_cyl_bessel_k_d(dv, dx))
     }
 
     // MARK: - Mixed-precision promotions for cylindrical Bessel (Float ↔ Double)
@@ -269,7 +269,7 @@ public extension SpecialFunctions {
     #endif
     
     @inlinable static func besselJZero<T: BinaryFloatingPoint>(v: T, m: Int32) -> T {
-        return T(bs_cyl_bessel_j_zero(Double(v), m))
+        return T(bs_cyl_bessel_j_zero_d(Double(v), m))
     }
     
     /// Compute multiple zeros of J_v(x), starting at a given index, using the C bridge.
@@ -294,7 +294,7 @@ public extension SpecialFunctions {
         var buf = Array<Double>(repeating: 0, count: count)
         buf.withUnsafeMutableBufferPointer { bp in
             // Bridge call: fills bp.baseAddress with `count` zeros starting at `start`.
-            bs_cyl_bessel_j_zeros(dv, start, UInt32(count), bp.baseAddress)
+            bs_cyl_bessel_j_zeros_d(dv, start, UInt32(count), bp.baseAddress)
         }
         // Map the Double results back to T.
         return buf.map { T($0) }
@@ -321,7 +321,7 @@ public extension SpecialFunctions {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_sph_bessel(UInt32(n), dx))
+        return T(bs_sph_bessel_d(UInt32(n), dx))
     }
     
     /// Spherical Bessel function of the second kind y_n(x) (spherical Neumann).
@@ -344,7 +344,7 @@ public extension SpecialFunctions {
         guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dx > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
-        return T(bs_sph_neumann(UInt32(n), dx))
+        return T(bs_sph_neumann_d(UInt32(n), dx))
     }
     
     // MARK: - Bessel derivatives (generic)
@@ -374,7 +374,7 @@ public extension SpecialFunctions {
         let dv = D(v), dx = D(x)
         guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_cyl_bessel_j_prime(dv, dx))
+        return T(bs_cyl_bessel_j_prime_d(dv, dx))
     }
     
     /// Derivative with respect to x of the modified Bessel function I_v(x).
@@ -400,7 +400,7 @@ public extension SpecialFunctions {
         let dv = D(v), dx = D(x)
         guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_cyl_bessel_i_prime(dv, dx))
+        return T(bs_cyl_bessel_i_prime_d(dv, dx))
     }
     
     /// Derivative with respect to x of the modified Bessel function K_v(x).
@@ -431,7 +431,7 @@ public extension SpecialFunctions {
         guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dx > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
-        return T(bs_cyl_bessel_k_prime(dv, dx))
+        return T(bs_cyl_bessel_k_prime_d(dv, dx))
     }
     
     /// Derivative with respect to x of the spherical Bessel function j_n(x).
@@ -464,7 +464,7 @@ public extension SpecialFunctions {
         guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dx >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
-        return T(bs_sph_bessel_prime(UInt32(n), dx))
+        return T(bs_sph_bessel_prime_d(UInt32(n), dx))
     }
     
     /// Derivative with respect to x of the spherical Neumann function y_n(x).
@@ -497,7 +497,7 @@ public extension SpecialFunctions {
         guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dx > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
-        return T(bs_sph_neumann_prime(UInt32(n), dx))
+        return T(bs_sph_neumann_prime_d(UInt32(n), dx))
     }
     
     

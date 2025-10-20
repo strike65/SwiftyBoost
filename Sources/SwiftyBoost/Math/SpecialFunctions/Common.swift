@@ -183,7 +183,7 @@ extension SpecialFunctions {
     @inlinable static func cbrt<T: BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_cbrt(dx))
+        return T(bs_cbrt_d(dx))
     }
     
     /// Computes `sqrt(1 + x) - 1` with improved numerical stability near zero.
@@ -207,11 +207,11 @@ extension SpecialFunctions {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dx >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
-        return T(bs_rsqrt(dx))
+        return T(bs_rsqrt_d(dx))
     }
     
     //double bs_sqrt1pm1(double x)         { return bs_wrap<double>([&] { return boost::math::sqrt1pm1(x); }); }
-    //double bs_hypot(double x, double y)  { return bs_wrap<double>([&] { return boost::math::hypot(x, y); }); }
+    //double bs_hypot_d(double x, double y)  { return bs_wrap<double>([&] { return boost::math::hypot(x, y); }); }
     
     
     // MARK: - Float overloads
@@ -387,7 +387,7 @@ extension SpecialFunctions {
     @inlinable static func sinPi<T: BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_sin_pi(dx))
+        return T(bs_sin_pi_d(dx))
     }
     
     /// Computes `cos(πx)` with improved accuracy for half- and integer-aligned arguments.
@@ -398,7 +398,7 @@ extension SpecialFunctions {
     @inlinable static func cosPi<T: BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_cos_pi(dx))
+        return T(bs_cos_pi_d(dx))
     }
     
     // MARK: Float overloads for sinPi / cosPi

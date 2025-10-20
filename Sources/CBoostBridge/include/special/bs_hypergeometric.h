@@ -46,7 +46,7 @@ float bs_hypergeometric_1F1_f(float a, float b, float z);
 long double bs_hypergeometric_1F1_l(long double a, long double b, long double z);
 
 // General pFq with arrays of parameters
-double bs_hypergeometric_pFq(const double *a, size_t p, const double *b, size_t q, double z);
+double bs_hypergeometric_pFq_d(const double *a, size_t p, const double *b, size_t q, double z);
 float bs_hypergeometric_pFq_f(const float *a, size_t p, const float *b, size_t q, float z);
 long double bs_hypergeometric_pFq_l(const long double *a, size_t p, const long double *b, size_t q, long double z);
 

@@ -68,7 +68,7 @@ public extension SpecialFunctions {
     ///   ```
     static func cardinal_B_Spline<T: BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
         guard x <= 1, x >= -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 1, max: 1) }
-        return T(bs_cardinal_b_spline(UInt32(n), D(x)))
+        return T(bs_cardinal_b_spline_d(UInt32(n), D(x)))
     }
     
     /// Evaluates the cardinal B-spline of order `n` at position `x` (single precision).
@@ -124,7 +124,7 @@ public extension SpecialFunctions {
     static func cardinal_B_Spline_prime<T: BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
         guard x <= 1, x >= -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 1, max: 1) }
         guard  n >= 3 else { throw SpecialFunctionError.parameterOutOfRange(name: "n", min: 3, max: .infinity) }
-        return T(bs_cardinal_b_spline_prime(UInt32(n), D(x)))
+        return T(bs_cardinal_b_spline_prime_d(UInt32(n), D(x)))
     }
     
     /// Evaluates the first derivative of the cardinal B-spline of order `n` at position `x` (single precision).
@@ -181,7 +181,7 @@ public extension SpecialFunctions {
     static func cardinal_B_Spline_double_prime<T: BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
         guard x <= 1, x >= -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 1, max: 1) }
         guard  n >= 3 else { throw SpecialFunctionError.parameterOutOfRange(name: "n", min: 3, max: .infinity) }
-        return T(bs_cardinal_b_spline_double_prime(UInt32(n), D(x)))
+        return T(bs_cardinal_b_spline_double_prime_d(UInt32(n), D(x)))
     }
     
     /// Evaluates the second derivative of the cardinal B-spline of order `n` at position `x` (single precision).

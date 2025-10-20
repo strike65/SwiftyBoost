@@ -27,16 +27,14 @@ extern "C" {
 #endif
 
 #include "bs_complex.h"
-
-double bs_sinc_pi(double x);
-bs_complex_d bs_sincc_pi(bs_complex_d x);
+double bs_sinc_pi_d(double x);
+bs_complex_d bs_sincc_pi_d(bs_complex_d x);
 float bs_sinc_pi_f(float x);
 bs_complex_f bs_sincc_pi_f(bs_complex_f x);
 long double bs_sinc_pi_l(long double x);
 bs_complex_l bs_sincc_pi_l(bs_complex_l x);
-
-double bs_sinhc_pi(double x);
-bs_complex_d bs_sinhcc_pi(bs_complex_d x);
+double bs_sinhc_pi_d(double x);
+bs_complex_d bs_sinhcc_pi_d(bs_complex_d x);
 float bs_sinhc_pi_f(float x);
 bs_complex_f bs_sinhcc_pi_f(bs_complex_f x);
 long double bs_sinhc_pi_l(long double x);

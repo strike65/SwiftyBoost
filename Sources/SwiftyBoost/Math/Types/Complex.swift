@@ -442,7 +442,7 @@ public extension Complex where T == Double {
     @inlinable
     var exp: Complex<Double> {
         let z = bs_complex_d(re: real, im: imag)
-        let r = bs_cexp(z)
+        let r = bs_cexp_d(z)
         return Complex(r.re, r.im)
     }
 
@@ -450,7 +450,7 @@ public extension Complex where T == Double {
     @inlinable
     var log: Complex<Double> {
         let z = bs_complex_d(re: real, im: imag)
-        let r = bs_clog(z)
+        let r = bs_clog_d(z)
         return Complex(r.re, r.im)
     }
 
@@ -458,7 +458,7 @@ public extension Complex where T == Double {
     @inlinable
     var sin: Complex<Double> {
         let z = bs_complex_d(re: real, im: imag)
-        let r = bs_csin(z)
+        let r = bs_csin_d(z)
         return Complex(r.re, r.im)
     }
 
@@ -466,7 +466,7 @@ public extension Complex where T == Double {
     @inlinable
     var cos: Complex<Double> {
         let z = bs_complex_d(re: real, im: imag)
-        let r = bs_ccos(z)
+        let r = bs_ccos_d(z)
         return Complex(r.re, r.im)
     }
 
@@ -474,7 +474,7 @@ public extension Complex where T == Double {
     @inlinable
     var tan: Complex<Double> {
         let z = bs_complex_d(re: real, im: imag)
-        let r = bs_ctan(z)
+        let r = bs_ctan_d(z)
         return Complex(r.re, r.im)
     }
 
@@ -482,7 +482,7 @@ public extension Complex where T == Double {
     @inlinable
     var sinh: Complex<Double> {
         let z = bs_complex_d(re: real, im: imag)
-        let r = bs_csinh(z)
+        let r = bs_csinh_d(z)
         return Complex(r.re, r.im)
     }
 
@@ -490,7 +490,7 @@ public extension Complex where T == Double {
     @inlinable
     var cosh: Complex<Double> {
         let z = bs_complex_d(re: real, im: imag)
-        let r = bs_ccosh(z)
+        let r = bs_ccosh_d(z)
         return Complex(r.re, r.im)
     }
 
@@ -498,7 +498,7 @@ public extension Complex where T == Double {
     @inlinable
     var tanh: Complex<Double> {
         let z = bs_complex_d(re: real, im: imag)
-        let r = bs_ctanh(z)
+        let r = bs_ctanh_d(z)
         return Complex(r.re, r.im)
     }
 
@@ -506,7 +506,7 @@ public extension Complex where T == Double {
     @inlinable
     var atan: Complex<Double> {
         let z = bs_complex_d(re: real, im: imag)
-        let r = bs_catan(z)
+        let r = bs_catan_d(z)
         return Complex(r.re, r.im)
     }
 }

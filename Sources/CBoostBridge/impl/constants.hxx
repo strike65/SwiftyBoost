@@ -27,35 +27,31 @@
 extern "C" {
 
 // Boost constants (double)
-double bs_const_e(void)                 { return bs_wrap<double>([] { return boost::math::constants::e<double>(); }); }
-double bs_const_pi(void)                { return bs_wrap<double>([] { return boost::math::constants::pi<double>(); }); }
-double bs_const_two_pi(void)            { return bs_wrap<double>([] { return boost::math::constants::two_pi<double>(); }); }
-double bs_const_half_pi(void)           { return bs_wrap<double>([] { return boost::math::constants::half_pi<double>(); }); }
-double bs_const_third_pi(void)          { return bs_wrap<double>([] { return boost::math::constants::third_pi<double>(); }); }
-double bs_const_two_thirds_pi(void)     { return bs_wrap<double>([] { return boost::math::constants::two_thirds_pi<double>(); }); }
-double bs_const_quarter_pi(void)        { return bs_wrap<double>([] { return boost::math::constants::quarter_pi<double>(); }); }
-double bs_const_three_quarters_pi(void) { return bs_wrap<double>([] { return boost::math::constants::three_quarters_pi<double>(); }); }
-double bs_const_sixth_pi(void)          { return bs_wrap<double>([] { return boost::math::constants::sixth_pi<double>(); }); }
-double bs_const_pi_sqr(void)            { return bs_wrap<double>([] { return boost::math::constants::pi_sqr<double>(); }); }
-
-double bs_const_root_two(void)          { return bs_wrap<double>([] { return boost::math::constants::root_two<double>(); }); }
-double bs_const_root_three(void)        { return bs_wrap<double>([] { return boost::math::constants::root_three<double>(); }); }
-double bs_const_root_pi(void)           { return bs_wrap<double>([] { return boost::math::constants::root_pi<double>(); }); }
-
-double bs_const_one_div_pi(void)        { return bs_wrap<double>([] { return boost::math::constants::one_div_pi<double>(); }); }
-double bs_const_one_div_two_pi(void)    { return bs_wrap<double>([] { return boost::math::constants::one_div_two_pi<double>(); }); }
-double bs_const_one_div_root_pi(void)   { return bs_wrap<double>([] { return boost::math::constants::one_div_root_pi<double>(); }); }
-double bs_const_two_div_pi(void)        { return bs_wrap<double>([] { return boost::math::constants::two_div_pi<double>(); }); }
-double bs_const_two_div_root_pi(void)   { return bs_wrap<double>([] { return boost::math::constants::two_div_root_pi<double>(); }); }
-
-double bs_const_ln_two(void)            { return bs_wrap<double>([] { return boost::math::constants::ln_two<double>(); }); }
-double bs_const_ln_ten(void)            { return bs_wrap<double>([] { return boost::math::constants::ln_ten<double>(); }); }
-double bs_const_ln_ln_two(void)         { return bs_wrap<double>([] { return boost::math::constants::ln_ln_two<double>(); }); }
-
-double bs_const_euler(void)             { return bs_wrap<double>([] { return boost::math::constants::euler<double>(); }); }
-double bs_const_catalan(void)           { return bs_wrap<double>([] { return boost::math::constants::catalan<double>(); }); }
-double bs_const_zeta_three(void)        { return bs_wrap<double>([] { return boost::math::constants::zeta_three<double>(); }); }
-double bs_const_phi(void)               { return bs_wrap<double>([] { return boost::math::constants::phi<double>(); }); }
+double bs_const_e_d(void)                 { return bs_wrap<double>([] { return boost::math::constants::e<double>(); }); }
+double bs_const_pi_d(void)                { return bs_wrap<double>([] { return boost::math::constants::pi<double>(); }); }
+double bs_const_two_pi_d(void)            { return bs_wrap<double>([] { return boost::math::constants::two_pi<double>(); }); }
+double bs_const_half_pi_d(void)           { return bs_wrap<double>([] { return boost::math::constants::half_pi<double>(); }); }
+double bs_const_third_pi_d(void)          { return bs_wrap<double>([] { return boost::math::constants::third_pi<double>(); }); }
+double bs_const_two_thirds_pi_d(void)     { return bs_wrap<double>([] { return boost::math::constants::two_thirds_pi<double>(); }); }
+double bs_const_quarter_pi_d(void)        { return bs_wrap<double>([] { return boost::math::constants::quarter_pi<double>(); }); }
+double bs_const_three_quarters_pi_d(void) { return bs_wrap<double>([] { return boost::math::constants::three_quarters_pi<double>(); }); }
+double bs_const_sixth_pi_d(void)          { return bs_wrap<double>([] { return boost::math::constants::sixth_pi<double>(); }); }
+double bs_const_pi_sqr_d(void)            { return bs_wrap<double>([] { return boost::math::constants::pi_sqr<double>(); }); }
+double bs_const_root_two_d(void)          { return bs_wrap<double>([] { return boost::math::constants::root_two<double>(); }); }
+double bs_const_root_three_d(void)        { return bs_wrap<double>([] { return boost::math::constants::root_three<double>(); }); }
+double bs_const_root_pi_d(void)           { return bs_wrap<double>([] { return boost::math::constants::root_pi<double>(); }); }
+double bs_const_one_div_pi_d(void)        { return bs_wrap<double>([] { return boost::math::constants::one_div_pi<double>(); }); }
+double bs_const_one_div_two_pi_d(void)    { return bs_wrap<double>([] { return boost::math::constants::one_div_two_pi<double>(); }); }
+double bs_const_one_div_root_pi_d(void)   { return bs_wrap<double>([] { return boost::math::constants::one_div_root_pi<double>(); }); }
+double bs_const_two_div_pi_d(void)        { return bs_wrap<double>([] { return boost::math::constants::two_div_pi<double>(); }); }
+double bs_const_two_div_root_pi_d(void)   { return bs_wrap<double>([] { return boost::math::constants::two_div_root_pi<double>(); }); }
+double bs_const_ln_two_d(void)            { return bs_wrap<double>([] { return boost::math::constants::ln_two<double>(); }); }
+double bs_const_ln_ten_d(void)            { return bs_wrap<double>([] { return boost::math::constants::ln_ten<double>(); }); }
+double bs_const_ln_ln_two_d(void)         { return bs_wrap<double>([] { return boost::math::constants::ln_ln_two<double>(); }); }
+double bs_const_euler_d(void)             { return bs_wrap<double>([] { return boost::math::constants::euler<double>(); }); }
+double bs_const_catalan_d(void)           { return bs_wrap<double>([] { return boost::math::constants::catalan<double>(); }); }
+double bs_const_zeta_three_d(void)        { return bs_wrap<double>([] { return boost::math::constants::zeta_three<double>(); }); }
+double bs_const_phi_d(void)               { return bs_wrap<double>([] { return boost::math::constants::phi<double>(); }); }
 
 // Boost constants (float)
 float bs_const_e_f(void)                 { return bs_wrap<float>([] { return boost::math::constants::e<float>(); }); }

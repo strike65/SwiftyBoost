@@ -34,15 +34,15 @@
 extern "C" {
 #endif
     // Beta family
-    double bs_beta(double a, double b)                     { return bs_wrap<double>([&] { return boost::math::beta(a, b); }); }
-    double bs_fullBeta(double a, double b, double x)       { return bs_wrap<double>([&] { return boost::math::beta(a, b, x); }); }
-    double bs_ibeta(double a, double b, double x)          { return bs_wrap<double>([&] { return boost::math::ibeta(a, b, x); }); }
-    double bs_ibetac(double a, double b, double x)         { return bs_wrap<double>([&] { return boost::math::ibetac(a, b, x); }); }
-    double bs_ibeta_inv(double a, double b, double p)      { return bs_wrap<double>([&] { return boost::math::ibeta_inv(a, b, p); }); }
-    double bs_ibetac_inv(double a, double b, double p)     { return bs_wrap<double>([&] { return boost::math::ibetac_inv(a, b, p); }); }
-    double bs_ibeta_inva(double b, double x, double p)     { return bs_wrap<double>([&] { return boost::math::ibeta_inva(b, x, p); }); }
-    double bs_ibeta_invb(double a, double x, double p)     { return bs_wrap<double>([&] { return boost::math::ibeta_invb(a, x, p); }); }
-    double bs_ibeta_derivative(double a, double b, double x) { return bs_wrap<double>([&] { return boost::math::ibeta_derivative(a, b, x); }); }
+double bs_beta_d(double a, double b)                     { return bs_wrap<double>([&] { return boost::math::beta(a, b); }); }
+double bs_fullBeta_d(double a, double b, double x)       { return bs_wrap<double>([&] { return boost::math::beta(a, b, x); }); }
+double bs_ibeta_d(double a, double b, double x)          { return bs_wrap<double>([&] { return boost::math::ibeta(a, b, x); }); }
+double bs_ibetac_d(double a, double b, double x)         { return bs_wrap<double>([&] { return boost::math::ibetac(a, b, x); }); }
+double bs_ibeta_inv_d(double a, double b, double p)      { return bs_wrap<double>([&] { return boost::math::ibeta_inv(a, b, p); }); }
+double bs_ibetac_inv_d(double a, double b, double p)     { return bs_wrap<double>([&] { return boost::math::ibetac_inv(a, b, p); }); }
+double bs_ibeta_inva_d(double b, double x, double p)     { return bs_wrap<double>([&] { return boost::math::ibeta_inva(b, x, p); }); }
+double bs_ibeta_invb_d(double a, double x, double p)     { return bs_wrap<double>([&] { return boost::math::ibeta_invb(a, x, p); }); }
+double bs_ibeta_derivative_d(double a, double b, double x) { return bs_wrap<double>([&] { return boost::math::ibeta_derivative(a, b, x); }); }
     
     float bs_beta_f(float a, float b)                      { return bs_wrap<float>([&] { return boost::math::beta(a, b); }); }
     float bs_fullBeta_f(float a, float b, float x)         { return bs_wrap<float>([&] { return boost::math::beta(a, b, x); }); }
@@ -65,10 +65,10 @@ extern "C" {
     long double bs_ibeta_derivative_l(long double a, long double b, long double x) { return bs_wrap<long double>([&] { return boost::math::ibeta_derivative(a, b, x); }); }
     
     // Digamma / Polygamma / Zeta
-    double bs_digamma(double x)            { return bs_wrap<double>([&] { return boost::math::digamma(x); }); }
-    double bs_trigamma(double x)           { return bs_wrap<double>([&] { return boost::math::trigamma(x); }); }
-    double bs_polygamma(int n, double x)   { return bs_wrap<double>([&] { return boost::math::polygamma(n, x); }); }
-    double bs_riemann_zeta(double x)       { return bs_wrap<double>([&] { return boost::math::zeta(x); }); }
+double bs_digamma_d(double x)            { return bs_wrap<double>([&] { return boost::math::digamma(x); }); }
+double bs_trigamma_d(double x)           { return bs_wrap<double>([&] { return boost::math::trigamma(x); }); }
+double bs_polygamma_d(int n, double x)   { return bs_wrap<double>([&] { return boost::math::polygamma(n, x); }); }
+double bs_riemann_zeta_d(double x)       { return bs_wrap<double>([&] { return boost::math::zeta(x); }); }
     
     float bs_digamma_f(float x)            { return bs_wrap<float>([&] { return boost::math::digamma(x); }); }
     float bs_trigamma_f(float x)           { return bs_wrap<float>([&] { return boost::math::trigamma(x); }); }
@@ -81,7 +81,7 @@ extern "C" {
     long double bs_riemann_zeta_l(long double x)     { return bs_wrap<long double>([&] { return boost::math::zeta(x); }); }
     
     // Owen's T
-    double bs_owens_t(double h, double a)           { return bs_wrap<double>([&] { return boost::math::owens_t(h, a); }); }
+double bs_owens_t_d(double h, double a)           { return bs_wrap<double>([&] { return boost::math::owens_t(h, a); }); }
     float bs_owens_t_f(float h, float a)            { return bs_wrap<float>([&] { return boost::math::owens_t(h, a); }); }
     long double bs_owens_t_l(long double h, long double a) { return bs_wrap<long double>([&] { return boost::math::owens_t(h, a); }); }
     

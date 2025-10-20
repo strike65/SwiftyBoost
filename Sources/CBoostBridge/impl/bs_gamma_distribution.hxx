@@ -26,7 +26,7 @@ extern "C" {
 void* bs_gamma_make_f(float k, float theta) {
     try { return new bs_gamma_f_handle(k, theta); } catch (...) { return nullptr; }
 }
-void* bs_gamma_make(double k, double theta) {
+void* bs_gamma_make_d(double k, double theta) {
     try { return new bs_gamma_d_handle(k, theta); } catch (...) { return nullptr; }
 }
 void* bs_gamma_make_l(long double k, long double theta) {
@@ -35,7 +35,7 @@ void* bs_gamma_make_l(long double k, long double theta) {
 void bs_gamma_free_f(void* handle) {
     delete static_cast<bs_gamma_f_handle*>(handle);
 }
-void bs_gamma_free(void* handle) {
+void bs_gamma_free_d(void* handle) {
     delete static_cast<bs_gamma_d_handle*>(handle);
 }
 void bs_gamma_free_l(void* handle) {
@@ -47,7 +47,7 @@ float bs_gamma_cdf_f(const void* handle, float x) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return cdf(h->dist, x); });
 }
-double bs_gamma_cdf(const void* handle, double x) {
+double bs_gamma_cdf_d(const void* handle, double x) {
     auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return cdf(h->dist, x); });
@@ -63,7 +63,7 @@ float bs_gamma_ccdf_f(const void* handle, float x) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return cdf(complement(h->dist, x)); });
 }
-double bs_gamma_ccdf(const void* handle, double x) {
+double bs_gamma_ccdf_d(const void* handle, double x) {
     auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return cdf(complement(h->dist, x)); });
@@ -88,7 +88,7 @@ float bs_gamma_hazard_f(const void* handle, float x) {
     }
     return d / p;
 }
-double bs_gamma_hazard(const void* handle, double x) {
+double bs_gamma_hazard_d(const void* handle, double x) {
     auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     double p = bs_wrap<double>([&]{ return cdf(complement(h->dist, x)); });
@@ -122,7 +122,7 @@ float bs_gamma_chf_f(const void* handle, float x) {
     float p = bs_wrap<float>([&]{ return cdf(complement(h->dist, x)); });
     return -log(p);
 }
-double     bs_gamma_chf(const void* handle, double x) {
+double     bs_gamma_chf_d(const void* handle, double x) {
     auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     double p = bs_wrap<double>([&]{ return cdf(complement(h->dist, x)); });
@@ -141,7 +141,7 @@ float bs_gamma_kurtosis_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis(h->dist); });
 }
-double bs_gamma_kurtosis(const void* handle) {
+double bs_gamma_kurtosis_d(const void* handle) {
     auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis(h->dist); });
@@ -157,7 +157,7 @@ float bs_gamma_kurtosis_excess_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis_excess(h->dist); });
 }
-double bs_gamma_kurtosis_excess(const void* handle) {
+double bs_gamma_kurtosis_excess_d(const void* handle) {
     auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<float>([&]{ return kurtosis_excess(h->dist); });
@@ -173,7 +173,7 @@ float bs_gamma_mean_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return mean(h->dist); });
 }
-double bs_gamma_mean(const void* handle) {
+double bs_gamma_mean_d(const void* handle) {
     auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return mean(h->dist); });
@@ -189,7 +189,7 @@ float bs_gamma_median_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return median(h->dist); });
 }
-double bs_gamma_median (const void* handle) {
+double bs_gamma_median_d(const void* handle) {
     auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<long double>([&]{ return median(h->dist); });
@@ -205,7 +205,7 @@ float bs_gamma_mode_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return mode(h->dist); });
 }
-double bs_gamma_mode(const void* handle) {
+double bs_gamma_mode_d(const void* handle) {
     auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return mode(h->dist); });
@@ -221,7 +221,7 @@ float bs_gamma_pdf_f(const void* handle, float x) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return pdf(h->dist, x); });
 }
-double bs_gamma_pdf(const void* handle, double x) {
+double bs_gamma_pdf_d(const void* handle, double x) {
     auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return pdf(h->dist, x); });
@@ -242,7 +242,7 @@ bs_range_f bs_gamma_range_f(const void* handle) {
     return bs_range_f{ static_cast<float>(pr.first), static_cast<float>(pr.second) };
 }
 
-bs_range_d bs_gamma_range(const void* handle) {
+bs_range_d bs_gamma_range_d(const void* handle) {
     auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) {
         double nan = std::numeric_limits<double>::quiet_NaN();
@@ -272,7 +272,7 @@ bs_range_f bs_gamma_support_f(const void* handle) {
     return bs_range_f{ static_cast<float>(pr.first), static_cast<float>(pr.second) };
 }
 
-bs_range_d bs_gamma_support(const void* handle) {
+bs_range_d bs_gamma_support_d(const void* handle) {
     auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) {
         double nan = std::numeric_limits<double>::quiet_NaN();
@@ -297,7 +297,7 @@ float bs_gamma_quantile_f(const void* handle, float p) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return quantile(h->dist, p); });
 }
-double bs_gamma_quantile(const void* handle, double p) {
+double bs_gamma_quantile_d(const void* handle, double p) {
     auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return quantile(h->dist, p); });
@@ -313,7 +313,7 @@ float bs_gamma_quantile_complement_f(const void* handle, float q) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return quantile(complement(h->dist, q)); });
 }
-double bs_gamma_quantile_complement(const void* handle, double q) {
+double bs_gamma_quantile_complement_d(const void* handle, double q) {
     auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return quantile(complement(h->dist, q)); });
@@ -329,7 +329,7 @@ float bs_gamma_skewness_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return skewness(h->dist); });
 }
-double      bs_gamma_skewness (const void* handle) {
+double      bs_gamma_skewness_d(const void* handle) {
     auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return skewness(h->dist); });
@@ -345,7 +345,7 @@ float       bs_gamma_standard_deviation_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return standard_deviation(h->dist); });
 }
-double      bs_gamma_standard_deviation (const void* handle) {
+double      bs_gamma_standard_deviation_d(const void* handle) {
     auto h = static_cast<const bs_gamma_l_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return standard_deviation(h->dist); });
@@ -361,7 +361,7 @@ float bs_gamma_variance_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return variance(h->dist); });
 }
-double bs_gamma_variance(const void* handle) {
+double bs_gamma_variance_d(const void* handle) {
     auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return variance(h->dist); });
@@ -377,7 +377,7 @@ float bs_gamma_entropy_f(const void* handle) {
     if (!h) return std::numeric_limits<float>::quiet_NaN();
     return bs_wrap<float>([&]{ return entropy(h->dist); });
 }
-double bs_gamma_entropy(const void* handle) {
+double bs_gamma_entropy_d(const void* handle) {
     auto h = static_cast<const bs_gamma_d_handle*>(handle);
     if (!h) return std::numeric_limits<double>::quiet_NaN();
     return bs_wrap<double>([&]{ return entropy(h->dist); });

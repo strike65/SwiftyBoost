@@ -13,7 +13,7 @@ struct FactorialAndCombinatoricsTests {
     func factorialDouble() throws {
         for n in 0...Int(SpecialFunctions.maxFactorialInputDouble) {
             let nn = UInt32(n)
-            let expected = bs_factorial(nn)
+            let expected = bs_factorial_d(nn)
             let got = try SpecialFunctions.factorial(nn)
             #expect(got == expected, "Mismatch at n=\(n)")
         }
@@ -50,7 +50,7 @@ struct FactorialAndCombinatoricsTests {
         typealias T = Float
         for n in 0...Int(SpecialFunctions.maxFactorialInput(for: T.self)) {
             let nn = UInt32(n)
-            let expected = T(bs_factorial(nn)) // generic path uses Double backend
+            let expected = T(bs_factorial_d(nn)) // generic path uses Double backend
             let got: T = try SpecialFunctions.factorial(nn)
             #expect(got == expected, "Mismatch at n=\(n)")
         }
@@ -61,7 +61,7 @@ struct FactorialAndCombinatoricsTests {
         typealias T = Double
         for n in 0...Int(SpecialFunctions.maxFactorialInput(for: T.self)) {
             let nn = UInt32(n)
-            let expected = T(bs_factorial(nn))
+            let expected = T(bs_factorial_d(nn))
             let got: T = try SpecialFunctions.factorial(nn)
             #expect(got == expected, "Mismatch at n=\(n)")
         }
@@ -91,7 +91,7 @@ struct FactorialAndCombinatoricsTests {
         typealias T = Float80
         for n in 0...Int(SpecialFunctions.maxFactorialInput(for: T.self)) {
             let nn = UInt32(n)
-            let expected = T(bs_factorial(nn)) // generic path uses Double backend
+            let expected = T(bs_factorial_d(nn)) // generic path uses Double backend
             let got: T = try SpecialFunctions.factorial(nn)
             #expect(got == expected, "Mismatch at n=\(n)")
         }
@@ -125,7 +125,7 @@ struct FactorialAndCombinatoricsTests {
                 #expect(got == 0)
             } else {
                 let got = try SpecialFunctions.rising_factorial(x, n)
-                let expected = bs_rising_factorial(x, n)
+                let expected = bs_rising_factorial_d(x, n)
                 #expect(got == expected, "Mismatch at x=\(x), n=\(n)")
             }
         }
@@ -209,7 +209,7 @@ struct FactorialAndCombinatoricsTests {
         let pairs: [(UInt32, UInt32)] = [(5,1), (5,2), (10,3), (20,10)]
         for (n, k) in pairs {
             let got = try SpecialFunctions.binomial_coeff(n, k)
-            let expected = bs_binomial_coefficient(n, k)
+            let expected = bs_binomial_coefficient_d(n, k)
             #expect(got == expected, "Mismatch at C(\(n), \(k))")
         }
     }
@@ -251,7 +251,7 @@ struct FactorialAndCombinatoricsTests {
         let ns: [UInt32] = Array(0...25)
         for n in ns {
             let got = try SpecialFunctions.double_factorial(n)
-            let expected = bs_double_factorial(n)
+            let expected = bs_double_factorial_d(n)
             #expect(got == expected, "Mismatch at n!! with n=\(n)")
         }
     }
@@ -289,7 +289,7 @@ struct GammaAndRelatedTests {
         let xs: [Double] = [0.5, 1, 2.5, 5, 10]
         for x in xs {
             let got = try SpecialFunctions.gamma(x)
-            let expected = bs_tgamma(x)
+            let expected = bs_tgamma_d(x)
             #expect(got == expected, "Γ mismatch at x=\(x)")
         }
         for x in [0.0, -1.0, -2.0] {
@@ -304,7 +304,7 @@ struct GammaAndRelatedTests {
         let xs: [Double] = [0.5, 1, 2.5, 5, 10]
         for x in xs {
             let got = try SpecialFunctions.logGamma(x)
-            let expected = bs_lgamma(x)
+            let expected = bs_lgamma_d(x)
             #expect(got == expected, "lnΓ mismatch at x=\(x)")
         }
     }
@@ -313,31 +313,31 @@ struct GammaAndRelatedTests {
     func gammaRatios() throws {
         let a = 5.5, b = 2.25
         let r = try SpecialFunctions.gammaRatio(a, b)
-        #expect(r == bs_tgamma_ratio(a, b))
+        #expect(r == bs_tgamma_ratio_d(a, b))
 
         let delta = -1.75
         let rd = try SpecialFunctions.gammaDeltaRatio(a, delta: delta)
-        #expect(rd == bs_tgamma_delta_ratio(a, delta))
+        #expect(rd == bs_tgamma_delta_ratio_d(a, delta))
     }
 
     @Test
     func incompleteAndRegularized() throws {
         let a = 2.5, x = 1.25
-        #expect(try SpecialFunctions.incompleteGammaLower(a, x: x) == bs_tgamma_lower(a, x))
-        #expect(try SpecialFunctions.incompleteGammaUpper(a, x: x) == bs_tgamma_upper(a, x))
-        #expect(try SpecialFunctions.regularizedGammaP(a, x: x) == bs_gamma_p(a, x))
-        #expect(try SpecialFunctions.regularizedGammaQ(a, x: x) == bs_gamma_q(a, x))
-        #expect(try SpecialFunctions.regularizedGammaPDerivative(a, x: x) == bs_gamma_p_derivative(a, x))
+        #expect(try SpecialFunctions.incompleteGammaLower(a, x: x) == bs_tgamma_lower_d(a, x))
+        #expect(try SpecialFunctions.incompleteGammaUpper(a, x: x) == bs_tgamma_upper_d(a, x))
+        #expect(try SpecialFunctions.regularizedGammaP(a, x: x) == bs_gamma_p_d(a, x))
+        #expect(try SpecialFunctions.regularizedGammaQ(a, x: x) == bs_gamma_q_d(a, x))
+        #expect(try SpecialFunctions.regularizedGammaPDerivative(a, x: x) == bs_gamma_p_derivative_d(a, x))
     }
 
     @Test
     func regularizedInverses() throws {
         let a = 3.5
         for p in [0.1, 0.5, 0.9] {
-            #expect(try SpecialFunctions.regularizedGammaPInv(a, p: p) == bs_gamma_p_inv(a, p))
+            #expect(try SpecialFunctions.regularizedGammaPInv(a, p: p) == bs_gamma_p_inv_d(a, p))
         }
         for q in [0.1, 0.5, 0.9] {
-            #expect(try SpecialFunctions.regularizedGammaQInv(a, q: q) == bs_gamma_q_inv(a, q))
+            #expect(try SpecialFunctions.regularizedGammaQInv(a, q: q) == bs_gamma_q_inv_d(a, q))
         }
     }
 }
@@ -350,17 +350,17 @@ struct BetaFamilyTests {
     @Test
     func betaDouble() throws {
         let a = 2.5, b = 3.75
-        #expect(try SpecialFunctions.beta(a, b) == bs_beta(a, b))
+        #expect(try SpecialFunctions.beta(a, b) == bs_beta_d(a, b))
     }
 
     @Test
     func incompleteAndRegularized() throws {
         let a = 2.5, b = 3.75
         for x in [0.0, 0.25, 0.5, 1.0] {
-            #expect(try SpecialFunctions.incompleteBetaUnnormalized(a, b, x: x) == bs_fullBeta(a, b, x))
-            #expect(try SpecialFunctions.regularizedIncompleteBeta(a, b, x: x) == bs_ibeta(a, b, x))
-            #expect(try SpecialFunctions.complementaryRegularizedIncompleteBeta(a, b, x: x) == bs_ibetac(a, b, x))
-            #expect(try SpecialFunctions.regularizedIncompleteBetaDerivative(a, b, x: x) == bs_ibeta_derivative(a, b, x))
+            #expect(try SpecialFunctions.incompleteBetaUnnormalized(a, b, x: x) == bs_fullBeta_d(a, b, x))
+            #expect(try SpecialFunctions.regularizedIncompleteBeta(a, b, x: x) == bs_ibeta_d(a, b, x))
+            #expect(try SpecialFunctions.complementaryRegularizedIncompleteBeta(a, b, x: x) == bs_ibetac_d(a, b, x))
+            #expect(try SpecialFunctions.regularizedIncompleteBetaDerivative(a, b, x: x) == bs_ibeta_derivative_d(a, b, x))
         }
     }
 
@@ -368,12 +368,12 @@ struct BetaFamilyTests {
     func inversesAndSolvers() throws {
         let a = 2.5, b = 3.75
         for p in [0.1, 0.5, 0.9] {
-            #expect(try SpecialFunctions.inverseRegularizedIncompleteBeta(a, b, p: p) == bs_ibeta_inv(a, b, p))
-            #expect(try SpecialFunctions.inverseComplementaryRegularizedIncompleteBeta(a, b, p: p) == bs_ibetac_inv(a, b, p))
+            #expect(try SpecialFunctions.inverseRegularizedIncompleteBeta(a, b, p: p) == bs_ibeta_inv_d(a, b, p))
+            #expect(try SpecialFunctions.inverseComplementaryRegularizedIncompleteBeta(a, b, p: p) == bs_ibetac_inv_d(a, b, p))
         }
         let x = 0.4, p = 0.6
-        #expect(SpecialFunctions.solveAForRegularizedIncompleteBeta(b: b, x: x, p: p) == bs_ibeta_inva(b, x, p))
-        #expect(SpecialFunctions.solveBForRegularizedIncompleteBeta(a: a, x: x, p: p) == bs_ibeta_invb(a, x, p))
+        #expect(SpecialFunctions.solveAForRegularizedIncompleteBeta(b: b, x: x, p: p) == bs_ibeta_inva_d(b, x, p))
+        #expect(SpecialFunctions.solveBForRegularizedIncompleteBeta(a: a, x: x, p: p) == bs_ibeta_invb_d(a, x, p))
     }
 }
 
@@ -387,8 +387,8 @@ struct BesselAndLegendreTests {
         let v = 2.5
         let xs: [Double] = [0.1, 1.0, 5.0]
         for x in xs {
-            #expect(try SpecialFunctions.besselJ(v: v, x: x) == bs_cyl_bessel_j(v, x))
-            #expect(try SpecialFunctions.modifiedBesselI(v: v, x: x) == bs_cyl_bessel_i(v, x))
+            #expect(try SpecialFunctions.besselJ(v: v, x: x) == bs_cyl_bessel_j_d(v, x))
+            #expect(try SpecialFunctions.modifiedBesselI(v: v, x: x) == bs_cyl_bessel_i_d(v, x))
         }
         for x in xs {
             #expect(throws: SpecialFunctionError.parameterNotPositive(name: "x")) {
@@ -397,8 +397,8 @@ struct BesselAndLegendreTests {
             #expect(throws: SpecialFunctionError.parameterNotPositive(name: "x")) {
                 _ = try SpecialFunctions.modifiedBesselK(v: v, x: 0.0)
             }
-            #expect(try SpecialFunctions.besselY(v: v, x: x) == bs_cyl_neumann(v, x))
-            #expect(try SpecialFunctions.modifiedBesselK(v: v, x: x) == bs_cyl_bessel_k(v, x))
+            #expect(try SpecialFunctions.besselY(v: v, x: x) == bs_cyl_neumann_d(v, x))
+            #expect(try SpecialFunctions.modifiedBesselK(v: v, x: x) == bs_cyl_bessel_k_d(v, x))
         }
     }
 
@@ -407,13 +407,13 @@ struct BesselAndLegendreTests {
         let xs: [Double] = [-0.75, -0.1, 0.0, 0.25, 0.9]
         for n in 0...6 {
             for x in xs {
-                #expect(try SpecialFunctions.legendreP(n, x) == bs_legendre_p(Int32(n), x))
+                #expect(try SpecialFunctions.legendreP(n, x) == bs_legendre_p_d(Int32(n), x))
             }
         }
         for n in 0...6 {
             for m in -n...n {
                 for x in xs {
-                    #expect(try SpecialFunctions.associatedLegendreP(n, m, x) == bs_assoc_legendre_p(Int32(n), Int32(m), x))
+                    #expect(try SpecialFunctions.associatedLegendreP(n, m, x) == bs_assoc_legendre_p_d(Int32(n), Int32(m), x))
                 }
             }
         }
@@ -493,7 +493,7 @@ struct EllipticAndLambertWTests {
 
     @Test
     func lambertW_Double() throws {
-        let e = bs_const_e()
+        let e = bs_const_e_d()
         let minX = -1.0 / e
         let xs0: [Double] = [minX, -0.2, 0.0, 0.5, 2.0]
         for x in xs0 {
@@ -559,7 +559,7 @@ struct ExponentialIntegralsAndErrorFunctionTests {
     func exponentialIntegralEi_Double() throws {
         let xs: [Double] = [-5, -1, -0.1, 0.1, 1, 5]
         for x in xs {
-            #expect(try SpecialFunctions.exponentialIntegralEi(x) == bs_expint_Ei(x))
+            #expect(try SpecialFunctions.exponentialIntegralEi(x) == bs_expint_Ei_d(x))
         }
     }
 
@@ -569,7 +569,7 @@ struct ExponentialIntegralsAndErrorFunctionTests {
         let xs: [Double] = [0.0, 0.1, 1.0, 5.0]
         for n in ns {
             for x in xs {
-                #expect(try SpecialFunctions.exponentialIntegralEn(n, x) == bs_expint_En(Int32(n), x))
+                #expect(try SpecialFunctions.exponentialIntegralEn(n, x) == bs_expint_En_d(Int32(n), x))
             }
         }
         #expect(throws: SpecialFunctionError.parameterNotPositive(name: "n")) {
@@ -581,8 +581,8 @@ struct ExponentialIntegralsAndErrorFunctionTests {
     func errorFunctions_Double() throws {
         let xs: [Double] = [-3, -1, -0.1, 0, 0.1, 1, 3]
         for x in xs {
-            #expect(try SpecialFunctions.errorFunction(x) == bs_erf(x))
-            #expect(try SpecialFunctions.complementaryErrorFunction(x) == bs_erfc(x))
+            #expect(try SpecialFunctions.errorFunction(x) == bs_erf_d(x))
+            #expect(try SpecialFunctions.complementaryErrorFunction(x) == bs_erfc_d(x))
         }
     }
 }
@@ -596,8 +596,8 @@ struct DigammaPolygammaZetaTests {
     func digamma_trigamma_Double() throws {
         let xs: [Double] = [0.5, 0.75, 1.0, 2.5, 5.0]
         for x in xs {
-            #expect(try SpecialFunctions.digamma(x) == bs_digamma(x))
-            #expect(try SpecialFunctions.trigamma(x) == bs_trigamma(x))
+            #expect(try SpecialFunctions.digamma(x) == bs_digamma_d(x))
+            #expect(try SpecialFunctions.trigamma(x) == bs_trigamma_d(x))
         }
         for x in [0.0, -1.0, -2.0] {
             #expect(throws: SpecialFunctionError.poleAtNonPositiveInteger(name: "x")) {
@@ -614,7 +614,7 @@ struct DigammaPolygammaZetaTests {
         let xs: [Double] = [0.5, 1.0, 2.5]
         for n in 0...5 {
             for x in xs {
-                #expect(try SpecialFunctions.polygamma(order: n, x) == bs_polygamma(Int32(n), x))
+                #expect(try SpecialFunctions.polygamma(order: n, x) == bs_polygamma_d(Int32(n), x))
             }
         }
         #expect(throws: SpecialFunctionError.parameterNotPositive(name: "order")) {
@@ -626,7 +626,7 @@ struct DigammaPolygammaZetaTests {
     func zeta_Double() throws {
         let xs: [Double] = [-3.0, -2.0, -0.5, 0.0, 2.0, 3.5]
         for x in xs where x != 1.0 {
-            #expect(try SpecialFunctions.riemannZeta(x) == bs_riemann_zeta(x))
+            #expect(try SpecialFunctions.riemannZeta(x) == bs_riemann_zeta_d(x))
         }
         #expect(throws: SpecialFunctionError.invalidCombination(message: "riemannZeta has a pole at x = 1")) {
             _ = try SpecialFunctions.riemannZeta(1.0 as Double)
@@ -645,7 +645,7 @@ struct OwensTAndHypergeometricTests {
         let as_: [Double] = [-2.0, -0.5, 0.0, 0.5, 2.0]
         for h in hs {
             for a in as_ {
-                #expect(try SpecialFunctions.owensT(h: h, a: a) == bs_owens_t(h, a))
+                #expect(try SpecialFunctions.owensT(h: h, a: a) == bs_owens_t_d(h, a))
             }
         }
     }
@@ -681,7 +681,7 @@ struct OwensTAndHypergeometricTests {
         let got = SpecialFunctions.hypergeometricPFQ(a: a, b: b, z: z)
         let expected = a.withUnsafeBufferPointer { ap in
             b.withUnsafeBufferPointer { bp in
-                bs_hypergeometric_pFq(ap.baseAddress, ap.count, bp.baseAddress, bp.count, z)
+                bs_hypergeometric_pFq_d(ap.baseAddress, ap.count, bp.baseAddress, bp.count, z)
             }
         }
         #expect(got == expected)
@@ -709,7 +709,7 @@ struct CommonHelpersTests {
                     _ = try SpecialFunctions.log1pmx(x)
                 }
             }
-            #expect(try SpecialFunctions.cbrt(x) == bs_cbrt(x))
+            #expect(try SpecialFunctions.cbrt(x) == bs_cbrt_d(x))
         }
     }
 
@@ -728,8 +728,8 @@ struct CommonHelpersTests {
     func sinPi_cosPi_Double() throws {
         let xs: [Double] = [-2.5, -1.0, -0.25, 0.0, 0.25, 1.0, 2.5]
         for x in xs {
-            #expect(try SpecialFunctions.sinPi(x) == bs_sin_pi(x))
-            #expect(try SpecialFunctions.cosPi(x) == bs_cos_pi(x))
+            #expect(try SpecialFunctions.sinPi(x) == bs_sin_pi_d(x))
+            #expect(try SpecialFunctions.cosPi(x) == bs_cos_pi_d(x))
         }
     }
 }

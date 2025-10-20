@@ -27,10 +27,10 @@ extern "C" {
 #endif
 
 // Legendre
-double bs_legendre_p(int n, double x);
-double bs_assoc_legendre_p(int n, int m, double x);
-double bs_legendre_p_prime(int n, double x);
-void bs_legendre_p_zeros(int l, double *out);
+double bs_legendre_p_d(int n, double x);
+double bs_assoc_legendre_p_d(int n, int m, double x);
+double bs_legendre_p_prime_d(int n, double x);
+void bs_legendre_p_zeros_d(int l, double *out);
 
 float bs_legendre_p_f(int n, float x);
 float bs_assoc_legendre_p_f(int n, int m, float x);
