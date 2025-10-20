@@ -25,7 +25,6 @@ session.log
 changelog.temp.txt
 transscript.txt
 *.json
-Boost/
 .swift-module-cache/
 tmp*.swift
 ## Editors/IDE
