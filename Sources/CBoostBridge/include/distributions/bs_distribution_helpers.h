@@ -19,6 +19,19 @@ extern "C" {
 float       bs_student_t_find_degrees_of_freedom_f(float difference_from_mean, float alpha, float beta, float sd, float hint);
 double      bs_student_t_find_degrees_of_freedom_d(double difference_from_mean, double alpha, double beta, double sd, double hint);
 long double bs_student_t_find_degrees_of_freedom_l(long double difference_from_mean, long double alpha, long double beta, long double sd, long double hint);
+float bs_beta_find_alpha_f(float mean, float variance);
+double bs_beta_find_alpha_d(double mean, double variance);
+long double bs_beta_find_alpha_l(long double mean, long double variance);
+
+float bs_beta_find_beta_f(float mean, float variance);
+double bs_beta_find_beta_d(double mean, double variance);
+long double bs_beta_find_beta_l(long double mean, long double variance);
+float bs_beta_find_alpha_from_beta_f(float beta, float x, float probability);
+double bs_beta_find_alpha_from_beta_d(double beta, double x, double probability);
+long double bs_beta_find_alpha_from_beta_l(long double beta, long double x, long double probability);
+float bs_beta_find_beta_from_alpha_f(float alpha, float x, float probability);
+double bs_beta_find_beta_from_alpha_d(double alpha, double x, double probability);
+long double bs_beta_find_beta_from_alpha_l(long double alpha, long double x, long double probability);
 
 #ifdef __cplusplus
 }

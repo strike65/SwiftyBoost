@@ -12,6 +12,7 @@
 #include <boost/math/distributions/students_t.hpp>
 #include <boost/math/distributions/fisher_f.hpp>
 #include <boost/math/distributions/arcsine.hpp>
+#include <boost/math/distributions/beta.hpp>
 #include <boost/math/distributions/complement.hpp>
 #include <boost/math/tools/numeric_limits.hpp>
 
@@ -19,6 +20,7 @@ using boost::math::gamma_distribution;
 using boost::math::students_t_distribution;
 using boost::math::fisher_f_distribution;
 using boost::math::arcsine_distribution;
+using boost::math::beta_distribution;
 using boost::math::complement;
 
 namespace {
@@ -178,6 +180,11 @@ struct arcsine_f_handle { arcsine_distribution<float> dist; arcsine_f_handle(flo
 struct arcsine_d_handle { arcsine_distribution<double> dist; arcsine_d_handle(double a, double b): dist(a, b) {} };
 struct arcsine_l_handle { arcsine_distribution<long double> dist; arcsine_l_handle(long double a, long double b): dist(a, b) {} };
 
+// Arcsine
+struct beta_f_handle { beta_distribution<float> dist; beta_f_handle(float a, float b): dist(a, b) {} };
+struct beta_d_handle { beta_distribution<double> dist; beta_d_handle(double a, double b): dist(a, b) {} };
+struct beta_l_handle { beta_distribution<long double> dist; beta_l_handle(long double a, long double b): dist(a, b) {} };
+
 } // namespace
 
 extern "C" {
@@ -296,6 +303,34 @@ bool bs_dist_make_d(const char* name, const bs_param_d* params, size_t count, bs
         out->median = &median_fn<arcsine_d_handle, double>;
         out->entropy = nullptr; // not provided in Boost
         out->free = &free_fn<arcsine_d_handle>;
+        return true;
+    } else if (n == "beta" || n == "beta_distribution") {
+        double a = 0, b = 0;
+        const char* aKeys[] = { "alpha", "a", "p", "shape1" };
+        const char* bKeys[] = { "beta", "b", "q", "shape2" };
+        if (!find_param(params, count, aKeys, 4, &a)) return false;
+        if (!find_param(params, count, bKeys, 4, &b)) return false;
+        auto* h = new (std::nothrow) beta_d_handle(a, b);
+        if (!h) return false;
+        out->ctx = h;
+        out->pdf = &pdf_fn<beta_d_handle, double>;
+        out->logpdf = &logpdf_fn<beta_d_handle, double>;
+        out->cdf = &cdf_fn<beta_d_handle, double>;
+        out->sf = &sf_fn<beta_d_handle, double>;
+        out->hazard = &hazard_fn<beta_d_handle, double>;
+        out->chf = &chf_fn<beta_d_handle, double>;
+        out->quantile = &quantile_fn<beta_d_handle, double>;
+        out->quantile_complement = &quantile_complement_fn<beta_d_handle, double>;
+        out->range = &range_fn<beta_d_handle, bs_range_d, double>;
+        out->mean = &mean_fn<beta_d_handle, double>;
+        out->variance = &variance_fn<beta_d_handle, double>;
+        out->skewness = &skewness_fn<beta_d_handle, double>;
+        out->kurtosis = &kurtosis_fn<beta_d_handle, double>;
+        out->kurtosis_excess = &kurtosis_excess_fn<beta_d_handle, double>;
+        out->mode = &mode_fn<beta_d_handle, double>;
+        out->median = &median_fn<beta_d_handle, double>;
+        out->entropy = nullptr; // not provided in Boost
+        out->free = &free_fn<beta_d_handle>;
         return true;
         }
         return false;
@@ -418,7 +453,36 @@ bool bs_dist_make_f(const char* name, const bs_param_f* params, size_t count, bs
         out->entropy = nullptr;
         out->free = &free_fn<arcsine_f_handle>;
         return true;
+    } else if (n == "beta" || n == "beta_distribution") {
+        double a = 0, b = 0;
+        const char* aKeys[] = { "alpha", "a", "p", "shape1" };
+        const char* bKeys[] = { "beta", "b", "q", "shape2" };
+        if (!find_param(params, count, aKeys, 4, &a)) return false;
+        if (!find_param(params, count, bKeys, 4, &b)) return false;
+        auto* h = new (std::nothrow) beta_d_handle(a, b);
+        if (!h) return false;
+        out->ctx = h;
+        out->pdf = &pdf_fn<beta_f_handle, float>;
+        out->logpdf = &logpdf_fn<beta_f_handle, float>;
+        out->cdf = &cdf_fn<beta_f_handle, float>;
+        out->sf = &sf_fn<beta_f_handle, float>;
+        out->hazard = &hazard_fn<beta_f_handle, float>;
+        out->chf = &chf_fn<beta_f_handle, float>;
+        out->quantile = &quantile_fn<beta_f_handle, float>;
+        out->quantile_complement = &quantile_complement_fn<beta_f_handle, float>;
+        out->range = &range_fn<beta_f_handle, bs_range_f, float>;
+        out->mean = &mean_fn<beta_f_handle, float>;
+        out->variance = &variance_fn<beta_f_handle, float>;
+        out->skewness = &skewness_fn<beta_f_handle, float>;
+        out->kurtosis = &kurtosis_fn<beta_f_handle, float>;
+        out->kurtosis_excess = &kurtosis_excess_fn<beta_f_handle, float>;
+        out->mode = &mode_fn<beta_f_handle, float>;
+        out->median = &median_fn<beta_f_handle, float>;
+        out->entropy = nullptr; // not provided in Boost
+        out->free = &free_fn<beta_f_handle>;
+        return true;
         }
+
         return false;
     } catch (...) {
         return false;
@@ -539,7 +603,35 @@ bool bs_dist_make_l(const char* name, const bs_param_l* params, size_t count, bs
         out->entropy = nullptr;
         out->free = &free_fn<arcsine_l_handle>;
         return true;
-        }
+    } else if (n == "beta" || n == "beta_distribution") {
+        double a = 0, b = 0;
+        const char* aKeys[] = { "alpha", "a", "p", "shape1" };
+        const char* bKeys[] = { "beta", "b", "q", "shape2" };
+        if (!find_param(params, count, aKeys, 4, &a)) return false;
+        if (!find_param(params, count, bKeys, 4, &b)) return false;
+        auto* h = new (std::nothrow) beta_d_handle(a, b);
+        if (!h) return false;
+        out->ctx = h;
+        out->pdf = &pdf_fn<beta_l_handle, long double>;
+        out->logpdf = &logpdf_fn<beta_l_handle, long double>;
+        out->cdf = &cdf_fn<beta_l_handle, long double>;
+        out->sf = &sf_fn<beta_l_handle, long double>;
+        out->hazard = &hazard_fn<beta_l_handle, long double>;
+        out->chf = &chf_fn<beta_l_handle, long double>;
+        out->quantile = &quantile_fn<beta_l_handle, long double>;
+        out->quantile_complement = &quantile_complement_fn<beta_l_handle, long double>;
+        out->range = &range_fn<beta_d_handle, bs_range_l, long double>;
+        out->mean = &mean_fn<beta_l_handle, long double>;
+        out->variance = &variance_fn<beta_l_handle, long double>;
+        out->skewness = &skewness_fn<beta_l_handle, long double>;
+        out->kurtosis = &kurtosis_fn<beta_l_handle, long double>;
+        out->kurtosis_excess = &kurtosis_excess_fn<beta_l_handle, long double>;
+        out->mode = &mode_fn<beta_l_handle, long double>;
+        out->median = &median_fn<beta_l_handle, long double>;
+        out->entropy = nullptr; // not provided in Boost
+        out->free = &free_fn<beta_d_handle>;
+        return true;
+    }
         return false;
     } catch (...) {
         return false;

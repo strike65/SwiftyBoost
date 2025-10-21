@@ -56,4 +56,4 @@
 
 // Generic vtable-based distribution factory
 #include "distributions/bs_generic_distribution.h"
-#include "distributions/bs_student_t_distribution.h"
+#include "distributions/bs_distribution_helpers.h"
