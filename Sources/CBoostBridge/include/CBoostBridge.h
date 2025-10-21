@@ -26,7 +26,7 @@
 
 #include "bs_constants.h"
 
-#include "bs_complex.h"
+#include "complex.h"
 #include "special/bs_error.h"
 #include "special/bs_gamma.h"
 #include "special/bs_beta.h"

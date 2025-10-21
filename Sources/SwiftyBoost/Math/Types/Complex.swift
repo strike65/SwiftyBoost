@@ -441,7 +441,7 @@ public extension Complex where T == Double {
     /// Complex exponential: exp(a + ib)
     @inlinable
     var exp: Complex<Double> {
-        let z = bs_complex_d(re: real, im: imag)
+        let z = complex_d(re: real, im: imag)
         let r = bs_cexp_d(z)
         return Complex(r.re, r.im)
     }
@@ -449,7 +449,7 @@ public extension Complex where T == Double {
     /// Natural logarithm: log(z) = ln|z| + i arg(z)
     @inlinable
     var log: Complex<Double> {
-        let z = bs_complex_d(re: real, im: imag)
+        let z = complex_d(re: real, im: imag)
         let r = bs_clog_d(z)
         return Complex(r.re, r.im)
     }
@@ -457,7 +457,7 @@ public extension Complex where T == Double {
     /// Complex sine: sin(a + ib)
     @inlinable
     var sin: Complex<Double> {
-        let z = bs_complex_d(re: real, im: imag)
+        let z = complex_d(re: real, im: imag)
         let r = bs_csin_d(z)
         return Complex(r.re, r.im)
     }
@@ -465,7 +465,7 @@ public extension Complex where T == Double {
     /// Complex cosine: cos(a + ib)
     @inlinable
     var cos: Complex<Double> {
-        let z = bs_complex_d(re: real, im: imag)
+        let z = complex_d(re: real, im: imag)
         let r = bs_ccos_d(z)
         return Complex(r.re, r.im)
     }
@@ -473,7 +473,7 @@ public extension Complex where T == Double {
     /// Complex tangent: tan(a + ib)
     @inlinable
     var tan: Complex<Double> {
-        let z = bs_complex_d(re: real, im: imag)
+        let z = complex_d(re: real, im: imag)
         let r = bs_ctan_d(z)
         return Complex(r.re, r.im)
     }
@@ -481,7 +481,7 @@ public extension Complex where T == Double {
     /// Complex hyperbolic sine: sinh(a + ib)
     @inlinable
     var sinh: Complex<Double> {
-        let z = bs_complex_d(re: real, im: imag)
+        let z = complex_d(re: real, im: imag)
         let r = bs_csinh_d(z)
         return Complex(r.re, r.im)
     }
@@ -489,7 +489,7 @@ public extension Complex where T == Double {
     /// Complex hyperbolic cosine: cosh(a + ib)
     @inlinable
     var cosh: Complex<Double> {
-        let z = bs_complex_d(re: real, im: imag)
+        let z = complex_d(re: real, im: imag)
         let r = bs_ccosh_d(z)
         return Complex(r.re, r.im)
     }
@@ -497,7 +497,7 @@ public extension Complex where T == Double {
     /// Complex hyperbolic tangent: tanh(a + ib)
     @inlinable
     var tanh: Complex<Double> {
-        let z = bs_complex_d(re: real, im: imag)
+        let z = complex_d(re: real, im: imag)
         let r = bs_ctanh_d(z)
         return Complex(r.re, r.im)
     }
@@ -505,7 +505,7 @@ public extension Complex where T == Double {
     /// Complex arctangent: atan(a + ib)
     @inlinable
     var atan: Complex<Double> {
-        let z = bs_complex_d(re: real, im: imag)
+        let z = complex_d(re: real, im: imag)
         let r = bs_catan_d(z)
         return Complex(r.re, r.im)
     }
@@ -529,7 +529,7 @@ public extension Complex where T == Float {
     /// Complex exponential: exp(a + ib)
     @inlinable
     var exp: Complex<Float> {
-        let z = bs_complex_f(re: real, im: imag)
+        let z = complex_f(re: real, im: imag)
         let r = bs_cexp_f(z)
         return Complex(r.re, r.im)
     }
@@ -537,7 +537,7 @@ public extension Complex where T == Float {
     /// Natural logarithm: log(z) = ln|z| + i arg(z)
     @inlinable
     var log: Complex<Float> {
-        let z = bs_complex_f(re: real, im: imag)
+        let z = complex_f(re: real, im: imag)
         let r = bs_clog_f(z)
         return Complex(r.re, r.im)
     }
@@ -545,7 +545,7 @@ public extension Complex where T == Float {
     /// Complex sine: sin(a + ib)
     @inlinable
     var sin: Complex<Float> {
-        let z = bs_complex_f(re: real, im: imag)
+        let z = complex_f(re: real, im: imag)
         let r = bs_csin_f(z)
         return Complex(r.re, r.im)
     }
@@ -553,7 +553,7 @@ public extension Complex where T == Float {
     /// Complex cosine: cos(a + ib)
     @inlinable
     var cos: Complex<Float> {
-        let z = bs_complex_f(re: real, im: imag)
+        let z = complex_f(re: real, im: imag)
         let r = bs_ccos_f(z)
         return Complex(r.re, r.im)
     }
@@ -568,7 +568,7 @@ public extension Complex where T == Float {
     /// Complex hyperbolic sine: sinh(a + ib)
     @inlinable
     var sinh: Complex<Float> {
-        let z = bs_complex_f(re: real, im: imag)
+        let z = complex_f(re: real, im: imag)
         let r = bs_csinh_f(z)
         return Complex(r.re, r.im)
     }
@@ -576,7 +576,7 @@ public extension Complex where T == Float {
     /// Complex hyperbolic cosine: cosh(a + ib)
     @inlinable
     var cosh: Complex<Float> {
-        let z = bs_complex_f(re: real, im: imag)
+        let z = complex_f(re: real, im: imag)
         let r = bs_ccosh_f(z)
         return Complex(r.re, r.im)
     }
@@ -584,7 +584,7 @@ public extension Complex where T == Float {
     /// Complex hyperbolic tangent: tanh(a + ib)
     @inlinable
     var tanh: Complex<Float> {
-        let z = bs_complex_f(re: real, im: imag)
+        let z = complex_f(re: real, im: imag)
         let r = bs_ctanh_f(z)
         return Complex(r.re, r.im)
     }
@@ -592,7 +592,7 @@ public extension Complex where T == Float {
     /// Complex arctangent: atan(a + ib)
     @inlinable
     var atan: Complex<Float> {
-        let z = bs_complex_f(re: real, im: imag)
+        let z = complex_f(re: real, im: imag)
         let r = bs_catan_f(z)
         return Complex(r.re, r.im)
     }
@@ -617,7 +617,7 @@ public extension Complex where T == Float80 {
     /// Complex exponential: exp(a + ib)
     @inlinable
     var exp: Complex<Float80> {
-        let z = bs_complex_l(re: real, im: imag)
+        let z = complex_l(re: real, im: imag)
         let r = bs_cexp_l(z)
         return Complex(r.re, r.im)
     }
@@ -625,7 +625,7 @@ public extension Complex where T == Float80 {
     /// Natural logarithm: log(z) = ln|z| + i arg(z)
     @inlinable
     var log: Complex<Float80> {
-        let z = bs_complex_l(re: real, im: imag)
+        let z = complex_l(re: real, im: imag)
         let r = bs_clog_l(z)
         return Complex(r.re, r.im)
     }
@@ -633,7 +633,7 @@ public extension Complex where T == Float80 {
     /// Complex sine: sin(a + ib)
     @inlinable
     var sin: Complex<Float80> {
-        let z = bs_complex_l(re: real, im: imag)
+        let z = complex_l(re: real, im: imag)
         let r = bs_csin_l(z)
         return Complex(r.re, r.im)
     }
@@ -641,7 +641,7 @@ public extension Complex where T == Float80 {
     /// Complex cosine: cos(a + ib)
     @inlinable
     var cos: Complex<Float80> {
-        let z = bs_complex_l(re: real, im: imag)
+        let z = complex_l(re: real, im: imag)
         let r = bs_ccos_l(z)
         return Complex(r.re, r.im)
     }
@@ -649,7 +649,7 @@ public extension Complex where T == Float80 {
     /// Complex tangent: tan(a + ib)
     @inlinable
     var tan: Complex<Float80> {
-        let z = bs_complex_l(re: real, im: imag)
+        let z = complex_l(re: real, im: imag)
         let r = bs_ctan_l(z)
         return Complex(r.re, r.im)
     }
@@ -657,7 +657,7 @@ public extension Complex where T == Float80 {
     /// Complex hyperbolic sine: sinh(a + ib)
     @inlinable
     var sinh: Complex<Float80> {
-        let z = bs_complex_l(re: real, im: imag)
+        let z = complex_l(re: real, im: imag)
         let r = bs_csinh_l(z)
         return Complex(r.re, r.im)
     }
@@ -665,7 +665,7 @@ public extension Complex where T == Float80 {
     /// Complex hyperbolic cosine: cosh(a + ib)
     @inlinable
     var cosh: Complex<Float80> {
-        let z = bs_complex_l(re: real, im: imag)
+        let z = complex_l(re: real, im: imag)
         let r = bs_ccosh_l(z)
         return Complex(r.re, r.im)
     }
@@ -673,7 +673,7 @@ public extension Complex where T == Float80 {
     /// Complex hyperbolic tangent: tanh(a + ib)
     @inlinable
     var tanh: Complex<Float80> {
-        let z = bs_complex_l(re: real, im: imag)
+        let z = complex_l(re: real, im: imag)
         let r = bs_ctanh_l(z)
         return Complex(r.re, r.im)
     }
@@ -681,7 +681,7 @@ public extension Complex where T == Float80 {
     /// Complex arctangent: atan(a + ib)
     @inlinable
     var atan: Complex<Float80> {
-        let z = bs_complex_l(re: real, im: imag)
+        let z = complex_l(re: real, im: imag)
         let r = bs_catan_l(z)
         return Complex(r.re, r.im)
     }

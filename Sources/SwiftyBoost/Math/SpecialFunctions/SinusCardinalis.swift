@@ -127,7 +127,7 @@ public extension SpecialFunctions {
     /// - Note: Delegates to a Boost-based implementation via `CBoostBridge`.
     @inlinable
     static func sincc_pi(_ z: ComplexD) -> ComplexD {
-        let r = bs_sincc_pi_d(bs_complex_d(re: z.real, im: z.imag))
+        let r = bs_sincc_pi_d(complex_d(re: z.real, im: z.imag))
         return ComplexD(r.re, r.im)
     }
 
@@ -139,7 +139,7 @@ public extension SpecialFunctions {
     /// - Returns: The complex value of `sin(πz) / (πz)`, or `1 + 0i` when `z == 0`.
     @inlinable
     static func sincc_pi(_ z: ComplexF) -> ComplexF {
-        let r = bs_sincc_pi_f(bs_complex_f(re: z.real, im: z.imag))
+        let r = bs_sincc_pi_f(complex_f(re: z.real, im: z.imag))
         return ComplexF(r.re, r.im)
     }
 
@@ -151,7 +151,7 @@ public extension SpecialFunctions {
     /// - Returns: The complex value of `sinh(πz) / (πz)`, or `1 + 0i` when `z == 0`.
     @inlinable
     static func sinhcc_pi(_ z: ComplexD) -> ComplexD {
-        let r = bs_sinhcc_pi_d(bs_complex_d(re: z.real, im: z.imag))
+        let r = bs_sinhcc_pi_d(complex_d(re: z.real, im: z.imag))
         return ComplexD(r.re, r.im)
     }
 
@@ -163,7 +163,7 @@ public extension SpecialFunctions {
     /// - Returns: The complex value of `sinh(πz) / (πz)`, or `1 + 0i` when `z == 0`.
     @inlinable
     static func sinhcc_pi(_ z: ComplexF) -> ComplexF {
-        let r = bs_sinhcc_pi_f(bs_complex_f(re: z.real, im: z.imag))
+        let r = bs_sinhcc_pi_f(complex_f(re: z.real, im: z.imag))
         return ComplexF(r.re, r.im)
     }
 
@@ -194,7 +194,7 @@ public extension SpecialFunctions {
     /// - Availability: Only on `i386` and `x86_64` architectures.
     @inlinable
     static func sincc_pi(_ z: ComplexL) -> ComplexL {
-        let r = bs_sincc_pi_l(bs_complex_l(re: z.real, im: z.imag))
+        let r = bs_sincc_pi_l(complex_l(re: z.real, im: z.imag))
         return ComplexL(r.re, r.im)
     }
 
@@ -205,7 +205,7 @@ public extension SpecialFunctions {
     /// - Availability: Only on `i386` and `x86_64` architectures.
     @inlinable
     static func sinhcc_pi(_ z: ComplexL) -> ComplexL {
-        let r = bs_sinhcc_pi_l(bs_complex_l(re: z.real, im: z.imag))
+        let r = bs_sinhcc_pi_l(complex_l(re: z.real, im: z.imag))
         return ComplexL(r.re, r.im)
     }
     #endif

@@ -21,24 +21,24 @@
 //  THE SOFTWARE.
 //  
 
-#pragma once
+//#pragma once
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "bs_complex.h"
+#include "complex.h"
 double bs_sinc_pi_d(double x);
-bs_complex_d bs_sincc_pi_d(bs_complex_d x);
+complex_d bs_sincc_pi_d(complex_d x);
 float bs_sinc_pi_f(float x);
-bs_complex_f bs_sincc_pi_f(bs_complex_f x);
+complex_f bs_sincc_pi_f(complex_f x);
 long double bs_sinc_pi_l(long double x);
-bs_complex_l bs_sincc_pi_l(bs_complex_l x);
+complex_l bs_sincc_pi_l(complex_l x);
 double bs_sinhc_pi_d(double x);
-bs_complex_d bs_sinhcc_pi_d(bs_complex_d x);
+complex_d bs_sinhcc_pi_d(complex_d x);
 float bs_sinhc_pi_f(float x);
-bs_complex_f bs_sinhcc_pi_f(bs_complex_f x);
+complex_f bs_sinhcc_pi_f(complex_f x);
 long double bs_sinhc_pi_l(long double x);
-bs_complex_l bs_sinhcc_pi_l(bs_complex_l x);
+complex_l bs_sinhcc_pi_l(complex_l x);
 
 #ifdef __cplusplus
 }

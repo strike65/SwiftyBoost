@@ -1,27 +1,4 @@
-//
-//  Created by Volker Thieme 2025.
-//  Copyright © 2025 Volker Thieme.
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//  THE SOFTWARE.
-//
-// Lambert W and Hypergeometric functions
-#include <boost/math/special_functions/lambert_w.hpp>
+// Hypergeometric function wrappers
 #include <boost/math/special_functions/hypergeometric_1F0.hpp>
 #include <boost/math/special_functions/hypergeometric_0F1.hpp>
 #include <boost/math/special_functions/hypergeometric_2F0.hpp>
@@ -32,17 +9,6 @@
 
 extern "C" {
 
-// Lambert W (real branches)
-double bs_lambert_w0(double x)        { return bs_wrap<double>([&] { return boost::math::lambert_w0(x); }); }
-double bs_lambert_wm1(double x)       { return bs_wrap<double>([&] { return boost::math::lambert_wm1(x); }); }
-
-float bs_lambert_w0_f(float x)        { return bs_wrap<float>([&] { return boost::math::lambert_w0(x); }); }
-float bs_lambert_wm1_f(float x)       { return bs_wrap<float>([&] { return boost::math::lambert_wm1(x); }); }
-
-long double bs_lambert_w0_l(long double x)  { return bs_wrap<long double>([&] { return boost::math::lambert_w0(x); }); }
-long double bs_lambert_wm1_l(long double x) { return bs_wrap<long double>([&] { return boost::math::lambert_wm1(x); }); }
-
-// Hypergeometric functions
 double bs_hypergeometric_1F0(double a, double z) { return bs_wrap<double>([&] { return boost::math::hypergeometric_1F0(a, z); }); }
 float  bs_hypergeometric_1F0_f(float a, float z) { return bs_wrap<float>([&] { return boost::math::hypergeometric_1F0(a, z); }); }
 long double bs_hypergeometric_1F0_l(long double a, long double z) { return bs_wrap<long double>([&] { return boost::math::hypergeometric_1F0(a, z); }); }
@@ -58,6 +24,7 @@ long double bs_hypergeometric_2F0_l(long double a, long double b, long double z)
 double bs_hypergeometric_1F1(double a, double b, double z) { return bs_wrap<double>([&] { return boost::math::hypergeometric_1F1(a, b, z); }); }
 float  bs_hypergeometric_1F1_f(float a, float b, float z)  { return bs_wrap<float>([&] { return boost::math::hypergeometric_1F1(a, b, z); }); }
 long double bs_hypergeometric_1F1_l(long double a, long double b, long double z) { return bs_wrap<long double>([&] { return boost::math::hypergeometric_1F1(a, b, z); }); }
+
 double bs_hypergeometric_pFq_d(const double* a, size_t p, const double* b, size_t q, double z) {
     return bs_wrap<double>([&] {
         std::vector<double> va(a, a + p);

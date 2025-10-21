@@ -26,9 +26,10 @@
 // provide complex overloads in a separate header, include it conditionally.
 #include <boost/math/special_functions/sinc.hpp>
 #include <boost/math/special_functions/sinhc.hpp>
+#include <boost/math/constants/constants.hpp>
 #include "../internal/bs_internal.hpp"
-#include "../include/bs_complex.h"
 #include <cmath>
+#include "../include/complex.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,10 +39,10 @@ double bs_sinc_pi_d(double x) {
         return boost::math::sin_pi(x) / (boost::math::constants::pi<double>() * x);
     });
 }
-bs_complex_d bs_sincc_pi_d(bs_complex_d x) {
+complex_d bs_sincc_pi_d(complex_d x) {
     auto z = to_std(x);
     if (z == std::complex<double>(0.0, 0.0)) {
-        return bs_complex_d{1.0, 0.0};
+        return complex_d{1.0, 0.0};
     }
     const double pi = boost::math::constants::pi<double>();
     auto denom = pi * z;
@@ -56,10 +57,10 @@ float bs_sinc_pi_f(float x) {
         return static_cast<float>(boost::math::sin_pi(xd) / (boost::math::constants::pi<double>() * xd));
     });
 }
-bs_complex_f bs_sincc_pi_f(bs_complex_f x) {
+complex_f bs_sincc_pi_f(complex_f x) {
     auto z = to_std(x);
     if (z == std::complex<float>(0.0f, 0.0f)) {
-        return bs_complex_f{1.0f, 0.0f};
+        return complex_f{1.0f, 0.0f};
     }
     const float pi = static_cast<float>(boost::math::constants::pi<double>());
     auto denom = pi * z;
@@ -73,10 +74,10 @@ long double bs_sinc_pi_l(long double x) {
         return boost::math::sin_pi(x) / (boost::math::constants::pi<long double>() * x);
     });
 }
-bs_complex_l bs_sincc_pi_l(bs_complex_l x) {
+complex_l bs_sincc_pi_l(complex_l x) {
     auto z = to_std(x);
     if (z == std::complex<long double>(0.0L, 0.0L)) {
-        return bs_complex_l{static_cast<long double>(1.0), static_cast<long double>(0.0)};
+        return complex_l{static_cast<long double>(1.0), static_cast<long double>(0.0)};
     }
     const long double pi = boost::math::constants::pi<long double>();
     auto denom = pi * z;
@@ -90,9 +91,9 @@ double bs_sinhc_pi_d(double x) {
         return std::sinh(p * x) / (p * x);
     });
 }
-bs_complex_d bs_sinhcc_pi_d(bs_complex_d x) {
+complex_d bs_sinhcc_pi_d(complex_d x) {
     auto y = from_std(boost::math::sinhc_pi(to_std(x)));
-    bs_complex_d r { static_cast<double>(y.re), static_cast<double>(y.im) };
+    complex_d r { static_cast<double>(y.re), static_cast<double>(y.im) };
     return r;
 }
 
@@ -104,9 +105,9 @@ float bs_sinhc_pi_f(float x) {
         return static_cast<float>(std::sinh(p * xd) / (p * xd));
     });
 }
-bs_complex_f bs_sinhcc_pi_f(bs_complex_f x) {
+complex_f bs_sinhcc_pi_f(complex_f x) {
     auto y = from_std(boost::math::sinhc_pi(to_std(x)));
-    bs_complex_f r { static_cast<float>(y.re), static_cast<float>(y.im) };
+    complex_f r { static_cast<float>(y.re), static_cast<float>(y.im) };
     return r;
 }
 
@@ -117,9 +118,9 @@ long double bs_sinhc_pi_l(long double x) {
         return std::sinh(p * x) / (p * x);
     });
 }
-bs_complex_l bs_sinhcc_pi_l(bs_complex_l x) {
+complex_l bs_sinhcc_pi_l(complex_l x) {
     auto y = from_std(boost::math::sinhc_pi(to_std(x)));
-    bs_complex_l r { static_cast<long double>(y.re), static_cast<long double>(y.im) };
+    complex_l r { static_cast<long double>(y.re), static_cast<long double>(y.im) };
     return r;
 }
 
