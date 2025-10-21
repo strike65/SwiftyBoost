@@ -54,8 +54,6 @@
 #include "special/bs_sin_cardinal.h"
 #include "special/bs_a_hyper.h"
 
-// Distributions
-#include "distributions/bs_gamma_distribution.h"
+// Generic vtable-based distribution factory
+#include "distributions/bs_generic_distribution.h"
 #include "distributions/bs_student_t_distribution.h"
-#include "distributions/bs_fisher_f_distribution.h"
-#include "distributions/bs_arcsine_distribution.h"

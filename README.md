@@ -8,6 +8,8 @@ SwiftyBoost gives Swift developers direct access to Boost.Math special functions
 - Gamma, Beta, error, Bessel, Legendre, elliptic (Legendre and Carlson), Lambert W, Owen's T, and other high-precision helpers.
 - Probability distributions with Boost-backed implementations:
   - Gamma, Student’s t, Fisher’s F, and Arcsine (PDF/CDF/SF, quantiles, hazards, moments).
+  - Typed wrappers delegate internally to a unified runtime vtable (`Distribution.Dynamic`) for consistent behavior across precisions.
+  - Unified runtime factory to construct distributions by name at runtime (see "Dynamic Distribution Factory").
 - `CBoostBridge` target that forwards Swift calls into the vendored Boost headers under `extern/boost`.
 - Architectural awareness with dedicated `Float`, `Double`, and (x86_64) `Float80` overloads plus generic `BinaryFloatingPoint` entry points.
 - Generic `Complex<T: BinaryFloatingPoint>` type with arithmetic, polar helpers, and elementary complex functions (`exp`, `log`, `sin`, `cos`, `tan`, `sinh`, `cosh`, `tanh`, `atan`). Double/Float/(x86_64) Float80 specializations call Boost-backed bridge functions (`bs_*`).
@@ -84,6 +86,46 @@ let a = try Distribution.Arcsine<Double>(minX: 0, maxX: 1)
 let a_pdf = try a.pdf(0.2)
 
 APIs throw `SpecialFunctionError` for invalid inputs or domain violations. See DocC symbol docs for function‑specific bounds mirrored from Boost.Math.
+
+### Dynamic Distribution Factory
+
+Create distributions by name with a parameter dictionary, without committing to a concrete Swift wrapper type upfront. This is powered by a small C vtable and a Swift wrapper that conforms to `DistributionProtocol`.
+
+```swift
+// Gamma(k, theta)
+let dynG = try Distribution.Dynamic<Double>(
+  distributionName: "gamma",
+  parameters: ["shape": 4.5, "scale": 1.0]
+)
+let p = try dynG.pdf(2.0)
+let x = try dynG.quantile(0.95)
+
+// Student's t (aliases: student_t, t)
+let dynT = try Distribution.Dynamic<Float>(
+  distributionName: "student_t",
+  parameters: ["df": 12]
+)
+
+// Fisher F (aliases: fisherf, f)
+let dynF = try Distribution.Dynamic<Double>(
+  distributionName: "fisherf",
+  parameters: ["df1": 10, "df2": 20]
+)
+
+// Arcsine (aliases: arcsine_distribution)
+let dynA = try Distribution.Dynamic<Float>(
+  distributionName: "arcsine",
+  parameters: ["minX": 0, "maxX": 1]
+)
+```
+
+Notes:
+- The Swift wrapper falls back to Swift-side formulas for certain metrics not provided by Boost (e.g., Fisher F and Arcsine entropy).
+- Typed distribution wrappers delegate to `Distribution.Dynamic` internally, so dynamic and typed paths share the same Boost backend and numerical policies.
+- Supported names and parameter aliases are documented in `DIST-Factory-README.md`.
+- Under the hood, the factory uses a C vtable with a non-null context pointer and nullable function pointers per metric.
+
+See `DIST-Factory-README.md` for the full design, ABI surface, and extension guide.
 
 ### Complex Numbers
 

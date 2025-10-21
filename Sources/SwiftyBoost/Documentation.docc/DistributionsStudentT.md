@@ -18,7 +18,7 @@ The distribution is symmetric about zero. The mode and median are 0. The mean is
 - ``Distribution/StudentT``<`Float`>
 - ``Distribution/StudentT``<`Float80`> (x86_64 only; falls back to `Double` elsewhere)
 
-Each instance constructs a Boost.Math `students_t_distribution` once and keeps an internal opaque handle, reused for all evaluations.
+Each instance delegates to the unified runtime distribution vtable via ``Distribution/Dynamic``. Internally, the dynamic wrapper constructs a Boost.Math `students_t_distribution` through the C bridge factory and reuses that backend for all evaluations.
 
 ## API Overview
 
@@ -54,4 +54,4 @@ let nu = Distribution.StudentT<Double>.findDegreesOfFreedom(
 
 ## Implementation Details
 
-All operations delegate to Boost via the C bridge. The Swift type holds an opaque pointer to a `boost::math::students_t_distribution` in the matching precision. Calls route through stable `bs_` functions (e.g., `bs_student_t_pdf_h`, `bs_student_t_cdf_h`, `bs_student_t_quantile_h`). The planning utility forwards to Boost’s static method `students_t_distribution<>::find_degrees_of_freedom`.
+All operations are routed through ``Distribution/Dynamic`` which wraps a small C vtable over Boost.Math. The dynamic layer creates a `students_t_distribution` in the matching precision and exposes stable function pointers for PDF/CDF/SF, quantiles, hazards, and moments. The planning utility still forwards to Boost’s static helper `students_t_distribution<>::find_degrees_of_freedom`.

@@ -20,7 +20,7 @@ F(x) = I_{ z }(d1/2, d2/2) with z = d1 x / (d1 x + d2).
 - ``Distribution/FisherF``<`Float`>
 - ``Distribution/FisherF``<`Float80`> (x86_64 only; falls back to `Double` elsewhere)
 
-Each instance constructs a Boost.Math `fisher_f_distribution` once and keeps an internal opaque handle, reused for all evaluations.
+Each instance delegates to the unified runtime distribution vtable via ``Distribution/Dynamic``. Internally, the dynamic wrapper constructs a Boost.Math `fisher_f_distribution` and reuses that backend for all evaluations.
 
 ## API Overview
 
@@ -57,5 +57,4 @@ let q95  = try f.quantile(0.95)
 
 ## Implementation Details
 
-All operations delegate to Boost via the C bridge. The Swift type holds an opaque pointer to a `boost::math::fisher_f_distribution` in the matching precision. Calls route through stable `bs_` functions (e.g., `bs_fisher_f_pdf_h`, `bs_fisher_f_cdf_h`, `bs_fisher_f_quantile_h`).
-
+All operations are routed through ``Distribution/Dynamic`` which wraps a small C vtable over Boost.Math. The dynamic layer creates a `fisher_f_distribution` in the matching precision and exposes stable function pointers for PDF/CDF/SF, quantiles, hazards, and moments. Entropy is provided by a Swift-side fallback in the dynamic wrapper because Boost does not expose it for F.

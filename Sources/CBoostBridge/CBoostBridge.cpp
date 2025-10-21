@@ -55,8 +55,6 @@
 // Cardinal sine/cosine helpers (real/complex)
 #include "impl/bs_sin_cardinal.hxx"
 
-// Distributions
-#include "impl/bs_gamma_distribution.hxx"
+// Unified generic distribution vtable (runtime factory)
+#include "impl/bs_generic_distribution.hxx"
 #include "impl/bs_student_t_distribution.hxx"
-#include "impl/bs_fisher_f_distribution.hxx"
-#include "impl/bs_arcsine_distribution.hxx"

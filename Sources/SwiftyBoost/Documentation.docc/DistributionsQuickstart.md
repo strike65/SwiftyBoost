@@ -51,7 +51,7 @@ let a_cdf = try a.cdf(0.8)
 
 ## Implementation model
 
-Distribution types call stable C functions that operate on an internal opaque handle to a Boost distribution object. Each instance creates its backend once; all evaluations reuse the same backend for performance and numerical policy consistency.
+Typed distribution wrappers (Gamma, Student’s t, Fisher’s F, Arcsine) delegate to ``Distribution/Dynamic``, a unified runtime vtable backed by Boost.Math via the C bridge. Each instance constructs its Boost backend once through the dynamic factory and reuses it for all evaluations to ensure performance and consistent numerical policies.
 
 ## Error handling
 

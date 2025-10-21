@@ -3,6 +3,19 @@
 All notable changes to this project are tracked here, following the principles of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adhering to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
+- Dynamic distribution factory (runtime):
+  - Added a unified vtable-based factory in `CBoostBridge` with non-null context pointer (`ctx`) and nullable function pointers for metrics.
+  - New Swift wrapper `Distribution.Dynamic<T>` that conforms to `DistributionProtocol` and constructs distributions by name with a parameter dictionary.
+  - Supported names and aliases: `gamma|gamma_distribution`, `student_t|studentt|students_t|t|t_distribution`, `fisherf|f|f_distribution`, `arcsine|arcsine_distribution`.
+  - Swift-side fallbacks for metrics not present in vtable: differential entropy for Fisher F and Arcsine.
+  - Comprehensive tests comparing Dynamic vs typed wrappers (PDF/CDF/quantile, hazard/CHF, moments), alias handling, error cases, and Float80 smoke on x86_64.
+  - New DocC page: “Dynamic Distribution Factory” with usage, aliases, nullability, and initialization notes.
+  - Documentation: `DIST-Factory-README.md` details the ABI, design, and extension guide.
+  - README updated with a “Dynamic Distribution Factory” section and examples.
+  - Typed wrappers refactor: ``Distribution.StudentT``, ``Distribution.FisherF``, and ``Distribution.Arcsine`` now delegate internally to ``Distribution.Dynamic`` instead of holding per-type C handles. This reduces duplication and keeps behavior consistent with the factory. Public APIs and semantics are unchanged.
+  - Header nullability tightened: `ctx` marked `_Nonnull`; all vtable function pointers marked `_Nullable` with `const void* _Nonnull` context. Factory prototypes annotated `_Nonnull` for `name`, `params`, and `out`.
+  - Robust factory error handling: `bs_dist_make_*` now catch exceptions and return `false` on invalid parameters.
+  - Removed the experimental `AnyDistribution` path; use `Distribution.Dynamic<T>` instead. Demo updated accordingly.
 - Mixed-precision promotions:
   - Beta (complete/incomplete/regularized, inverses, derivative, parameter solvers)
   - Gamma (ratios, incomplete/regularized P/Q, inverses, derivative)

@@ -20,7 +20,7 @@ F(x) = (2/π) arcsin( √( (x − a)/(b − a) ) ).
 - ``Distribution/Arcsine``<`Float`>
 - ``Distribution/Arcsine``<`Float80`> (x86_64 only; falls back to `Double` elsewhere)
 
-Each instance constructs a Boost.Math `arcsine_distribution` once and keeps an internal opaque handle, reused for all evaluations.
+Each instance delegates to the unified runtime distribution vtable via ``Distribution/Dynamic``. Internally, the dynamic wrapper constructs a Boost.Math `arcsine_distribution` and reuses that backend for all evaluations.
 
 ## API Overview
 
@@ -57,5 +57,4 @@ let q5 = try a.quantile(0.5) // equals median
 
 ## Implementation Details
 
-All operations delegate to Boost via the C bridge. The Swift type holds an opaque pointer to a `boost::math::arcsine_distribution` in the matching precision. Calls route through stable `bs_` functions (e.g., `bs_arcsine_pdf_h`, `bs_arcsine_cdf_h`, `bs_arcsine_quantile_h`).
-
+All operations are routed through ``Distribution/Dynamic`` which wraps a small C vtable over Boost.Math. The dynamic layer creates an `arcsine_distribution` in the matching precision and exposes stable function pointers for PDF/CDF/SF, quantiles, hazards, and moments. Entropy is provided by a Swift-side fallback in the dynamic wrapper because Boost does not expose it for Arcsine.
