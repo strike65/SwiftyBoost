@@ -30,7 +30,7 @@
 //  - Boost.Math Gegenbauer documentation
 //
 
-import CBoostBridge
+import SwiftyBoostPrelude
 
 public extension SpecialFunctions {
     
@@ -64,7 +64,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
     /// - `SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: ...)` if `n > UInt32.max`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "lambda"|"x")` if inputs are NaN or ±∞.
-    @inlinable static func gegenbauer<T: BinaryFloatingPoint>(n: Int, lambda: T, x: T) throws -> T {
+    @inlinable static func gegenbauer<T: Real & BinaryFloatingPoint>(n: Int, lambda: T, x: T) throws -> T {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
         let dl = D(lambda), dx = D(x)
@@ -93,7 +93,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
     /// - `SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: ...)` if `n > UInt32.max`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "lambda"|"x")` if inputs are NaN or ±∞.
-    @inlinable static func gegenbauerPrime<T: BinaryFloatingPoint>(n: Int, lambda: T, x: T) throws -> T {
+    @inlinable static func gegenbauerPrime<T: Real & BinaryFloatingPoint>(n: Int, lambda: T, x: T) throws -> T {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
         let dl = D(lambda), dx = D(x)
@@ -125,7 +125,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterNotPositive(name: "k")` if `k < 0`.
     /// - `SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "k", max: ...)` if `k > UInt32.max`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "lambda"|"x")` if inputs are NaN or ±∞.
-    @inlinable static func gegenbauerDerivative<T: BinaryFloatingPoint>(n: Int, lambda: T, x: T, k: Int) throws -> T {
+    @inlinable static func gegenbauerDerivative<T: Real & BinaryFloatingPoint>(n: Int, lambda: T, x: T, k: Int) throws -> T {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         guard k >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "k") }
         guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }

@@ -44,7 +44,7 @@
 //  - Boost.Math documentation
 //
 
-import CBoostBridge
+import SwiftyBoostPrelude
 #if canImport(Darwin)
 import Darwin
 #else
@@ -92,7 +92,7 @@ public extension SpecialFunctions {
     ///
     /// Returns:
     /// - The largest n such that n! is finite in type `T`.
-    @inlinable static func maxFactorialInput<T: BinaryFloatingPoint>(for _: T.Type) -> UInt32 {
+    @inlinable static func maxFactorialInput<T: Real & BinaryFloatingPoint>(for _: T.Type) -> UInt32 {
         if T.self == Float.self { return maxFactorialInputFloat }
 #if arch(i386) || arch(x86_64)
         if T.self == Float80.self { return maxFactorialInputFloat80 }
@@ -120,7 +120,7 @@ public extension SpecialFunctions {
     ///
     /// Notes:
     /// - The computation is delegated to a Double-backed backend and then converted to `T`.
-    @inlinable static func factorial<T: BinaryFloatingPoint> (_ n: UInt32) throws -> T {
+    @inlinable static func factorial<T: Real & BinaryFloatingPoint> (_ n: UInt32) throws -> T {
         let limit = maxFactorialInput(for: T.self)
         guard n <= limit else {
             throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(limit))
@@ -192,7 +192,7 @@ public extension SpecialFunctions {
     /// Purpose:
     /// - Used to pre-check overflow for rising factorial and related computations by
     ///   comparing ln-magnitudes against ln(max finite).
-    @inline(__always)  static func logMaxFinite<T: BinaryFloatingPoint>(for _: T.Type) -> Double {
+    @inline(__always)  static func logMaxFinite<T: Real & BinaryFloatingPoint>(for _: T.Type) -> Double {
         if T.self == Float.self {
             return 88.72283905206835 // log(Float.greatestFiniteMagnitude)
         }
@@ -209,7 +209,7 @@ public extension SpecialFunctions {
     /// Purpose:
     /// - Used as an optional underflow-to-zero policy for rising factorial. If the
     ///   predicted ln-magnitude is below this value, the function returns 0.
-    @inline(__always)  static func logLeastPosNonzero<T: BinaryFloatingPoint>(for _: T.Type) -> Double {
+    @inline(__always)  static func logLeastPosNonzero<T: Real & BinaryFloatingPoint>(for _: T.Type) -> Double {
         if T.self == Float.self {
             return -103.27892990343185 // log(Float.leastNonzeroMagnitude)
         }
@@ -261,7 +261,7 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if x is NaN or ±∞.
     /// - `SpecialFunctionError.invalidCombination(message: ...)` if the result would overflow `T`.
-    @inlinable static func rising_factorial<T: BinaryFloatingPoint> (_ x: T, _ n: UInt32) throws -> T {
+    @inlinable static func rising_factorial<T: Real & BinaryFloatingPoint> (_ x: T, _ n: UInt32) throws -> T {
         let dx = D(x)
         // Finiteness check
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -397,7 +397,7 @@ public extension SpecialFunctions {
     ///
     /// Returns:
     /// - (x)_n as `T`, with the same checks and throwing behavior as rising_factorial(_:_:).
-    @inlinable static func pochhammer<T: BinaryFloatingPoint> (_ x: T, _ n: UInt32) throws -> T {
+    @inlinable static func pochhammer<T: Real & BinaryFloatingPoint> (_ x: T, _ n: UInt32) throws -> T {
         try rising_factorial(x, n)
     }
     
@@ -437,7 +437,7 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.invalidCombination(message: ...)` if the result would overflow `T`.
-    @inlinable static func binomial_coeff<T: BinaryFloatingPoint> (_ n: UInt32, _ k: UInt32) throws -> T {
+    @inlinable static func binomial_coeff<T: Real & BinaryFloatingPoint> (_ n: UInt32, _ k: UInt32) throws -> T {
         if k > n { return T(0) }
         if k == 0 || k == n { return T(1) }
         
@@ -574,7 +574,7 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.invalidCombination(message: ...)` if the result would overflow `T`.
-    @inlinable static func double_factorial<T: BinaryFloatingPoint>(_ n: UInt32) throws -> T {
+    @inlinable static func double_factorial<T: Real & BinaryFloatingPoint>(_ n: UInt32) throws -> T {
         // Magnitude check via log
         let S = logDoubleFactorial(n)
         let lnMax = logMaxFinite(for: T.self)

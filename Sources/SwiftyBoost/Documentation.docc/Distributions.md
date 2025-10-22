@@ -5,8 +5,11 @@ This section documents probability distributions exposed by SwiftyBoost using Bo
 ## Implemented
 
 - ``Distribution/Gamma``
+- ``Distribution/Beta``
+- ``Distribution/ChiSquared``
 - ``Distribution/StudentT``
 - ``Distribution/FisherF``
+- ``Distribution/Bernoulli``
 - ``Distribution/Arcsine``
 
 ### Tutorials
@@ -18,3 +21,4 @@ This section documents probability distributions exposed by SwiftyBoost using Bo
 - All public APIs are thin wrappers over Boost functions via the C bridge (`bs_` prefixed symbols). No new algorithms are implemented in Swift.
 - Generic types support `Double`, `Float`, and, on x86_64, `Float80` (falling back to `Double` where not available).
 - Methods that accept probabilities validate input in `[0, 1]`. Domain errors are thrown using ``SwiftyBoost/SpecialFunctionError``.
+- ``Distribution/Bernoulli`` is discrete but keeps the continuous-style interface for consistency; treat `pdf` as the PMF.

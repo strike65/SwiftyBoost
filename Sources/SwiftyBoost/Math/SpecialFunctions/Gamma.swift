@@ -11,8 +11,7 @@
 //  values) and at poles where the function is not defined (e.g., non-positive
 //  integers for Gamma). See each function’s documentation for details.
 //
-
-import CBoostBridge
+import SwiftyBoostPrelude
 public extension SpecialFunctions {
     
     
@@ -59,7 +58,7 @@ public extension SpecialFunctions {
     ///     // Handle invalid inputs or poles
     /// }
     /// ```
-    @inlinable static func gamma<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func gamma<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         if dx <= 0, dx == dx.rounded(.towardZero) {
@@ -108,7 +107,7 @@ public extension SpecialFunctions {
     ///     // Handle invalid inputs or poles
     /// }
     /// ```
-    @inlinable static func logGamma<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func logGamma<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         if dx <= 0, dx == dx.rounded(.towardZero) {
@@ -156,7 +155,7 @@ public extension SpecialFunctions {
     ///
     /// References:
     /// - Boost.Math `tgamma_ratio`
-    @inlinable static func gammaRatio<T: BinaryFloatingPoint>(_ a: T, _ b: T) throws -> T {
+    @inlinable static func gammaRatio<T: Real & BinaryFloatingPoint>(_ a: T, _ b: T) throws -> T {
         let da = D(a), db = D(b)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard db.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
@@ -204,7 +203,7 @@ public extension SpecialFunctions {
     ///
     /// References:
     /// - Boost.Math `tgamma_delta_ratio`
-    @inlinable static func gammaDeltaRatio<T: BinaryFloatingPoint>(_ a: T, delta: T) throws -> T {
+    @inlinable static func gammaDeltaRatio<T: Real & BinaryFloatingPoint>(_ a: T, delta: T) throws -> T {
         let da = D(a), dd = D(delta)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard dd.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "delta") }
@@ -252,7 +251,7 @@ public extension SpecialFunctions {
     /// SeeAlso:
     /// - ``SpecialFunctions/incompleteGammaUpper(_:x:)->T``
     /// - ``SpecialFunctions/regularizedGammaP(_:x:)->T`` and ``SpecialFunctions/regularizedGammaQ(_:x:)->T``
-    @inlinable static func incompleteGammaLower<T: BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
+    @inlinable static func incompleteGammaLower<T: Real & BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
         let da = D(a), dx = D(x)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -296,7 +295,7 @@ public extension SpecialFunctions {
     /// SeeAlso:
     /// - ``SpecialFunctions/incompleteGammaLower(_:x:)->T``
     /// - ``SpecialFunctions/regularizedGammaP(_:x:)->T`` and ``SpecialFunctions/regularizedGammaQ(_:x:)->T``
-    @inlinable static func incompleteGammaUpper<T: BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
+    @inlinable static func incompleteGammaUpper<T: Real & BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
         let da = D(a), dx = D(x)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -341,7 +340,7 @@ public extension SpecialFunctions {
     /// SeeAlso:
     /// - ``SpecialFunctions/regularizedGammaQ(_:x:)->T``
     /// - ``SpecialFunctions/regularizedGammaPInv(_:p:)->T``
-    @inlinable static func regularizedGammaP<T: BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
+    @inlinable static func regularizedGammaP<T: Real & BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
         let da = D(a), dx = D(x)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -385,7 +384,7 @@ public extension SpecialFunctions {
     /// SeeAlso:
     /// - ``SpecialFunctions/regularizedGammaP(_:x:)->T``
     /// - ``SpecialFunctions/regularizedGammaQInv(_:q:)->T``
-    @inlinable static func regularizedGammaQ<T: BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
+    @inlinable static func regularizedGammaQ<T: Real & BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
         let da = D(a), dx = D(x)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -422,7 +421,7 @@ public extension SpecialFunctions {
     ///
     /// SeeAlso:
     /// - ``SpecialFunctions/regularizedGammaP(_:x:)->T``
-    @inlinable static func regularizedGammaPInv<T: BinaryFloatingPoint>(_ a: T, p: T) throws -> T {
+    @inlinable static func regularizedGammaPInv<T: Real & BinaryFloatingPoint>(_ a: T, p: T) throws -> T {
         let da = D(a), dp = D(p)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard dp.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p") }
@@ -459,7 +458,7 @@ public extension SpecialFunctions {
     ///
     /// SeeAlso:
     /// - ``SpecialFunctions/regularizedGammaQ(_:x:)->T``
-    @inlinable static func regularizedGammaQInv<T: BinaryFloatingPoint>(_ a: T, q: T) throws -> T {
+    @inlinable static func regularizedGammaQInv<T: Real & BinaryFloatingPoint>(_ a: T, q: T) throws -> T {
         let da = D(a), dq = D(q)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard dq.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "q") }
@@ -509,7 +508,7 @@ public extension SpecialFunctions {
     /// SeeAlso:
     /// - ``SpecialFunctions/regularizedGammaP(_:x:)->T``
     /// - ``SpecialFunctions/regularizedGammaQ(_:x:)->T``
-    @inlinable static func regularizedGammaPDerivative<T: BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
+    @inlinable static func regularizedGammaPDerivative<T: Real & BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
         let da = D(a), dx = D(x)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }

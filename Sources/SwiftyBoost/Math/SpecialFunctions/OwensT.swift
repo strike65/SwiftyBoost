@@ -10,8 +10,7 @@
 //  All functions throw Swift errors for invalid inputs (e.g., non-finite
 //  values). See each function’s documentation for details.
 //
-
-import CBoostBridge
+import SwiftyBoostPrelude
 public extension SpecialFunctions {
     
     
@@ -65,7 +64,7 @@ public extension SpecialFunctions {
     ///     // Handle invalid inputs
     /// }
     /// ```
-    @inlinable static func owensT<T: BinaryFloatingPoint>(h: T, a: T) throws -> T {
+    @inlinable static func owensT<T: Real & BinaryFloatingPoint>(h: T, a: T) throws -> T {
         // Convert to Double for the C backend. Keep a single conversion point to
         // minimize rounding steps.
         let dh = D(h), da = D(a)

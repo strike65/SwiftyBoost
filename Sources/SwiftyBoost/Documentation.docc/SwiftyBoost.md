@@ -15,6 +15,10 @@ Use this documentation catalog with DocC to explore how to configure Boost-backe
 - <doc:UsingSpecialFunctions>
 - <doc:ResultTypePromotions>
 
+### Constants
+
+- <doc:Constants>
+
 ### Complex Numbers
 
 - <doc:ComplexNumbers>
@@ -27,7 +31,10 @@ Use this documentation catalog with DocC to explore how to configure Boost-backe
 ### Distribution APIs
 
 - ``Distribution/Gamma``
+- ``Distribution/Beta``
+- ``Distribution/ChiSquared``
 - ``Distribution/StudentT``
 - ``Distribution/FisherF``
+- ``Distribution/Bernoulli``
 - ``Distribution/Arcsine``
 - <doc:Distributions>

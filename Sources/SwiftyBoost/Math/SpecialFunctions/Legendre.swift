@@ -26,7 +26,7 @@
 //  - Orthogonal Polynomials (general background): G. Szegő, “Orthogonal Polynomials”.
 //
 
-import CBoostBridge
+import SwiftyBoostPrelude
 public extension SpecialFunctions {
     
     
@@ -71,7 +71,7 @@ public extension SpecialFunctions {
     /// ```swift
     /// let p3: Double = try legendreP(3, 0.5) // P3(0.5) = (5x^3 − 3x)/2 at x=0.5
     /// ```
-    @inlinable static func legendreP<T: BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
+    @inlinable static func legendreP<T: Real & BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
         // Degree must be non-negative.
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         // Convert to Double for the C backend. Keep a single conversion point to minimize rounding steps.
@@ -126,7 +126,7 @@ public extension SpecialFunctions {
     /// ```swift
     /// let p32: Double = try associatedLegendreP(3, 2, 0.3) // P3^2(0.3)
     /// ```
-    @inlinable static func associatedLegendreP<T: BinaryFloatingPoint>(_ n: Int, _ m: Int, _ x: T) throws -> T {
+    @inlinable static func associatedLegendreP<T: Real & BinaryFloatingPoint>(_ n: Int, _ m: Int, _ x: T) throws -> T {
         // Degree/order constraints.
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         guard abs(m) <= n else { throw SpecialFunctionError.parameterOutOfRange(name: "m", min: Double(-n), max: Double(n)) }
@@ -150,7 +150,7 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    @inlinable static func legendrePPrime<T: BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
+    @inlinable static func legendrePPrime<T: Real & BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -168,7 +168,7 @@ public extension SpecialFunctions {
     ///
     /// Returns:
     /// - An array [x_i] of length l containing the zeros of Pₗ(x), converted to `T`.
-    @inlinable static func legendrePZeros<T: BinaryFloatingPoint>(degree l: Int) throws -> [T] {
+    @inlinable static func legendrePZeros<T: Real & BinaryFloatingPoint>(degree l: Int) throws -> [T] {
         guard l >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "degree") }
         guard l > 0 else { return [] }
         var tmp = Array<Double>(repeating: .zero, count: l)

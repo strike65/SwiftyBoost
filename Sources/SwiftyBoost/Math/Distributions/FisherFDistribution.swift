@@ -20,9 +20,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 //
-import CBoostBridge
-import Foundation
-
+import SwiftyBoostPrelude
 extension Distribution {
     /// Fisher–Snedecor F distribution.
     ///
@@ -38,8 +36,8 @@ extension Distribution {
     /// only defined for certain ranges of the degrees of freedom; when undefined
     /// or numerically non-finite in the underlying backend, optional properties
     /// such as `mean`, `variance`, `skewness`, and `kurtosis` will return `nil`.
-    public struct FisherF<T: BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
-        typealias Real = T
+    public struct FisherF<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
+        typealias RealType = T
 
         /// Numerator degrees of freedom (df1). Must be positive and finite.
         public let degreesOfFreedom1: T

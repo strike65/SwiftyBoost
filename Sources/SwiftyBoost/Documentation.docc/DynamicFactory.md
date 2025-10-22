@@ -36,6 +36,27 @@ let f = try Distribution.Dynamic<Double>(
 )
 let H = try f.chf(2.0)
 
+// Beta
+let beta = try Distribution.Dynamic<Double>(
+  distributionName: "beta",
+  parameters: ["alpha": 2.0, "beta": 5.0]
+)
+let mean = beta.mean
+
+// Chi-squared
+let chi2 = try Distribution.Dynamic<Double>(
+  distributionName: "chisquared",
+  parameters: ["df": 8.0]
+)
+let sf = try chi2.sf(12.0)
+
+// Bernoulli
+let bern = try Distribution.Dynamic<Double>(
+  distributionName: "bernoulli",
+  parameters: ["p": 0.3]
+)
+let pmf = try bern.pdf(1)
+
 // Arcsine (aliases: arcsine_distribution)
 let a = try Distribution.Dynamic<Float>(
   distributionName: "arcsine",
@@ -48,10 +69,16 @@ let c = try a.cdf(0.25)
 
 - Gamma: `gamma`, `gamma_distribution`
   - Params: `shape|k` (required), `scale|theta` (default = 1)
+- Beta: `beta`, `beta_distribution`
+  - Params: `alpha|a|p|shape1` (required), `beta|b|q|shape2` (required)
+- Chi-squared: `chisquared`, `chi_squared`, `chi2`, `chi-squared`, `chisquare`
+  - Params: `df|nu|degreesOfFreedom` (required)
 - StudentT: `studentt`, `student_t`, `students_t`, `t`, `t_distribution`
   - Params: `df|nu|degreesOfFreedom` (required)
 - FisherF: `fisherf`, `f`, `f_distribution`
   - Params: `df1|d1|m|degreesOfFreedom1` (required), `df2|d2|n|degreesOfFreedom2` (required)
+- Bernoulli: `bernoulli`, `bernoulli_distribution`
+  - Params: `p|prob|probability|success|theta` (required)
 - Arcsine: `arcsine`, `arcsine_distribution`
   - Params: `minX|min|a|lower` (required), `maxX|max|b|upper` (required)
 
@@ -71,4 +98,3 @@ let c = try a.cdf(0.25)
 Adding new distributions requires only a small extension of the C factory to map names and aliases to Boost objects and wire the vtable pointers. The Swift wrapper does not need changes.
 
 See `DIST-Factory-README.md` for an in‑depth design and an extension guide.
-

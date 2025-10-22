@@ -7,9 +7,10 @@ SwiftyBoost gives Swift developers direct access to Boost.Math special functions
 ## Features
 - Gamma, Beta, error, Bessel, Legendre, elliptic (Legendre and Carlson), Lambert W, Owen's T, and other high-precision helpers.
 - Probability distributions with Boost-backed implementations:
-  - Gamma, Student’s t, Fisher’s F, and Arcsine (PDF/CDF/SF, quantiles, hazards, moments).
+  - Gamma, Beta, Chi-squared, Student’s t, Fisher’s F, Bernoulli, and Arcsine (PDF/PMF, CDF/SF, quantiles, hazards, moments).
   - Typed wrappers delegate internally to a unified runtime vtable (`Distribution.Dynamic`) for consistent behavior across precisions.
   - Unified runtime factory to construct distributions by name at runtime (see "Dynamic Distribution Factory").
+- High-precision mathematical constants (`π`, `e`, `√2`, Euler–Mascheroni, Catalan, ζ(3), φ, …) exposed via the generic `Constants<T>` namespace with dedicated `Float`, `Double`, and (x86_64) `Float80` entry points.
 - `CBoostBridge` target that forwards Swift calls into the vendored Boost headers under `extern/boost`.
 - Architectural awareness with dedicated `Float`, `Double`, and (x86_64) `Float80` overloads plus generic `BinaryFloatingPoint` entry points.
 - Generic `Complex<T: BinaryFloatingPoint>` type with arithmetic, polar helpers, and elementary complex functions (`exp`, `log`, `sin`, `cos`, `tan`, `sinh`, `cosh`, `tanh`, `atan`). Double/Float/(x86_64) Float80 specializations call Boost-backed bridge functions (`bs_*`).
@@ -72,6 +73,16 @@ let z    = ComplexD(0, 0.7)
 let sc   = SpecialFunctions.sincc_pi(z)                  // equals sinhc_pi(0.7)
 ```
 
+```swift
+// Constants (choose your precision)
+let tau   = Constants<Double>.twoPi
+let phi   = Constants<Float>.phi
+#if arch(x86_64)
+let rootPi80 = Constants<Float80>.rootPi
+#endif
+```
+
+```swift
 // Distributions
 // Student’s t (ν = 5)
 let t = try Distribution.StudentT<Double>(degreesOfFreedom: 5)
@@ -81,9 +92,22 @@ let t_q975 = try t.quantile(0.975)
 let f = try Distribution.FisherF<Double>(degreesOfFreedom1: 10, degreesOfFreedom2: 20)
 let f_cdf = try f.cdf(2.5)
 
+// Beta(α = 2, β = 5)
+let beta = try Distribution.Beta<Double>(alpha: 2, beta: 5)
+let beta_mean = beta.mean
+
+// Chi-squared (ν = 8)
+let chi2 = try Distribution.ChiSquared<Double>(degreesOfFreedom: 8)
+let chi2_sf = try chi2.sf(12.0)
+
+// Bernoulli(p = 0.3)
+let bern = try Distribution.Bernoulli<Double>(p: 0.3)
+let bern_entropy = bern.entropy
+
 // Arcsine on [0, 1]
-let a = try Distribution.Arcsine<Double>(minX: 0, maxX: 1)
-let a_pdf = try a.pdf(0.2)
+let arcsine = try Distribution.Arcsine<Double>(minX: 0, maxX: 1)
+let arcsine_pdf = try arcsine.pdf(0.2)
+```
 
 APIs throw `SpecialFunctionError` for invalid inputs or domain violations. See DocC symbol docs for function‑specific bounds mirrored from Boost.Math.
 
@@ -110,6 +134,24 @@ let dynT = try Distribution.Dynamic<Float>(
 let dynF = try Distribution.Dynamic<Double>(
   distributionName: "fisherf",
   parameters: ["df1": 10, "df2": 20]
+)
+
+// Beta (aliases: beta_distribution)
+let dynB = try Distribution.Dynamic<Double>(
+  distributionName: "beta",
+  parameters: ["alpha": 2.0, "beta": 5.0]
+)
+
+// Chi-squared (aliases: chi_squared, chisq)
+let dynChi = try Distribution.Dynamic<Double>(
+  distributionName: "chisquared",
+  parameters: ["df": 8.0]
+)
+
+// Bernoulli (aliases: bernoulli_distribution)
+let dynBern = try Distribution.Dynamic<Double>(
+  distributionName: "bernoulli",
+  parameters: ["p": 0.3]
 )
 
 // Arcsine (aliases: arcsine_distribution)

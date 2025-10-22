@@ -7,12 +7,17 @@
 //  let p = try d.pdf(2.0)
 //
 
-import CBoostBridge
-import Foundation
+import SwiftyBoostPrelude
 
 extension Distribution {
-    internal struct Dynamic<T: BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
-        public typealias Real = T
+    /// Internal runtime-backed distribution wrapper that binds Swift generic entry points
+    /// to the Boost.Math vtable exposed by `CBoostBridge`.
+    ///
+    /// Each instance owns the underlying C handle and forwards calls through function
+    /// pointers supplied by the factory. Public distribution types (e.g. ``Distribution/Gamma``)
+    /// delegate to this implementation for consistency.
+    internal struct Dynamic<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
+        public typealias RealType = T
 
         private final class Box: @unchecked Sendable {
             var d: bs_dist_d?

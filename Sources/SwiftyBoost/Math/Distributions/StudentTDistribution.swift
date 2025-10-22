@@ -20,9 +20,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 //
-import CBoostBridge
-import Foundation
-
+import SwiftyBoostPrelude
 extension Distribution {
     /// Student's t distribution with ν degrees of freedom (ν > 0).
     ///
@@ -34,10 +32,10 @@ extension Distribution {
     ///
     /// This type constructs the underlying Boost `students_t_distribution` once
     /// and keeps an opaque handle; all evaluations reuse this instance.
-    public struct StudentT<T: BinaryFloatingPoint & Sendable>: Sendable,
+    public struct StudentT<T: Real & BinaryFloatingPoint & Sendable>: Sendable,
         DistributionProtocol
     {
-        typealias Real = T
+        typealias RealType = T
         public let degreesOfFreedom: T
         private let dyn: Distribution.Dynamic<T>
 

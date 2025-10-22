@@ -20,7 +20,7 @@
 //  THE SOFTWARE.
 //
 
-import CBoostBridge
+import SwiftyBoostPrelude
 
 /// A namespace-like generic that exposes high-precision mathematical constants
 /// specialized for concrete floating-point types.

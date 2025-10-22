@@ -38,7 +38,7 @@
 //    https://www.boost.org/doc/libs/release/libs/math/doc/html/math_toolkit/ellint/carlson.html
 //
 
-import CBoostBridge
+import SwiftyBoostPrelude
 public extension SpecialFunctions {
     
     
@@ -62,7 +62,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterNotFinite(name: "y")` if `y` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterNotPositive(name: "y")` if `y ≤ 0`.
-    @inlinable static func carlsonRC<T: BinaryFloatingPoint>(_ x: T, _ y: T) throws -> T {
+    @inlinable static func carlsonRC<T: Real & BinaryFloatingPoint>(_ x: T, _ y: T) throws -> T {
         let dx = D(x), dy = D(y)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dy.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
@@ -92,7 +92,7 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x"|"y"|"z")` if any is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: +∞)` if any < 0.
-    @inlinable static func carlsonRF<T: BinaryFloatingPoint>(_ x: T, _ y: T, _ z: T) throws -> T {
+    @inlinable static func carlsonRF<T: Real & BinaryFloatingPoint>(_ x: T, _ y: T, _ z: T) throws -> T {
         let dx = D(x), dy = D(y), dz = D(z)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dy.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
@@ -126,7 +126,7 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x"|"y"|"z")` if any is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: +∞)` if any < 0.
-    @inlinable static func carlsonRD<T: BinaryFloatingPoint>(_ x: T, _ y: T, _ z: T) throws -> T {
+    @inlinable static func carlsonRD<T: Real & BinaryFloatingPoint>(_ x: T, _ y: T, _ z: T) throws -> T {
         let dx = D(x), dy = D(y), dz = D(z)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dy.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
@@ -160,7 +160,7 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x"|"y"|"z"|"p")` if any is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x/y/z/p", min: 0, max: +∞)` if any < 0.
-    @inlinable static func carlsonRJ<T: BinaryFloatingPoint>(_ x: T, _ y: T, _ z: T, _ p: T) throws -> T {
+    @inlinable static func carlsonRJ<T: Real & BinaryFloatingPoint>(_ x: T, _ y: T, _ z: T, _ p: T) throws -> T {
         let dx = D(x), dy = D(y), dz = D(z), dp = D(p)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dy.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
@@ -194,7 +194,7 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x"|"y"|"z")` if any is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x/y/z", min: 0, max: +∞)` if any < 0.
-    @inlinable static func carlsonRG<T: BinaryFloatingPoint>(_ x: T, _ y: T, _ z: T) throws -> T {
+    @inlinable static func carlsonRG<T: Real & BinaryFloatingPoint>(_ x: T, _ y: T, _ z: T) throws -> T {
         let dx = D(x), dy = D(y), dz = D(z)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dy.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }

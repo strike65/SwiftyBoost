@@ -105,7 +105,7 @@
 //  - Boost.Math chebyshev: https://www.boost.org/doc/libs/release/libs/math/doc/html/math_toolkit/sf_poly/chebyshev.html
 //
 
-import CBoostBridge
+import SwiftyBoostPrelude
 
 public extension SpecialFunctions {
     // MARK: - Generic overloads (Double-backed)
@@ -131,7 +131,7 @@ public extension SpecialFunctions {
     ///
     /// Notes:
     /// - For |x| ≤ 1, Tₙ(x) ∈ [−1, 1]. For |x| > 1, magnitude can grow quickly with n.
-    @inlinable static func chebyshevT<T: BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
+    @inlinable static func chebyshevT<T: Real & BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -159,7 +159,7 @@ public extension SpecialFunctions {
     ///
     /// Notes:
     /// - Uₙ has (n) simple zeros in (−1, 1). Uₙ(±1) = (±1)ⁿ (n + 1).
-    @inlinable static func chebyshevU<T: BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
+    @inlinable static func chebyshevU<T: Real & BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -184,7 +184,7 @@ public extension SpecialFunctions {
     ///
     /// - If `halfWeightC0 == false`, we pass a modified coefficient vector with c₀' = 2·c₀
     ///   so that Boost’s half-weight interpretation yields the desired unweighted c₀.
-    @inlinable static func chebyshevClenshawRecurrence<T: BinaryFloatingPoint>(_ coefficients: [T], x: T, halfWeightC0: Bool = true) throws -> T {
+    @inlinable static func chebyshevClenshawRecurrence<T: Real & BinaryFloatingPoint>(_ coefficients: [T], x: T, halfWeightC0: Bool = true) throws -> T {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         for c in coefficients {
             guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients") }
@@ -373,7 +373,7 @@ public extension SpecialFunctions {
     /// var U0 = 1.0, U1 = 2.0 * x
     /// let U2 = try SpecialFunctions.chebyshev_next(U1, U0, x) // 0.0
     /// ```
-    @inlinable static func chebyshev_next<T: BinaryFloatingPoint>(_ Pn: T, _ Pn1: T, _ x: T) throws -> T {
+    @inlinable static func chebyshev_next<T: Real & BinaryFloatingPoint>(_ Pn: T, _ Pn1: T, _ x: T) throws -> T {
         guard Pn.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "Pn") }
         guard Pn1.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "Pn1") }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }

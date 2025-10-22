@@ -37,7 +37,7 @@
 //  - Boost.Math Lambert W: https://www.boost.org/doc/libs/release/libs/math/doc/html/math_toolkit/lambert_w.html
 //
 
-import CBoostBridge
+import SwiftyBoostPrelude
 public extension SpecialFunctions {
     
     
@@ -57,7 +57,7 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x", min: −1/e, max: +∞)` if `x < −1/e`.
-    @inlinable static func lambertW0<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func lambertW0<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         let minX = -1.0 / bs_const_e_d()
@@ -79,7 +79,7 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x", min: −1/e, max: 0)` if `x ∉ [−1/e, 0)`.
-    @inlinable static func lambertWm1<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func lambertWm1<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         let minX = -1.0 / bs_const_e_d()

@@ -20,7 +20,7 @@
 //  THE SOFTWARE.
 //  
 
-import CBoostBridge
+import SwiftyBoostPrelude
 
 public extension SpecialFunctions {
     
@@ -50,7 +50,7 @@ public extension SpecialFunctions {
     /// References:
     /// - NIST DLMF §16.2 (Generalized Hypergeometric Function)
     /// - Boost.Math hypergeometric_1F0
-    @inlinable static func hypergeometric1F0<T: BinaryFloatingPoint>(a: T, z: T) throws -> T {
+    @inlinable static func hypergeometric1F0<T: Real & BinaryFloatingPoint>(a: T, z: T) throws -> T {
         let da = D(a), dz = D(z)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard dz.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
@@ -117,7 +117,7 @@ public extension SpecialFunctions {
     /// References:
     /// - NIST DLMF §13 (Bessel connections), §16.2
     /// - Boost.Math hypergeometric_0F1
-    @inlinable static func hypergeometric0F1<T: BinaryFloatingPoint>(b: T, z: T) throws -> T {
+    @inlinable static func hypergeometric0F1<T: Real & BinaryFloatingPoint>(b: T, z: T) throws -> T {
         let db = D(b), dz = D(z)
         guard db.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
         guard dz.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
@@ -185,7 +185,7 @@ public extension SpecialFunctions {
     /// References:
     /// - NIST DLMF §16.11
     /// - Boost.Math hypergeometric_2F0
-    @inlinable static func hypergeometric2F0<T: BinaryFloatingPoint>(a: T, b: T, z: T) throws -> T {
+    @inlinable static func hypergeometric2F0<T: Real & BinaryFloatingPoint>(a: T, b: T, z: T) throws -> T {
         let da = D(a), db = D(b), dz = D(z)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard db.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
@@ -259,7 +259,7 @@ public extension SpecialFunctions {
     /// References:
     /// - NIST DLMF §13, §16.2
     /// - Boost.Math hypergeometric_1F1
-    @inlinable static func hypergeometric1F1<T: BinaryFloatingPoint>(a: T, b: T, z: T) throws -> T {
+    @inlinable static func hypergeometric1F1<T: Real & BinaryFloatingPoint>(a: T, b: T, z: T) throws -> T {
         let da = D(a), db = D(b), dz = D(z)
         guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
         guard db.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }

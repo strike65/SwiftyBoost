@@ -6,7 +6,7 @@ All notable changes to this project are tracked here, following the principles o
 - Dynamic distribution factory (runtime):
   - Added a unified vtable-based factory in `CBoostBridge` with non-null context pointer (`ctx`) and nullable function pointers for metrics.
   - New Swift wrapper `Distribution.Dynamic<T>` that conforms to `DistributionProtocol` and constructs distributions by name with a parameter dictionary.
-  - Supported names and aliases: `gamma|gamma_distribution`, `student_t|studentt|students_t|t|t_distribution`, `fisherf|f|f_distribution`, `arcsine|arcsine_distribution`.
+  - Supported names and aliases: `gamma|gamma_distribution`, `beta|beta_distribution`, `chi_squared|chisquared|chi2|chi-squared|chisquare`, `student_t|studentt|students_t|t|t_distribution`, `fisherf|f|f_distribution`, `bernoulli|bernoulli_distribution`, `arcsine|arcsine_distribution`.
   - Swift-side fallbacks for metrics not present in vtable: differential entropy for Fisher F and Arcsine.
   - Comprehensive tests comparing Dynamic vs typed wrappers (PDF/CDF/quantile, hazard/CHF, moments), alias handling, error cases, and Float80 smoke on x86_64.
   - New DocC page: “Dynamic Distribution Factory” with usage, aliases, nullability, and initialization notes.
@@ -16,6 +16,9 @@ All notable changes to this project are tracked here, following the principles o
   - Header nullability tightened: `ctx` marked `_Nonnull`; all vtable function pointers marked `_Nullable` with `const void* _Nonnull` context. Factory prototypes annotated `_Nonnull` for `name`, `params`, and `out`.
   - Robust factory error handling: `bs_dist_make_*` now catch exceptions and return `false` on invalid parameters.
   - Removed the experimental `AnyDistribution` path; use `Distribution.Dynamic<T>` instead. Demo updated accordingly.
+- Constants namespace:
+  - Introduced `Constants<T>` to expose Boost-backed mathematical constants (π, τ, √π, Euler–Mascheroni, Catalan, ζ(3), φ, logarithms, ratio variants) with dedicated bindings for `Float`, `Double`, and (x86_64) `Float80`.
+  - Added inline documentation for every constant accessor plus DocC coverage and README usage examples.
 - Mixed-precision promotions:
   - Beta (complete/incomplete/regularized, inverses, derivative, parameter solvers)
   - Gamma (ratios, incomplete/regularized P/Q, inverses, derivative)
@@ -34,6 +37,8 @@ All notable changes to this project are tracked here, following the principles o
     - Complex `sincc_pi(z) = sin(πz)/(πz)` for `ComplexD/F/(x86_64) ComplexX`.
   - Bridge includes and mappings hardened for Boost 1.89.0 (sinc.hpp, sinhc.hpp); π-normalized forms used explicitly to avoid header ambiguities.
 - Documentation:
+  - Added DocC article “Constants Catalog” documenting the `Constants<T>` namespace, precision choices, and common values.
+  - Added distribution references for “Distribution/Beta”, “Distribution/ChiSquared”, and “Distribution/Bernoulli”; refreshed the Quickstart and Dynamic Factory guides with matching examples and alias tables.
   - New DocC page “Result-Type Promotions” (policy, supported APIs, and guidance).
   - README quick reference and usage examples for promotions, `rsqrt`, and Sinus cardinalis.
   - New DocC page “Complex Numbers” documenting `Complex<T>` construction, arithmetic, polar/phase, and Boost-backed elementary functions; linked from the module index.
@@ -44,8 +49,11 @@ All notable changes to this project are tracked here, following the principles o
   Distributions:
   - Added distribution types bridged from Boost:
     - `Distribution.Gamma<T>` (shape/scale) with PDF/CDF/SF, quantiles, hazards, and moments.
+    - `Distribution.Beta<T>` (alpha/beta) with PDF/CDF/SF, quantiles, hazards, and moments.
+    - `Distribution.ChiSquared<T>` (degrees of freedom) with PDF/CDF/SF, quantiles, hazards, and moments.
     - `Distribution.StudentT<T>` (ν) with PDF/CDF/SF, quantiles, hazards, moments, and power-planning helper.
     - `Distribution.FisherF<T>` (df1, df2) with PDF/CDF/SF, quantiles, hazards, and moments.
+    - `Distribution.Bernoulli<T>` (success probability) with PMF/CDF, quantiles, hazards, and entropy fallback.
     - `Distribution.Arcsine<T>` (minX, maxX) with PDF/CDF/SF, quantiles, hazards, and moments.
   - All distributions are generic over `BinaryFloatingPoint` with `Double`/`Float` overloads and `Float80` on x86_64.
 - Tests:

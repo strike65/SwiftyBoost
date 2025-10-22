@@ -1,6 +1,7 @@
 //
-//  Created by Volker Thieme 2025.
-//  Copyright © 2025 Volker Thieme.
+//  Created by VT on 22.10.25.
+//  Copyright © 2025 Volker Thieme. All rights reserved.
+//
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
 //  in the Software without restriction, including without limitation the rights
@@ -19,23 +20,6 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 //
-import SwiftyBoostPrelude
-
-/// Namespace for Boost-backed special function wrappers exposed by SwiftyBoost.
-///
-/// Browse ``SpecialFunctions`` in the documentation catalog to discover Gamma/Beta
-/// helpers, error/Bessel families, elliptic integrals, and stable transforms that
-/// mirror Boost.Math capabilities with Swift-friendly APIs and error semantics.
-public enum SpecialFunctions {}
-
-/// Namespace for probability distribution wrappers that delegate to Boost.Math.
-///
-/// Concrete types such as ``Distribution/Gamma`` or ``Distribution/StudentT`` live
-/// under this enum and conform to ``DistributionProtocol`` for a uniform API surface.
-public enum Distribution {}
-
-/// Namespace for high-precision mathematical constants specialized by floating-point type.
-///
-/// Access constants via generic entry points like `Constants<Double>.pi`,
-/// `Constants<Float>.euler`, or (on x86_64) `Constants<Float80>.twoPi`.
-public enum Constants<T: Real & BinaryFloatingPoint> {}
+@_exported import CBoostBridge
+@_exported import Foundation
+@_exported import Numerics

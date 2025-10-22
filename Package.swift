@@ -14,7 +14,8 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0")
+        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0"),
+        .package(url: "https://github.com/apple/swift-numerics.git", .upToNextMajor(from: "1.1.1")),
     ],
     targets: [
         .target(
@@ -31,8 +32,16 @@ let package = Package(
             ],
         ),
         .target(
+            name: "SwiftyBoostPrelude",
+            dependencies: [.product(name: "Numerics", package: "swift-numerics"),
+                           .product(name: "RealModule", package: "swift-numerics"),
+                           "CBoostBridge"],
+            path: "Sources/SwiftyBoostPrelude"
+        ),
+        .target(
             name: "SwiftyBoost",
-            dependencies: ["CBoostBridge"]
+            dependencies: ["SwiftyBoostPrelude", "CBoostBridge"],
+            path: "Sources/SwiftyBoost"
         ),
         .testTarget(
             name: "SwiftyBoostTests",

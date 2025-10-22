@@ -19,9 +19,7 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
-
-import CBoostBridge
-import Foundation
+import SwiftyBoostPrelude
 
 extension Distribution {
     /// A Chi-squared probability distribution.
@@ -35,7 +33,7 @@ extension Distribution {
     ///   provided by Boost via `CBoostBridge`, while also exposing some analytically derived properties implemented in Swift.
     ///
     /// - SeeAlso: Wikipedia: Chi-squared distribution, Boost.Math Chi-squared distribution
-    public struct ChiSquared<T: BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
+    public struct ChiSquared<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
         /// The floating-point type used by this distribution.
         typealias Real = T
 

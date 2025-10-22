@@ -13,7 +13,7 @@
 //  for digamma/polygamma, and x = 1 for ζ(x)). See each function’s documentation.
 //
 
-import CBoostBridge
+import SwiftyBoostPrelude
 public extension SpecialFunctions {
     
     
@@ -47,7 +47,7 @@ public extension SpecialFunctions {
     /// ```swift
     /// let d: Double = try digamma(3.0) // ≈ 0.922784...
     /// ```
-    @inlinable static func digamma<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func digamma<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         if dx <= 0, dx == dx.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x") }
@@ -77,7 +77,7 @@ public extension SpecialFunctions {
     /// ```swift
     /// let t: Double = try trigamma(2.0) // ≈ 0.644934...
     /// ```
-    @inlinable static func trigamma<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func trigamma<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         if dx <= 0, dx == dx.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x") }
@@ -110,7 +110,7 @@ public extension SpecialFunctions {
     /// ```swift
     /// let p2: Double = try polygamma(order: 2, 3.0) // second derivative at x=3
     /// ```
-    @inlinable static func polygamma<T: BinaryFloatingPoint>(order n: Int, _ x: T) throws -> T {
+    @inlinable static func polygamma<T: Real & BinaryFloatingPoint>(order n: Int, _ x: T) throws -> T {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "order") }
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -142,7 +142,7 @@ public extension SpecialFunctions {
     /// ```swift
     /// let z2: Double = try riemannZeta(2.0) // π^2 / 6 ≈ 1.644934...
     /// ```
-    @inlinable static func riemannZeta<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func riemannZeta<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dx != 1 else { throw SpecialFunctionError.invalidCombination(message: "riemannZeta has a pole at x = 1") }

@@ -42,8 +42,7 @@
 //  - Boost.Math elliptic integrals:
 //    https://www.boost.org/doc/libs/release/libs/math/doc/html/math_toolkit/ellint.html
 //
-
-import CBoostBridge
+import SwiftyBoostPrelude
 public extension SpecialFunctions {
     
     
@@ -64,7 +63,7 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "k")` if `k` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1)` if `|k| > 1`.
-    @inlinable static func completeEllipticIntegralK<T: BinaryFloatingPoint>(_ k: T) throws -> T {
+    @inlinable static func completeEllipticIntegralK<T: Real & BinaryFloatingPoint>(_ k: T) throws -> T {
         let dk = D(k)
         guard dk.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard abs(dk) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
@@ -90,7 +89,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterNotFinite(name: "k")` if `k` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterNotFinite(name: "phi")` if `phi` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1)` if `|k| > 1`.
-    @inlinable static func incompleteEllipticIntegralF<T: BinaryFloatingPoint>(_ k: T, phi: T) throws -> T {
+    @inlinable static func incompleteEllipticIntegralF<T: Real & BinaryFloatingPoint>(_ k: T, phi: T) throws -> T {
         let dk = D(k), dphi = D(phi)
         guard dk.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard dphi.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "phi") }
@@ -121,7 +120,7 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "k")` if `k` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1)` if `|k| > 1`.
-    @inlinable static func completeEllipticIntegralE<T: BinaryFloatingPoint>(_ k: T) throws -> T {
+    @inlinable static func completeEllipticIntegralE<T: Real & BinaryFloatingPoint>(_ k: T) throws -> T {
         let dk = D(k)
         guard dk.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard abs(dk) <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1) }
@@ -147,7 +146,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterNotFinite(name: "k")` if `k` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterNotFinite(name: "phi")` if `phi` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1)` if `|k| > 1`.
-    @inlinable static func incompleteEllipticIntegralE<T: BinaryFloatingPoint>(_ k: T, phi: T) throws -> T {
+    @inlinable static func incompleteEllipticIntegralE<T: Real & BinaryFloatingPoint>(_ k: T, phi: T) throws -> T {
         let dk = D(k), dphi = D(phi)
         guard dk.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k") }
         guard dphi.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "phi") }
@@ -194,7 +193,7 @@ public extension SpecialFunctions {
     /// References:
     /// - NIST DLMF §19.2, §19.7 (Legendre normal forms and properties)
     /// - Boost.Math ellint_3 (characteristic form)
-    @inlinable static func incompleteEllipticIntegralPi<T: BinaryFloatingPoint>(_ k: T, _ nu: T, _ phi: T) -> T {
+    @inlinable static func incompleteEllipticIntegralPi<T: Real & BinaryFloatingPoint>(_ k: T, _ nu: T, _ phi: T) -> T {
         let dk = D(k), dphi = D(phi), dnu = D(nu)
         return T(bs_ellint_3(dk, dnu, dphi))
     }
@@ -238,7 +237,7 @@ public extension SpecialFunctions {
     /// References:
     /// - NIST DLMF §19.2, §19.7 (Legendre normal forms and properties)
     /// - Boost.Math ellint_3_complete (characteristic form)
-    @inlinable static func completeEllipticIntegralPi<T: BinaryFloatingPoint>(_ k: T, _ nu: T) -> T {
+    @inlinable static func completeEllipticIntegralPi<T: Real & BinaryFloatingPoint>(_ k: T, _ nu: T) -> T {
         let dk = D(k), dnu = D(nu)
         return T(bs_ellint_3_complete(dk, dnu))
 

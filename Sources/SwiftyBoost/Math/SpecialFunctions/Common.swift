@@ -16,7 +16,7 @@
 //  delegating to CBoostBridge (Boost.Math) for the numerical implementation.
 //
 
-import CBoostBridge
+import SwiftyBoostPrelude
 
 // MARK: - Errors
 
@@ -110,7 +110,7 @@ public enum DistributionError: Error & Equatable {
 ///
 /// - Parameter x: A `BinaryFloatingPoint` value.
 /// - Returns: `x` converted to `Double`.
-@usableFromInline internal func D<T: BinaryFloatingPoint>(_ x: T) -> Double { Double(x) }
+@usableFromInline internal func D<T: Real & BinaryFloatingPoint>(_ x: T) -> Double { Double(x) }
 
 // MARK: - Numerically stable helpers
 extension SpecialFunctions {
@@ -120,7 +120,7 @@ extension SpecialFunctions {
     /// - Parameter x: The exponent.
     /// - Returns: `exp(x) - 1` as `T`.
     /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
-    @inlinable static func expm1<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func expm1<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return T(bs_expm1_d(dx))
@@ -133,7 +133,7 @@ extension SpecialFunctions {
     /// - Throws:
     ///   - `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
     ///   - `SpecialFunctionError.parameterOutOfRange` if `x <= -1`.
-    @inlinable static func log1p<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func log1p<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dx > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: -1.0.nextUp, max: Double.infinity) }
@@ -147,7 +147,7 @@ extension SpecialFunctions {
     /// - Throws:
     ///   - `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
     ///   - `SpecialFunctionError.parameterOutOfRange` if `x <= -1`.
-    @inlinable static func log1pmx<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func log1pmx<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dx > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: -1.0.nextUp, max: Double.infinity) }
@@ -164,7 +164,7 @@ extension SpecialFunctions {
     ///   - `SpecialFunctionError.parameterNotFinite` if `x` or `y` is not finite.
     ///   - `SpecialFunctionError.invalidCombination` if `x < 0` and `y` is non-integer
     ///     (undefined in the reals).
-    @inlinable static func powm1<T: BinaryFloatingPoint>(_ x: T, _ y: T) throws -> T {
+    @inlinable static func powm1<T: Real & BinaryFloatingPoint>(_ x: T, _ y: T) throws -> T {
         let dx = D(x), dy = D(y)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dy.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
@@ -180,7 +180,7 @@ extension SpecialFunctions {
     /// - Parameter x: The input value.
     /// - Returns: The real cube root of `x` as `T`.
     /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
-    @inlinable static func cbrt<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func cbrt<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return T(bs_cbrt_d(dx))
@@ -191,7 +191,7 @@ extension SpecialFunctions {
     /// - Parameter x: The input value.
     /// - Returns: `sqrt(1 + x) - 1` as `T`.
     /// - Note: This overload does not throw and relies on the underlying Boost implementation.
-    @inlinable static func sqrt1pm1<T: BinaryFloatingPoint>(x: T) -> T {
+    @inlinable static func sqrt1pm1<T: Real & BinaryFloatingPoint>(x: T) -> T {
         return T(bs_sqrt1pm1_d(Double(x)))
     }
     
@@ -203,7 +203,7 @@ extension SpecialFunctions {
     /// - Throws:
     ///   - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     ///   - `SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞)` if `x < 0`.
-    @inlinable static func rsqrt<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func rsqrt<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dx >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
@@ -384,7 +384,7 @@ extension SpecialFunctions {
     /// - Parameter x: The input value.
     /// - Returns: `sin(πx)` as `T`.
     /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
-    @inlinable static func sinPi<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func sinPi<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return T(bs_sin_pi_d(dx))
@@ -395,7 +395,7 @@ extension SpecialFunctions {
     /// - Parameter x: The input value.
     /// - Returns: `cos(πx)` as `T`.
     /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
-    @inlinable static func cosPi<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func cosPi<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return T(bs_cos_pi_d(dx))

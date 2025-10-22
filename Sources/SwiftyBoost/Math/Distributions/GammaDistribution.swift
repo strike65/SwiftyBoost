@@ -20,9 +20,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 //
-
-import CBoostBridge
-import Foundation
+import SwiftyBoostPrelude
 
 extension Distribution {
     /// Gamma distribution Γ(k, θ) with shape k > 0 and scale θ > 0.
@@ -46,8 +44,8 @@ extension Distribution {
     ///   keeps a small opaque handle; all evaluations reuse this instance.
     /// - Throws on invalid parameters (k ≤ 0 or θ ≤ 0) or invalid arguments to
     ///   evaluators (e.g., x < 0 for PDF/CDF/SF).
-    public struct Gamma<T: BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
-        public typealias Real = T
+    public struct Gamma<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
+        public typealias RealType = T
 
         /// Shape parameter k (> 0).
         public let shape: T

@@ -20,9 +20,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 //
-import CBoostBridge
-import Foundation
-
+import SwiftyBoostPrelude
 extension Distribution {
     /// A continuous arcsine distribution on a finite interval.
     ///
@@ -35,9 +33,9 @@ extension Distribution {
     ///
     /// - Note: This type is generic over a floating-point type `T` and supports `Float`, `Double`,
     ///   and, on x86 architectures, `Float80`. Internally it bridges to Boost via `CBoostBridge`.
-    public struct Arcsine<T: BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
+    public struct Arcsine<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
         /// The floating-point type used by this distribution.
-        typealias Real = T
+        typealias RealType = T
 
         /// The lower bound of the support (a).
         public let minX: T
@@ -188,13 +186,7 @@ extension Distribution {
         public var entropy: T? {
             guard self.minX < self.maxX else { return nil }
             let width = self.maxX - self.minX
-            #if arch(x86_64) || arch(i386)
-            let qpi: Float80 = Constants.quarterPi
-            return T(log(qpi)) + T(log(Float80(width)))
-            #else
-            let qpi: Double = Constants.quarterPi
-            return T(log(qpi)) + T(log(Double(width)))
-            #endif
+            return T.log(T.pi / 4) + T.log(width)
         }
     }
 }

@@ -35,6 +35,23 @@ let nu = Distribution.StudentT<Double>.findDegreesOfFreedom(
 ```
 
 ```swift
+// Beta(α = 2, β = 5)
+let beta = try Distribution.Beta<Double>(alpha: 2, beta: 5)
+let betaCDF = try beta.cdf(0.3)
+let betaMean = beta.mean
+
+// Chi-squared with ν = 8
+let chi2 = try Distribution.ChiSquared<Double>(degreesOfFreedom: 8)
+let chi2SF = try chi2.sf(12.0)
+let chi2Mode = chi2.mode
+
+// Bernoulli(p = 0.3)
+let bern = try Distribution.Bernoulli<Double>(p: 0.3)
+let bernPMF1 = try bern.pdf(1)
+let bernEntropy = bern.entropy
+```
+
+```swift
 // Fisher’s F (df1 = 10, df2 = 20)
 let f = try Distribution.FisherF<Double>(degreesOfFreedom1: 10, degreesOfFreedom2: 20)
 let f_pdf = try f.pdf(2.0)

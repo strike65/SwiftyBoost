@@ -29,7 +29,7 @@
 //  - Boost.Math erf/erfc: https://www.boost.org/doc/libs/release/libs/math/doc/html/math_toolkit/sf_erf/error_function.html
 //
 
-import CBoostBridge
+import SwiftyBoostPrelude
 public extension SpecialFunctions {
     
     
@@ -51,7 +51,7 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    @inlinable static func errorFunction<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func errorFunction<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return T(bs_erf_d(dx))
@@ -70,7 +70,7 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    @inlinable static func complementaryErrorFunction<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func complementaryErrorFunction<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return T(bs_erfc_d(dx))
@@ -96,7 +96,7 @@ public extension SpecialFunctions {
     ///
     /// Notes:
     /// - This generic overload funnels through a Double-backed backend and converts the result back to `T`.
-    @inlinable static func inverseErrorFunction<T: BinaryFloatingPoint>(_ z: T) throws -> T {
+    @inlinable static func inverseErrorFunction<T: Real & BinaryFloatingPoint>(_ z: T) throws -> T {
         let dp = D(z)
         guard dp.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
         guard abs(dp) < 1 else {

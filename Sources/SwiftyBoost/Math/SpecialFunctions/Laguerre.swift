@@ -47,7 +47,7 @@
 //  - Boost.Math Laguerre: https://www.boost.org/doc/libs/release/libs/math/doc/html/math_toolkit/sf_laguerre/laguerre.html
 //
 
-import CBoostBridge
+import SwiftyBoostPrelude
 
 public extension SpecialFunctions {
     // MARK: - Generic overloads (Double-backed)
@@ -70,7 +70,7 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    @inlinable static func laguerre<T: BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
+    @inlinable static func laguerre<T: Real & BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
@@ -97,7 +97,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
     /// - `SpecialFunctionError.parameterNotPositive(name: "m")` if `m < 0`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    @inlinable static func assocLaguerre<T: BinaryFloatingPoint>(_ n: Int, _ m: Int, _ x: T) throws -> T {
+    @inlinable static func assocLaguerre<T: Real & BinaryFloatingPoint>(_ n: Int, _ m: Int, _ x: T) throws -> T {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         guard m >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "m") }
         let dx = D(x)

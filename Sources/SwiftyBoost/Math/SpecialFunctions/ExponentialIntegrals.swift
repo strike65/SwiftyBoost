@@ -1,6 +1,6 @@
 // Sources/Math/SpecialFunctions/ExponentialIntegrals.swift
 
-import CBoostBridge
+import SwiftyBoostPrelude
 
 public extension SpecialFunctions {
     
@@ -35,7 +35,7 @@ public extension SpecialFunctions {
     /// References:
     /// - NIST DLMF §6.2 (Exponential Integral Ei)
     /// - Boost.Math expint(x)
-    @inlinable static func exponentialIntegralEi<T: BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func exponentialIntegralEi<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         return T(bs_expint_Ei_d(dx))
@@ -89,7 +89,7 @@ public extension SpecialFunctions {
     /// References:
     /// - NIST DLMF §8.20 (Exponential Integrals E_n)
     /// - Boost.Math expint(n, x)
-    @inlinable static func exponentialIntegralEn<T: BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
+    @inlinable static func exponentialIntegralEn<T: Real & BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
         guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }

@@ -53,8 +53,7 @@
 //  Instances are immutable. Calls into the underlying dynamic distribution wrapper are
 //  expected to be thread-safe when used concurrently across independent instances.
 //
-import CBoostBridge
-import Foundation
+import SwiftyBoostPrelude
 
 extension Distribution {
     /// The Beta distribution on the unit interval [0, 1].
@@ -84,9 +83,9 @@ extension Distribution {
     ///
     /// Concurrency
     /// - Immutable and Sendable. Safe to share across tasks/threads.
-    public struct Beta<T: BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
+    public struct Beta<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
         /// The floating-point type used by this distribution.
-        typealias Real = T
+        typealias RealType = T
 
         /// The first (α) shape parameter. Must be strictly greater than zero and finite.
         public let alpha: T
