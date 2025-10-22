@@ -149,10 +149,10 @@ struct SinusCardinalisTests {
     #if arch(x86_64)
     @Test("sincc_pi(z) matches sin(pi z)/(pi z) (Float80)")
     func complexSincMatchesClosedFormFloat80() {
-        let zs: [ComplexX] = [
-            ComplexX(0.25, 0.0),
-            ComplexX(0.3, 0.4),
-            ComplexX(-0.6, 0.2)
+        let zs: [ComplexL] = [
+            ComplexL(0.25, 0.0),
+            ComplexL(0.3, 0.4),
+            ComplexL(-0.6, 0.2)
         ]
         for z in zs {
             let pz = z * Float80.pi

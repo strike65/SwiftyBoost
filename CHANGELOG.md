@@ -38,7 +38,7 @@ All notable changes to this project are tracked here, following the principles o
   - Sinus cardinalis (π-normalized) functions:
     - `sinc_pi(x) = sin(πx)/(πx)` with removable singularity at 0.
     - `sinhc_pi(x) = sinh(πx)/(πx)` with removable singularity at 0.
-    - Complex `sincc_pi(z) = sin(πz)/(πz)` for `ComplexD/F/(x86_64) ComplexX`.
+    - Complex `sincc_pi(z) = sin(πz)/(πz)` for `ComplexD/F/(x86_64) ComplexL`.
   - Bridge includes and mappings hardened for Boost 1.89.0 (sinc.hpp, sinhc.hpp); π-normalized forms used explicitly to avoid header ambiguities.
 - Documentation:
   - Added DocC article “Constants Catalog” documenting the `Constants<T>` namespace, precision choices, and common values.
@@ -46,7 +46,7 @@ All notable changes to this project are tracked here, following the principles o
   - New DocC page “Result-Type Promotions” (policy, supported APIs, and guidance).
   - README quick reference and usage examples for promotions, `rsqrt`, and Sinus cardinalis.
   - New DocC page “Complex Numbers” documenting `Complex<T>` construction, arithmetic, polar/phase, and Boost-backed elementary functions; linked from the module index.
-  - Fixed README typealias to match code: `ComplexL` (Float80) instead of `ComplexX`; clarified spherical harmonics return types.
+  - Fixed README typealias to match code: `ComplexL` (Float80) instead of the former custom alias.
   - Added distribution reference pages: “Distribution/FisherF” and “Distribution/Arcsine” with definitions, API overview, usage, and notes.
   - Added special-function references: “Sinus Cardinalis (π-Normalized)” for `sinc_pi`/`sinhc_pi` and complex variants; “Common Helpers and Stable Transforms” for `rsqrt`, `expm1`, `log1p`, `log1pmx`, `powm1`, `cbrt`, `sqrt1pm1`.
   
@@ -63,12 +63,10 @@ All notable changes to this project are tracked here, following the principles o
 - Tests:
   - Added suites for mixed promotions across modules and for new helpers.
   - Real and complex tests for `sinc_pi`, `sinhc_pi`, and `sincc_pi` with identity checks and tolerances.
-- Added a generic complex number type `Complex<T: BinaryFloatingPoint>`
-  - Conforms to `Sendable`, `Equatable`, `Hashable`, `Codable`; includes `ComplexD`, `ComplexF`, and (x86_64) `ComplexX` typealiases.
-  - Stable arithmetic: Smith’s algorithm for division, numerically robust magnitude, principal square root.
-  - Mixed scalar operations, polar helpers (`fromPolar`, `phase`), and normalization.
-  - Double/Float/(x86_64) Float80 specializations call Boost-backed bridge functions (`bs_cexp`, `bs_clog`, `bs_csin`, `bs_ccos`, `bs_ctan`, `bs_csinh`, `bs_ccosh`, `bs_ctanh`, `bs_catan`).
-  - Added README usage section and examples.
+- Added Swift Numerics-backed complex numbers via typealiasing and extensions
+  - Swapped the bespoke `Complex<T>` for `ComplexModule.Complex<T>` and extended it with legacy conveniences (Smith division, stable magnitude, phase/polar helpers).
+  - Maintained `ComplexD`, `ComplexF`, and (x86_64) `ComplexL` aliases plus the Boost-powered elementary functions (`bs_cexp`, `bs_clog`, `bs_csin`, `bs_ccos`, `bs_ctan`, `bs_csinh`, `bs_ccosh`, `bs_ctanh`, `bs_catan`).
+  - Updated README and DocC to note the Numerics dependency and preserved ExpressibleByFloatLiteral compatibility for tests.
 - Corrected README usage examples to match public API naming (`errorFunction`, `besselJ(v:x:)`).
 - Aligned supported platforms in README with `Package.swift` (macOS, iOS).
 - Updated SPM installation URL to `github.com/strike65/SwiftyBoost`.
