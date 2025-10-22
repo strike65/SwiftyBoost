@@ -3,6 +3,9 @@
 All notable changes to this project are tracked here, following the principles of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adhering to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
+- Nothing yet.
+
+## [0.5.0] - 2025-10-22
 - Dynamic distribution factory (runtime):
   - Added a unified vtable-based factory in `CBoostBridge` with non-null context pointer (`ctx`) and nullable function pointers for metrics.
   - New Swift wrapper `Distribution.Dynamic<T>` that conforms to `DistributionProtocol` and constructs distributions by name with a parameter dictionary.
@@ -87,5 +90,6 @@ All notable changes to this project are tracked here, following the principles o
 - Vendored Boost.Math headers under `extern/boost`.
 - Published core Gamma, Beta, error, Legendre, and Bessel function wrappers with Swift-friendly APIs and error handling.
 
+[0.5.0]: https://github.com/strike65/SwiftyBoost/releases/tag/0.5.0
 [0.1.0]: https://github.com/strike65/SwiftyBoost/releases/tag/0.1.0
 [0.0.1]: https://github.com/strike65/SwiftyBoost/releases/tag/0.0.1
