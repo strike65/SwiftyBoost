@@ -1,6 +1,6 @@
 # Complex Numbers
 
-SwiftyBoost provides a lightweight, generic complex type with stable arithmetic and Boost-backed elementary functions for common precisions.
+SwiftyBoost re-exports Swift Numerics’ ``ComplexModule/Complex`` and layers SwiftyBoost-specific helpers plus Boost-backed elementary functions for common precisions.
 
 ## Overview
 
@@ -81,4 +81,3 @@ let sc = SpecialFunctions.sincc_pi(z)   // equals SpecialFunctions.sinhc_pi(0.7)
 
 - `ComplexL` (Float80) is available on `x86_64` only.
 - Polar and elementary functions are specialized for `Double`, `Float`, and (where applicable) `Float80`.
-

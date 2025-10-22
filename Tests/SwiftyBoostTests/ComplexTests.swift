@@ -257,8 +257,10 @@ struct ComplexDoubleBasicTests {
         let a: ComplexD = 2.5 // ExpressibleByFloatLiteral
         #expect(a == ComplexD(2.5, 0))
         #expect(ComplexD(1, 2).isFinite)
-        #expect(ComplexD(.infinity, 0).isInfinite)
-        #expect(ComplexD(0, .infinity).isInfinite)
+        let infReal = ComplexD(.infinity, 0)
+        let infImag = ComplexD(0, .infinity)
+        #expect(infReal.isInfinite)
+        #expect(infImag.isInfinite)
         #expect(ComplexD(.nan, 0).isNaN)
         #expect(ComplexD(0, .nan).isNaN)
     }
@@ -357,4 +359,3 @@ struct ComplexFloat80Tests {
     }
 }
 #endif
-

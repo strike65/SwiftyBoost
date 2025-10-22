@@ -23,3 +23,4 @@
 @_exported import CBoostBridge
 @_exported import Foundation
 @_exported import Numerics
+@_exported import ComplexModule

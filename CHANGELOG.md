@@ -16,6 +16,10 @@ All notable changes to this project are tracked here, following the principles o
   - Header nullability tightened: `ctx` marked `_Nonnull`; all vtable function pointers marked `_Nullable` with `const void* _Nonnull` context. Factory prototypes annotated `_Nonnull` for `name`, `params`, and `out`.
   - Robust factory error handling: `bs_dist_make_*` now catch exceptions and return `false` on invalid parameters.
   - Removed the experimental `AnyDistribution` path; use `Distribution.Dynamic<T>` instead. Demo updated accordingly.
+- Complex numbers:
+  - Replaced the bespoke ``Complex`` struct with the Swift Numerics implementation, re-exported via `SwiftyBoostPrelude`.
+  - Retained SwiftyBoost conveniences (`.i`, `fromPolar`, stable magnitude/square root) and Boost-backed elementary functions through extensions.
+  - Updated README and DocC guidance to note the Numerics dependency.
 - Constants namespace:
   - Introduced `Constants<T>` to expose Boost-backed mathematical constants (π, τ, √π, Euler–Mascheroni, Catalan, ζ(3), φ, logarithms, ratio variants) with dedicated bindings for `Float`, `Double`, and (x86_64) `Float80`.
   - Added inline documentation for every constant accessor plus DocC coverage and README usage examples.

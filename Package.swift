@@ -33,14 +33,21 @@ let package = Package(
         ),
         .target(
             name: "SwiftyBoostPrelude",
-            dependencies: [.product(name: "Numerics", package: "swift-numerics"),
-                           .product(name: "RealModule", package: "swift-numerics"),
-                           "CBoostBridge"],
+            dependencies: [
+                .product(name: "Numerics", package: "swift-numerics"),
+                .product(name: "RealModule", package: "swift-numerics"),
+                .product(name: "ComplexModule", package: "swift-numerics"),
+                "CBoostBridge"
+            ],
             path: "Sources/SwiftyBoostPrelude"
         ),
         .target(
             name: "SwiftyBoost",
-            dependencies: ["SwiftyBoostPrelude", "CBoostBridge"],
+            dependencies: [
+                "SwiftyBoostPrelude",
+                "CBoostBridge",
+                .product(name: "ComplexModule", package: "swift-numerics")
+            ],
             path: "Sources/SwiftyBoost"
         ),
         .testTarget(

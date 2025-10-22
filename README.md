@@ -13,7 +13,7 @@ SwiftyBoost gives Swift developers direct access to Boost.Math special functions
 - High-precision mathematical constants (`π`, `e`, `√2`, Euler–Mascheroni, Catalan, ζ(3), φ, …) exposed via the generic `Constants<T>` namespace with dedicated `Float`, `Double`, and (x86_64) `Float80` entry points.
 - `CBoostBridge` target that forwards Swift calls into the vendored Boost headers under `extern/boost`.
 - Architectural awareness with dedicated `Float`, `Double`, and (x86_64) `Float80` overloads plus generic `BinaryFloatingPoint` entry points.
-- Generic `Complex<T: BinaryFloatingPoint>` type with arithmetic, polar helpers, and elementary complex functions (`exp`, `log`, `sin`, `cos`, `tan`, `sinh`, `cosh`, `tanh`, `atan`). Double/Float/(x86_64) Float80 specializations call Boost-backed bridge functions (`bs_*`).
+- Re-exported Swift Numerics `Complex<T>` type with SwiftyBoost convenience APIs: arithmetic, polar helpers, and Boost-backed elementary functions (`exp`, `log`, `sin`, `cos`, `tan`, `sinh`, `cosh`, `tanh`, `atan`). Double/Float/(x86_64) Float80 specializations call bridge functions (`bs_*`).
 
 ## Requirements
 - Swift 6.2 or later.
@@ -171,7 +171,7 @@ See `DIST-Factory-README.md` for the full design, ABI surface, and extension gui
 
 ### Complex Numbers
 
-SwiftyBoost includes a lightweight, generic complex number type with stable arithmetic and Boost-backed elementary functions where available.
+SwiftyBoost re-exports Swift Numerics’ `Complex<T>` and layers on stable arithmetic helpers plus Boost-backed elementary functions where available.
 
 ```swift
 import SwiftyBoost
