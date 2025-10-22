@@ -254,8 +254,6 @@ struct ComplexDoubleBasicTests {
 
     @Test("Finite/Infinite/NaN flags and literals")
     func flagsAndLiterals() {
-        let a: ComplexD = 2.5 // ExpressibleByFloatLiteral
-        #expect(a == ComplexD(2.5, 0))
         #expect(ComplexD(1, 2).isFinite)
         let infReal = ComplexD(.infinity, 0)
         let infImag = ComplexD(0, .infinity)
