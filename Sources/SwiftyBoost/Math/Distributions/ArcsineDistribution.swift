@@ -23,7 +23,7 @@
 import CBoostBridge
 import Foundation
 
-public extension Distribution {
+extension Distribution {
     /// A continuous arcsine distribution on a finite interval.
     ///
     /// This distribution is supported on the closed interval `[minX, maxX]` and has
@@ -35,7 +35,7 @@ public extension Distribution {
     ///
     /// - Note: This type is generic over a floating-point type `T` and supports `Float`, `Double`,
     ///   and, on x86 architectures, `Float80`. Internally it bridges to Boost via `CBoostBridge`.
-    struct Arcsine<T: BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
+    public struct Arcsine<T: BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
         /// The floating-point type used by this distribution.
         typealias Real = T
 
@@ -43,6 +43,7 @@ public extension Distribution {
         public let minX: T
         /// The upper bound of the support (b).
         public let maxX: T
+
         private let dyn: Distribution.Dynamic<T>
 
         /// Creates an arcsine distribution with the given support.
@@ -55,14 +56,24 @@ public extension Distribution {
         ///           `DistributionError.parameterNotFinite` if either bound is not finite,
         ///           or `DistributionError.generalError` if the underlying distribution could not be initialized.
         public init(minX min_x: T = 0, maxX max_x: T = 0) throws {
-            guard min_x < max_x else { throw DistributionError.invalidCombination(message: "minX must be less than maxX") }
-            guard min_x.isFinite else { throw DistributionError.parameterNotFinite(name: "minX") }
-            guard max_x.isFinite else { throw DistributionError.parameterNotFinite(name: "maxX") }
+            guard min_x < max_x else {
+                throw DistributionError.invalidCombination(message: "minX must be less than maxX")
+            }
+            guard min_x.isFinite else {
+                throw DistributionError.parameterNotFinite(name: "minX")
+            }
+            guard max_x.isFinite else {
+                throw DistributionError.parameterNotFinite(name: "maxX")
+            }
+
             self.minX = min_x
             self.maxX = max_x
             self.dyn = try Distribution.Dynamic<T>(
                 distributionName: "arcsine",
-                parameters: ["minX": min_x, "maxX": max_x]
+                parameters: [
+                    "minX": min_x,
+                    "maxX": max_x,
+                ]
             )
         }
 
@@ -156,7 +167,7 @@ public extension Distribution {
         /// - Parameter x: Evaluation point.
         /// - Returns: The cumulative hazard at `x`.
         public func chf(_ x: T) throws -> T { try dyn.chf(x) }
-        
+
         /// The lattice step size, if the distribution is lattice-supported.
         ///
         /// Always `nil` for this continuous distribution.
@@ -181,10 +192,9 @@ public extension Distribution {
             let qpi: Float80 = Constants.quarterPi
             return T(log(qpi)) + T(log(Float80(width)))
             #else
-            let qpi: Double  = Constants.quarterPi
+            let qpi: Double = Constants.quarterPi
             return T(log(qpi)) + T(log(Double(width)))
             #endif
         }
-
     }
 }

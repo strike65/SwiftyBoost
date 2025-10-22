@@ -7,12 +7,13 @@
 
 #include <boost/math/distributions/students_t.hpp>
 #include <boost/math/distributions/beta.hpp>
+#include <boost/math/distributions/chi_squared.hpp>
 #include <boost/math/distributions/complement.hpp>
 
 using boost::math::students_t_distribution;
 using boost::math::beta_distribution;
 using boost::math::complement;
-
+using boost::math::chi_squared_distribution;
 
 extern "C" {
 
@@ -57,14 +58,25 @@ long double bs_beta_find_alpha_from_beta_l(long double beta, long double x, long
     return bs_wrap<long double>([&]{ return beta_distribution<long double>::find_alpha(beta, x, probability); });
 }
 
-float bs_beta_find_beta_from_beta_f(float alpha, float x, float probability) {
+float bs_beta_find_beta_from_alpha_f(float alpha, float x, float probability) {
     return bs_wrap<float>([&]{ return beta_distribution<float>::find_alpha(alpha, x, probability); });
 }
-double bs_beta_find_beta_from_beta_d(double alpha, double x, double probability) {
+double bs_beta_find_beta_from_alpha_d(double alpha, double x, double probability) {
     return bs_wrap<double>([&]{ return beta_distribution<double>::find_alpha(alpha, x, probability); });
 }
-long double bs_beta_find_beta_from_beta_l(long double alpha, long double x, long double probability) {
+long double bs_beta_find_beta_from_alpha_l(long double alpha, long double x, long double probability) {
     return bs_wrap<long double>([&]{ return beta_distribution<long double>::find_alpha(alpha, x, probability); });
+}
+float bs_chisquare_find_degreesOfFreedom_f(float difference_from_variance, float alpha, float beta, float variance, float hint) {
+    return bs_wrap<float>([&]{ return chi_squared_distribution<float>::find_degrees_of_freedom(difference_from_variance, alpha, beta, variance, hint); });
+}
+
+double bs_chisquare_find_degreesOfFreedom_d(double difference_from_variance, double alpha, double beta, double variance, double hint) {
+    return bs_wrap<double>([&]{ return chi_squared_distribution<double>::find_degrees_of_freedom(difference_from_variance, alpha, beta, variance, hint); });
+}
+   
+long double bs_chisquare_find_degreesOfFreedom_l(long double difference_from_variance, long double alpha, long double beta, long double variance, long double hint) {
+    return bs_wrap<long double>([&]{ return chi_squared_distribution<long double>::find_degrees_of_freedom(difference_from_variance, alpha, beta, variance, hint); });
 }
 
 

@@ -23,7 +23,7 @@
 import CBoostBridge
 import Foundation
 
-public extension Distribution {
+extension Distribution {
     /// Student's t distribution with ν degrees of freedom (ν > 0).
     ///
     /// Definitions
@@ -34,18 +34,26 @@ public extension Distribution {
     ///
     /// This type constructs the underlying Boost `students_t_distribution` once
     /// and keeps an opaque handle; all evaluations reuse this instance.
-    struct StudentT<T: BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
+    public struct StudentT<T: BinaryFloatingPoint & Sendable>: Sendable,
+        DistributionProtocol
+    {
         typealias Real = T
         public let degreesOfFreedom: T
         private let dyn: Distribution.Dynamic<T>
 
         /// Initialize with ν degrees of freedom (> 0).
         public init(degreesOfFreedom v: T) throws {
-            guard v > 0 else { throw DistributionError.parameterNotPositive(name: "degreesOfFreedom") }
+            guard v > 0 else {
+                throw DistributionError.parameterNotPositive(
+                    name: "degreesOfFreedom"
+                )
+            }
             self.degreesOfFreedom = v
             self.dyn = try Distribution.Dynamic<T>(
                 distributionName: "student_t",
-                parameters: ["df": v]
+                parameters: [
+                    "df": v
+                ]
             )
         }
 
@@ -60,7 +68,9 @@ public extension Distribution {
         public func cdf(_ x: T) throws -> T { try dyn.cdf(x) }
         public func sf(_ x: T) throws -> T { try dyn.sf(x) }
         public func quantile(_ p: T) throws -> T { try dyn.quantile(p) }
-        public func quantileComplement(_ q: T) throws -> T { try dyn.quantileComplement(q) }
+        public func quantileComplement(_ q: T) throws -> T {
+            try dyn.quantileComplement(q)
+        }
 
         // MARK: Moments
         public var mean: T? { degreesOfFreedom > 1 ? T(0) : nil }
@@ -74,26 +84,63 @@ public extension Distribution {
         // MARK: Hazards
         public func hazard(_ x: T) throws -> T { try dyn.hazard(x) }
         public func chf(_ x: T) throws -> T { try dyn.chf(x) }
-        
+
         // Lattice/discrete-only properties (continuous ⇒ nil)
         public var latticeStep: T? { nil }
         public var latticeOrigin: T? { nil }
         public var entropy: T? { dyn.entropy }
 
-
         // MARK: Planning helper
         /// Find degrees of freedom ν given effect size, α, β, and σ.
-        public static func findDegreesOfFreedom(differenceFromMean: T, alpha: T, beta: T, sd: T, hint: T = 1) -> T {
+        public static func findDegreesOfFreedom(
+            differenceFromMean: T,
+            alpha: T,
+            beta: T,
+            sd: T,
+            hint: T = 1
+        ) -> T {
             if T.self == Double.self {
-                return T(bs_student_t_find_degrees_of_freedom_d(Double(differenceFromMean), Double(alpha), Double(beta), Double(sd), Double(hint)))
+                return T(
+                    bs_student_t_find_degrees_of_freedom_d(
+                        Double(differenceFromMean),
+                        Double(alpha),
+                        Double(beta),
+                        Double(sd),
+                        Double(hint)
+                    )
+                )
             }
             if T.self == Float.self {
-                return T(bs_student_t_find_degrees_of_freedom_f(Float(differenceFromMean), Float(alpha), Float(beta), Float(sd), Float(hint)))
+                return T(
+                    bs_student_t_find_degrees_of_freedom_f(
+                        Float(differenceFromMean),
+                        Float(alpha),
+                        Float(beta),
+                        Float(sd),
+                        Float(hint)
+                    )
+                )
             }
             #if arch(x86_64) || arch(i386)
-            return T(bs_student_t_find_degrees_of_freedom_l(Float80(differenceFromMean), Float80(alpha), Float80(beta), Float80(sd), Float80(hint)))
+                return T(
+                    bs_student_t_find_degrees_of_freedom_l(
+                        Float80(differenceFromMean),
+                        Float80(alpha),
+                        Float80(beta),
+                        Float80(sd),
+                        Float80(hint)
+                    )
+                )
             #else
-            return T(bs_student_t_find_degrees_of_freedom_d(Double(differenceFromMean), Double(alpha), Double(beta), Double(sd), Double(hint)))
+                return T(
+                    bs_student_t_find_degrees_of_freedom_d(
+                        Double(differenceFromMean),
+                        Double(alpha),
+                        Double(beta),
+                        Double(sd),
+                        Double(hint)
+                    )
+                )
             #endif
         }
     }

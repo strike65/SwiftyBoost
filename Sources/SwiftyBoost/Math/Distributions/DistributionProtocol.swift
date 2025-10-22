@@ -19,7 +19,7 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
-//  
+//
 
 /// A common interface for real-valued probability distributions.
 ///
@@ -55,7 +55,7 @@ internal protocol DistributionProtocol {
     /// by `+infinity` if supported by `Real`). Whether the bound is inclusive or exclusive
     /// is distribution-specific and should be documented by the conforming type.
     var supportUpperBound: Real { get }
-    
+
     // MARK: - Core functions
 
     /// The cumulative distribution function (CDF).
@@ -111,7 +111,7 @@ internal protocol DistributionProtocol {
     /// - Returns: The cumulative hazard at `x`.
     /// - Throws: If `x` is outside the supported domain or if the computation fails.
     func chf(_ x: Real) throws -> Real
-    
+
     // MARK: - Inverses
 
     /// The lower-tail quantile function, i.e. the inverse CDF.
@@ -179,21 +179,20 @@ internal protocol DistributionProtocol {
     /// Unless documented otherwise by the conforming type, this is typically equivalent
     /// to `(supportLowerBound, supportUpperBound)`, which may include infinite values.
     var range: (lower: Real, upper: Real) { get }
-    
+
     /// For lattice (discrete) distributions, the spacing between adjacent support points.
     ///
     /// Continuous distributions should return `nil`.
     var latticeStep: Real? { get }
-    
+
     /// For lattice (discrete) distributions, the origin (offset) of the lattice.
     ///
     /// Continuous distributions should return `nil`.
     var latticeOrigin: Real? { get }
-    
+
     /// The entropy H[X] (Shannon) where defined.
     ///
     /// Implementations should return `nil` when the entropy is undefined or does not
     /// exist (for example, diverges). Units are in nats (natural logarithm base).
     var entropy: Real? { get }
 }
-

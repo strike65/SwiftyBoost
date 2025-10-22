@@ -32,8 +32,8 @@
 //  - Public API with Swift naming conventions
 //
 
-import Foundation
 import CBoostBridge
+import Foundation
 
 /// A generic complex number with real and imaginary parts stored as `BinaryFloatingPoint`.
 ///
@@ -50,7 +50,9 @@ import CBoostBridge
 /// Codable:
 /// - Encoding uses a keyed container with keys `real` and `imag`.
 @frozen
-public struct Complex<T: BinaryFloatingPoint & Codable & Sendable>: Sendable, Equatable, Hashable, Codable, CustomStringConvertible {
+public struct Complex<T: BinaryFloatingPoint & Codable & Sendable>: Sendable, Equatable, Hashable,
+    Codable, CustomStringConvertible
+{
 
     /// Real component.
     public var real: T
@@ -84,7 +86,9 @@ public struct Complex<T: BinaryFloatingPoint & Codable & Sendable>: Sendable, Eq
     // MARK: - Common constants
 
     /// 0 + 0i
-    public static var zero: Complex<T> { Complex(real: .zero, imag: .zero) }
+    public static var zero: Complex<T> {
+        Complex(real: .zero, imag: .zero)
+    }
 
     /// 1 + 0i
     public static var one: Complex<T> { Complex(real: 1, imag: .zero) }
@@ -122,7 +126,11 @@ public struct Complex<T: BinaryFloatingPoint & Codable & Sendable>: Sendable, Eq
         let y = ar >= ai ? ai : ar
         if x == .zero { return .zero }
         let r = y / x
-        return x * (1 + r * r).squareRoot()
+        return x
+            * (1
+            + r
+            * r)
+            .squareRoot()
     }
 
     /// Whether both components are finite.
@@ -159,7 +167,11 @@ public struct Complex<T: BinaryFloatingPoint & Codable & Sendable>: Sendable, Eq
         // Default fallback (for generic T) returns purely real radius when phase == 0,
         // otherwise returns (radius, 0). Specialized implementations exist for common types.
         if phase == .zero {
-            return Complex(radius, .zero)
+            return
+                Complex(
+                    radius,
+                    .zero
+                )
         }
         return Complex(radius, .zero)
     }
@@ -170,7 +182,10 @@ public struct Complex<T: BinaryFloatingPoint & Codable & Sendable>: Sendable, Eq
     @inlinable
     public var phase: T {
         // Fallback: return 0 for generic T; specialized implementations exist for common types.
-        if real.sign == .minus { return .zero } // arbitrary placeholder for generic T
+        if real.sign == .minus {
+            return
+                .zero
+        }  // arbitrary placeholder for generic T
         return .zero
     }
 
@@ -185,23 +200,43 @@ public struct Complex<T: BinaryFloatingPoint & Codable & Sendable>: Sendable, Eq
     /// - Returns: `1 / (a + bi)`; if both `a` and `b` are zero, the result contains infinities/NaNs per IEEE division-by-zero rules.
     @inlinable
     public func reciprocal() -> Complex<T> {
-        let a = real, b = imag
-        let ar = abs(a), br = abs(b)
+        let a = real
+        let b = imag
+        let ar = abs(a)
+        let br = abs(b)
         if ar >= br {
             // If a == 0 and b != 0, we will take the else-branch below.
-            if a == .zero {
+            if a
+                == .zero
+            {
                 // Both zero => fall through to else path (which will also divide by zero).
                 // Let IEEE handle infinities/NaNs.
             } else {
-                let r = b / a
-                let den = a + b * r
-                return Complex((1) / den, (-r) / den)
+                let r =
+                    b
+                    / a
+                let den =
+                    a
+                    + b
+                    * r
+                return
+                    Complex(
+                        (1)
+                            / den,
+                        (-r)
+                            / den
+                    )
             }
         }
         // ar < br OR a == 0
         let r = a / b
         let den = b + a * r
-        return Complex(r / den, (-1) / den)
+        return Complex(
+            r
+                / den,
+            (-1)
+                / den
+        )
     }
 
     /// The normalized complex number `z / |z|` when `|z| > 0`; otherwise `z`.
@@ -217,7 +252,12 @@ public struct Complex<T: BinaryFloatingPoint & Codable & Sendable>: Sendable, Eq
     // MARK: - CustomStringConvertible
 
     public var description: String {
-        let sign = imag.sign == .minus ? " - " : " + "
+        let sign =
+            imag
+                .sign
+                == .minus
+            ? " - "
+            : " + "
         let b = abs(imag)
         return "\(real)\(sign)\(b)i"
     }
@@ -230,14 +270,32 @@ public struct Complex<T: BinaryFloatingPoint & Codable & Sendable>: Sendable, Eq
 
     @inlinable
     public init(from decoder: Decoder) throws {
-        let c = try decoder.container(keyedBy: CodingKeys.self)
-        self.real = try c.decode(T.self, forKey: .real)
-        self.imag = try c.decode(T.self, forKey: .imag)
+        let c = try decoder.container(
+            keyedBy:
+                CodingKeys
+                .self
+        )
+        self.real = try c.decode(
+            T
+                .self,
+            forKey:
+                .real
+        )
+        self.imag = try c.decode(
+            T
+                .self,
+            forKey:
+                .imag
+        )
     }
 
     @inlinable
     public func encode(to encoder: Encoder) throws {
-        var c = encoder.container(keyedBy: CodingKeys.self)
+        var c = encoder.container(
+            keyedBy:
+                CodingKeys
+                .self
+        )
         try c.encode(real, forKey: .real)
         try c.encode(imag, forKey: .imag)
     }
@@ -256,13 +314,39 @@ extension Complex: ExpressibleByFloatLiteral where T: ExpressibleByFloatLiteral 
 
 extension Complex: AdditiveArithmetic {
     @inlinable
-    public static func + (lhs: Complex<T>, rhs: Complex<T>) -> Complex<T> {
-        Complex(real: lhs.real + rhs.real, imag: lhs.imag + rhs.imag)
+    public static func + (lhs: Complex<T>, rhs: Complex<T>) -> Complex<
+        T
+    > {
+        Complex(
+            real:
+                lhs
+                .real
+                + rhs
+                .real,
+            imag:
+                lhs
+                .imag
+                + rhs
+                .imag
+        )
     }
 
     @inlinable
-    public static func - (lhs: Complex<T>, rhs: Complex<T>) -> Complex<T> {
-        Complex(real: lhs.real - rhs.real, imag: lhs.imag - rhs.imag)
+    public static func - (lhs: Complex<T>, rhs: Complex<T>) -> Complex<
+        T
+    > {
+        Complex(
+            real:
+                lhs
+                .real
+                - rhs
+                .real,
+            imag:
+                lhs
+                .imag
+                - rhs
+                .imag
+        )
     }
 }
 
@@ -288,28 +372,61 @@ public func * <T>(lhs: Complex<T>, rhs: Complex<T>) -> Complex<T> {
 @inlinable
 public func / <T>(lhs: Complex<T>, rhs: Complex<T>) -> Complex<T> {
     // (a + bi) / (c + di)
-    let a = lhs.real, b = lhs.imag, c = rhs.real, d = rhs.imag
-    let ac = abs(c), ad = abs(d)
+    let a = lhs.real
+    let b = lhs.imag
+    let c = rhs.real
+    let d = rhs.imag
+    let ac = abs(c)
+    let ad = abs(d)
     if ac >= ad {
         // If c == 0 and d != 0, we prefer the else-branch to avoid r = d/c.
         if c == .zero, d != .zero {
-            let r = c / d // 0 / d = 0
-            let denom = d + c * r
-            let real = (a * r + b) / denom
-            let imag = (b * r - a) / denom
-            return Complex(real: real, imag: imag)
+            let r =
+                c
+                / d  // 0 / d = 0
+            let denom =
+                d
+                + c
+                * r
+            let real =
+                (a
+                    * r
+                    + b)
+                / denom
+            let imag =
+                (b
+                    * r
+                    - a)
+                / denom
+            return
+                Complex(
+                    real:
+                        real,
+                    imag:
+                        imag
+                )
         }
         let r = d / c
         let denom = c + d * r
         let real = (a + b * r) / denom
         let imag = (b - a * r) / denom
-        return Complex(real: real, imag: imag)
+        return Complex(
+            real:
+                real,
+            imag:
+                imag
+        )
     } else {
         let r = c / d
         let denom = d + c * r
         let real = (a * r + b) / denom
         let imag = (b * r - a) / denom
-        return Complex(real: real, imag: imag)
+        return Complex(
+            real:
+                real,
+            imag:
+                imag
+        )
     }
 }
 
@@ -366,24 +483,45 @@ public func / <T>(lhs: T, rhs: Complex<T>) -> Complex<T> {
 
 // MARK: - Integer power
 
-public extension Complex {
+extension Complex {
     /// Raises `z` to an integer power `n` using exponentiation by squaring.
     ///
     /// - Parameters:
     ///   - n: An integer exponent (can be negative).
     /// - Returns: `z^n`. If `n < 0`, computes `(1/z)^|n|`.
     @inlinable
-    func pow(_ n: Int) -> Complex<T> {
+    public func pow(_ n: Int) -> Complex<T> {
         if n == 0 { return .one }
-        if n < 0 { return self.reciprocal().pow(-n) }
+        if n < 0 {
+            return
+                self
+                .reciprocal()
+                .pow(
+                    -n
+                )
+        }
         // n > 0
         var base = self
         var exp = n
         var result = Complex<T>.one
         while exp > 0 {
-            if (exp & 1) == 1 { result = result * base }
-            exp >>= 1
-            if exp > 0 { base = base * base }
+            if (exp
+                & 1)
+                == 1
+            {
+                result =
+                    result
+                    * base
+            }
+            exp >>=
+                1
+            if exp
+                > 0
+            {
+                base =
+                    base
+                    * base
+            }
         }
         return result
     }
@@ -391,7 +529,7 @@ public extension Complex {
 
 // MARK: - Square root (stable)
 
-public extension Complex {
+extension Complex {
     /// The principal square root of a complex number.
     ///
     /// Stable formula:
@@ -400,13 +538,26 @@ public extension Complex {
     ///
     /// This avoids catastrophic cancellation when `a` and `b` are large or disparate.
     @inlinable
-    var squareRoot: Complex<T> {
-        let a = real, b = imag
+    public var squareRoot: Complex<T> {
+        let a = real
+        let b = imag
         if b == .zero {
-            if a >= .zero {
-                return Complex(a.squareRoot(), .zero)
+            if a
+                >= .zero
+            {
+                return
+                    Complex(
+                        a
+                            .squareRoot(),
+                        .zero
+                    )
             } else {
-                return Complex(.zero, ( -a ).squareRoot())
+                return
+                    Complex(
+                        .zero,
+                        (-a)
+                            .squareRoot()
+                    )
             }
         }
         let r = magnitude
@@ -414,25 +565,46 @@ public extension Complex {
         let u = ((r + a) / 2).squareRoot()
         let v = ((r - a) / 2).squareRoot()
         if b >= .zero {
-            return Complex(u, v)
+            return
+                Complex(
+                    u,
+                    v
+                )
         } else {
-            return Complex(u, -v)
+            return
+                Complex(
+                    u,
+                    -v
+                )
         }
     }
 }
 
 // MARK: - Double/Float/Float80 specializations for polar and phase and elementary complex functions
 
-public extension Complex where T == Double {
+extension Complex where T == Double {
     /// Creates a complex number from polar coordinates `radius * (cos(phase) + i sin(phase))`.
     @inlinable
-    static func fromPolar(radius: Double, phase: Double) -> Complex<Double> {
-        Complex(radius * Darwin.cos(phase), radius * Darwin.sin(phase))
+    public static func fromPolar(radius: Double, phase: Double)
+        -> Complex<Double>
+    {
+        Complex(
+            radius
+                * Darwin
+                .cos(
+                    phase
+                ),
+            radius
+                * Darwin
+                .sin(
+                    phase
+                )
+        )
     }
 
     /// The principal argument (phase) in radians, in (−π, π].
     @inlinable
-    var phase: Double {
+    public var phase: Double {
         atan2(imag, real)
     }
 
@@ -440,87 +612,145 @@ public extension Complex where T == Double {
 
     /// Complex exponential: exp(a + ib)
     @inlinable
-    var exp: Complex<Double> {
-        let z = complex_d(re: real, im: imag)
+    public var exp: Complex<Double> {
+        let z = complex_d(
+            re:
+                real,
+            im:
+                imag
+        )
         let r = bs_cexp_d(z)
         return Complex(r.re, r.im)
     }
 
     /// Natural logarithm: log(z) = ln|z| + i arg(z)
     @inlinable
-    var log: Complex<Double> {
-        let z = complex_d(re: real, im: imag)
+    public var log: Complex<Double> {
+        let z = complex_d(
+            re:
+                real,
+            im:
+                imag
+        )
         let r = bs_clog_d(z)
         return Complex(r.re, r.im)
     }
 
     /// Complex sine: sin(a + ib)
     @inlinable
-    var sin: Complex<Double> {
-        let z = complex_d(re: real, im: imag)
+    public var sin: Complex<Double> {
+        let z = complex_d(
+            re:
+                real,
+            im:
+                imag
+        )
         let r = bs_csin_d(z)
         return Complex(r.re, r.im)
     }
 
     /// Complex cosine: cos(a + ib)
     @inlinable
-    var cos: Complex<Double> {
-        let z = complex_d(re: real, im: imag)
+    public var cos: Complex<Double> {
+        let z = complex_d(
+            re:
+                real,
+            im:
+                imag
+        )
         let r = bs_ccos_d(z)
         return Complex(r.re, r.im)
     }
 
     /// Complex tangent: tan(a + ib)
     @inlinable
-    var tan: Complex<Double> {
-        let z = complex_d(re: real, im: imag)
+    public var tan: Complex<Double> {
+        let z = complex_d(
+            re:
+                real,
+            im:
+                imag
+        )
         let r = bs_ctan_d(z)
         return Complex(r.re, r.im)
     }
 
     /// Complex hyperbolic sine: sinh(a + ib)
     @inlinable
-    var sinh: Complex<Double> {
-        let z = complex_d(re: real, im: imag)
+    public var sinh: Complex<Double> {
+        let z = complex_d(
+            re:
+                real,
+            im:
+                imag
+        )
         let r = bs_csinh_d(z)
         return Complex(r.re, r.im)
     }
 
     /// Complex hyperbolic cosine: cosh(a + ib)
     @inlinable
-    var cosh: Complex<Double> {
-        let z = complex_d(re: real, im: imag)
+    public var cosh: Complex<Double> {
+        let z = complex_d(
+            re:
+                real,
+            im:
+                imag
+        )
         let r = bs_ccosh_d(z)
         return Complex(r.re, r.im)
     }
 
     /// Complex hyperbolic tangent: tanh(a + ib)
     @inlinable
-    var tanh: Complex<Double> {
-        let z = complex_d(re: real, im: imag)
+    public var tanh: Complex<Double> {
+        let z = complex_d(
+            re:
+                real,
+            im:
+                imag
+        )
         let r = bs_ctanh_d(z)
         return Complex(r.re, r.im)
     }
 
     /// Complex arctangent: atan(a + ib)
     @inlinable
-    var atan: Complex<Double> {
-        let z = complex_d(re: real, im: imag)
+    public var atan: Complex<Double> {
+        let z = complex_d(
+            re:
+                real,
+            im:
+                imag
+        )
         let r = bs_catan_d(z)
         return Complex(r.re, r.im)
     }
 }
 
-public extension Complex where T == Float {
+extension Complex where T == Float {
     /// Creates a complex number from polar coordinates `radius * (cos(phase) + i sin(phase))`.
     @inlinable
-    static func fromPolar(radius: Float, phase: Float) -> Complex<Float> {
-        Complex(radius * Darwin.cos(phase), radius * Darwin.sin(phase))
+    public static func fromPolar(radius: Float, phase: Float)
+        -> Complex<Float>
+    {
+        Complex(
+            radius
+                * Darwin
+                .cos(
+                    phase
+                ),
+            radius
+                * Darwin
+                .sin(
+                    phase
+                )
+        )
     }
 
     /// The principal argument (phase) in radians, in (−π, π].
     @inlinable
-    var phase: Float {
+    public var phase: Float {
         atan2(imag, real)
     }
 
@@ -528,164 +758,356 @@ public extension Complex where T == Float {
 
     /// Complex exponential: exp(a + ib)
     @inlinable
-    var exp: Complex<Float> {
-        let z = complex_f(re: real, im: imag)
+    public var exp: Complex<Float> {
+        let z = complex_f(
+            re:
+                real,
+            im:
+                imag
+        )
         let r = bs_cexp_f(z)
         return Complex(r.re, r.im)
     }
 
     /// Natural logarithm: log(z) = ln|z| + i arg(z)
     @inlinable
-    var log: Complex<Float> {
-        let z = complex_f(re: real, im: imag)
+    public var log: Complex<Float> {
+        let z = complex_f(
+            re:
+                real,
+            im:
+                imag
+        )
         let r = bs_clog_f(z)
         return Complex(r.re, r.im)
     }
 
     /// Complex sine: sin(a + ib)
     @inlinable
-    var sin: Complex<Float> {
-        let z = complex_f(re: real, im: imag)
+    public var sin: Complex<Float> {
+        let z = complex_f(
+            re:
+                real,
+            im:
+                imag
+        )
         let r = bs_csin_f(z)
         return Complex(r.re, r.im)
     }
 
     /// Complex cosine: cos(a + ib)
     @inlinable
-    var cos: Complex<Float> {
-        let z = complex_f(re: real, im: imag)
+    public var cos: Complex<Float> {
+        let z = complex_f(
+            re:
+                real,
+            im:
+                imag
+        )
         let r = bs_ccos_f(z)
         return Complex(r.re, r.im)
     }
 
     /// Complex tangent: tan(a + ib)
     @inlinable
-    var tan: Complex<Float> {
+    public var tan: Complex<Float> {
         // Use identity to avoid missing C bridge symbol for Float:
         return self.sin / self.cos
     }
 
     /// Complex hyperbolic sine: sinh(a + ib)
     @inlinable
-    var sinh: Complex<Float> {
-        let z = complex_f(re: real, im: imag)
+    public var sinh: Complex<Float> {
+        let z = complex_f(
+            re:
+                real,
+            im:
+                imag
+        )
         let r = bs_csinh_f(z)
         return Complex(r.re, r.im)
     }
 
     /// Complex hyperbolic cosine: cosh(a + ib)
     @inlinable
-    var cosh: Complex<Float> {
-        let z = complex_f(re: real, im: imag)
+    public var cosh: Complex<Float> {
+        let z = complex_f(
+            re:
+                real,
+            im:
+                imag
+        )
         let r = bs_ccosh_f(z)
         return Complex(r.re, r.im)
     }
 
     /// Complex hyperbolic tangent: tanh(a + ib)
     @inlinable
-    var tanh: Complex<Float> {
-        let z = complex_f(re: real, im: imag)
+    public var tanh: Complex<Float> {
+        let z = complex_f(
+            re:
+                real,
+            im:
+                imag
+        )
         let r = bs_ctanh_f(z)
         return Complex(r.re, r.im)
     }
 
     /// Complex arctangent: atan(a + ib)
     @inlinable
-    var atan: Complex<Float> {
-        let z = complex_f(re: real, im: imag)
+    public var atan: Complex<Float> {
+        let z = complex_f(
+            re:
+                real,
+            im:
+                imag
+        )
         let r = bs_catan_f(z)
         return Complex(r.re, r.im)
     }
 }
 
 #if arch(x86_64)
-public extension Complex where T == Float80 {
-    /// Creates a complex number from polar coordinates `radius * (cos(phase) + i sin(phase))`.
-    @inlinable
-    static func fromPolar(radius: Float80, phase: Float80) -> Complex<Float80> {
-        Complex(radius * cos(phase), radius * sin(phase))
-    }
+    extension Complex where T == Float80 {
+        /// Creates a complex number from polar coordinates `radius * (cos(phase) + i sin(phase))`.
+        @inlinable
+        public static func fromPolar(
+            radius:
+                Float80,
+            phase:
+                Float80
+        ) -> Complex<Float80> {
+            Complex(
+                radius
+                    * cos(
+                        phase
+                    ),
+                radius
+                    * sin(
+                        phase
+                    )
+            )
+        }
 
-    /// The principal argument (phase) in radians, in (−π, π].
-    @inlinable
-    var phase: Float80 {
-        atan2(imag, real)
-    }
+        /// The principal argument (phase) in radians, in (−π, π].
+        @inlinable
+        public var phase: Float80 {
+            atan2(
+                imag,
+                real
+            )
+        }
 
-    // Elementary complex functions via Boost bridge
+        // Elementary complex functions via Boost bridge
 
-    /// Complex exponential: exp(a + ib)
-    @inlinable
-    var exp: Complex<Float80> {
-        let z = complex_l(re: real, im: imag)
-        let r = bs_cexp_l(z)
-        return Complex(r.re, r.im)
-    }
+        /// Complex exponential: exp(a + ib)
+        @inlinable
+        public var exp: Complex<Float80> {
+            let z =
+                complex_l(
+                    re:
+                        real,
+                    im:
+                        imag
+                )
+            let r =
+                bs_cexp_l(
+                    z
+                )
+            return
+                Complex(
+                    r
+                        .re,
+                    r
+                        .im
+                )
+        }
 
-    /// Natural logarithm: log(z) = ln|z| + i arg(z)
-    @inlinable
-    var log: Complex<Float80> {
-        let z = complex_l(re: real, im: imag)
-        let r = bs_clog_l(z)
-        return Complex(r.re, r.im)
-    }
+        /// Natural logarithm: log(z) = ln|z| + i arg(z)
+        @inlinable
+        public var log: Complex<Float80> {
+            let z =
+                complex_l(
+                    re:
+                        real,
+                    im:
+                        imag
+                )
+            let r =
+                bs_clog_l(
+                    z
+                )
+            return
+                Complex(
+                    r
+                        .re,
+                    r
+                        .im
+                )
+        }
 
-    /// Complex sine: sin(a + ib)
-    @inlinable
-    var sin: Complex<Float80> {
-        let z = complex_l(re: real, im: imag)
-        let r = bs_csin_l(z)
-        return Complex(r.re, r.im)
-    }
+        /// Complex sine: sin(a + ib)
+        @inlinable
+        public var sin: Complex<Float80> {
+            let z =
+                complex_l(
+                    re:
+                        real,
+                    im:
+                        imag
+                )
+            let r =
+                bs_csin_l(
+                    z
+                )
+            return
+                Complex(
+                    r
+                        .re,
+                    r
+                        .im
+                )
+        }
 
-    /// Complex cosine: cos(a + ib)
-    @inlinable
-    var cos: Complex<Float80> {
-        let z = complex_l(re: real, im: imag)
-        let r = bs_ccos_l(z)
-        return Complex(r.re, r.im)
-    }
+        /// Complex cosine: cos(a + ib)
+        @inlinable
+        public var cos: Complex<Float80> {
+            let z =
+                complex_l(
+                    re:
+                        real,
+                    im:
+                        imag
+                )
+            let r =
+                bs_ccos_l(
+                    z
+                )
+            return
+                Complex(
+                    r
+                        .re,
+                    r
+                        .im
+                )
+        }
 
-    /// Complex tangent: tan(a + ib)
-    @inlinable
-    var tan: Complex<Float80> {
-        let z = complex_l(re: real, im: imag)
-        let r = bs_ctan_l(z)
-        return Complex(r.re, r.im)
-    }
+        /// Complex tangent: tan(a + ib)
+        @inlinable
+        public var tan: Complex<Float80> {
+            let z =
+                complex_l(
+                    re:
+                        real,
+                    im:
+                        imag
+                )
+            let r =
+                bs_ctan_l(
+                    z
+                )
+            return
+                Complex(
+                    r
+                        .re,
+                    r
+                        .im
+                )
+        }
 
-    /// Complex hyperbolic sine: sinh(a + ib)
-    @inlinable
-    var sinh: Complex<Float80> {
-        let z = complex_l(re: real, im: imag)
-        let r = bs_csinh_l(z)
-        return Complex(r.re, r.im)
-    }
+        /// Complex hyperbolic sine: sinh(a + ib)
+        @inlinable
+        public var sinh: Complex<Float80> {
+            let z =
+                complex_l(
+                    re:
+                        real,
+                    im:
+                        imag
+                )
+            let r =
+                bs_csinh_l(
+                    z
+                )
+            return
+                Complex(
+                    r
+                        .re,
+                    r
+                        .im
+                )
+        }
 
-    /// Complex hyperbolic cosine: cosh(a + ib)
-    @inlinable
-    var cosh: Complex<Float80> {
-        let z = complex_l(re: real, im: imag)
-        let r = bs_ccosh_l(z)
-        return Complex(r.re, r.im)
-    }
+        /// Complex hyperbolic cosine: cosh(a + ib)
+        @inlinable
+        public var cosh: Complex<Float80> {
+            let z =
+                complex_l(
+                    re:
+                        real,
+                    im:
+                        imag
+                )
+            let r =
+                bs_ccosh_l(
+                    z
+                )
+            return
+                Complex(
+                    r
+                        .re,
+                    r
+                        .im
+                )
+        }
 
-    /// Complex hyperbolic tangent: tanh(a + ib)
-    @inlinable
-    var tanh: Complex<Float80> {
-        let z = complex_l(re: real, im: imag)
-        let r = bs_ctanh_l(z)
-        return Complex(r.re, r.im)
-    }
+        /// Complex hyperbolic tangent: tanh(a + ib)
+        @inlinable
+        public var tanh: Complex<Float80> {
+            let z =
+                complex_l(
+                    re:
+                        real,
+                    im:
+                        imag
+                )
+            let r =
+                bs_ctanh_l(
+                    z
+                )
+            return
+                Complex(
+                    r
+                        .re,
+                    r
+                        .im
+                )
+        }
 
-    /// Complex arctangent: atan(a + ib)
-    @inlinable
-    var atan: Complex<Float80> {
-        let z = complex_l(re: real, im: imag)
-        let r = bs_catan_l(z)
-        return Complex(r.re, r.im)
+        /// Complex arctangent: atan(a + ib)
+        @inlinable
+        public var atan: Complex<Float80> {
+            let z =
+                complex_l(
+                    re:
+                        real,
+                    im:
+                        imag
+                )
+            let r =
+                bs_catan_l(
+                    z
+                )
+            return
+                Complex(
+                    r
+                        .re,
+                    r
+                        .im
+                )
+        }
     }
-}
 #endif
 
 // MARK: - Public typealiases for common precisions
@@ -693,6 +1115,5 @@ public extension Complex where T == Float80 {
 public typealias ComplexD = Complex<Double>
 public typealias ComplexF = Complex<Float>
 #if arch(x86_64)
-public typealias ComplexL = Complex<Float80>
+    public typealias ComplexL = Complex<Float80>
 #endif
-

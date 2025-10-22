@@ -56,7 +56,7 @@
 import CBoostBridge
 import Foundation
 
-public extension Distribution {
+extension Distribution {
     /// The Beta distribution on the unit interval [0, 1].
     ///
     /// Definition
@@ -84,7 +84,7 @@ public extension Distribution {
     ///
     /// Concurrency
     /// - Immutable and Sendable. Safe to share across tasks/threads.
-    struct Beta<T: BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
+    public struct Beta<T: BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
         /// The floating-point type used by this distribution.
         typealias Real = T
 
@@ -112,15 +112,27 @@ public extension Distribution {
         /// - The support is the closed interval [0, 1].
         /// - For extreme values of α or β, numerical stability is delegated to Boost.
         public init(alpha: T = 0, beta: T = 0) throws {
-            guard alpha > 0 else { throw DistributionError.invalidCombination(message: "alpha must be > 0") }
-            guard beta > 0 else { throw DistributionError.invalidCombination(message: "beta must be > 0") }
-            guard alpha.isFinite else { throw DistributionError.parameterNotFinite(name: "alpha") }
-            guard beta.isFinite else { throw DistributionError.parameterNotFinite(name: "beta") }
+            guard alpha > 0 else {
+                throw DistributionError.invalidCombination(message: "alpha must be > 0")
+            }
+            guard beta > 0 else {
+                throw DistributionError.invalidCombination(message: "beta must be > 0")
+            }
+            guard alpha.isFinite else {
+                throw DistributionError.parameterNotFinite(name: "alpha")
+            }
+            guard beta.isFinite else {
+                throw DistributionError.parameterNotFinite(name: "beta")
+            }
+
             self.alpha = alpha
             self.beta = beta
             self.dyn = try Distribution.Dynamic<T>(
                 distributionName: "beta",
-                parameters: ["alpha": alpha, "beta": beta]
+                parameters: [
+                    "alpha": alpha,
+                    "beta": beta,
+                ]
             )
         }
 
@@ -245,7 +257,7 @@ public extension Distribution {
         /// - Returns: The cumulative hazard at `x`.
         /// - Throws: DistributionError from the underlying implementation if evaluation fails.
         public func chf(_ x: T) throws -> T { try dyn.chf(x) }
-        
+
         // MARK: - Lattice metadata (not applicable)
 
         /// The lattice step size, if the distribution is lattice-supported.
@@ -279,25 +291,28 @@ public extension Distribution {
         public var entropy: T? {
             guard alpha > 0 else { return nil }
             guard beta > 0 else { return nil }
+
             do {
                 let logB1 = try SpecialFunctions.logGamma(self.alpha)
                 let logB2 = try SpecialFunctions.logGamma(self.beta)
                 let logAb2 = try SpecialFunctions.logGamma(self.alpha + self.beta)
                 let logB = logB1 + logB2 - logAb2
+
                 let dA = try SpecialFunctions.digamma(self.alpha)
                 let dB = try SpecialFunctions.digamma(self.beta)
                 let dAB = try SpecialFunctions.digamma(self.alpha + self.beta)
+
                 let term1 = -(self.alpha - 1.0) * dA
                 let term2 = term1 - (self.beta - 1.0) * dB
                 let term3 = term2 + (self.alpha + self.beta - 2.0) * dAB
+
                 let h = logB + term3
                 return h
-            }
-            catch {
+            } catch {
                 return nil
             }
         }
-        
+
         // MARK: - Parameter solvers (helpers)
 
         /// Computes α given a desired mean and variance of a Beta(α, β) distribution.
@@ -316,7 +331,7 @@ public extension Distribution {
         /// Warning:
         /// - No explicit validation is performed here; invalid combinations may yield nonsensical values.
         ///   Consider validating (mean, variance) against beta constraints before use.
-        public static func find_alpha( mean: T, variance: T) -> T {
+        public static func find_alpha(mean: T, variance: T) -> T {
             if T.self == Double.self {
                 return T(bs_beta_find_alpha_d(Double(mean), Double(variance)))
             }
@@ -329,7 +344,7 @@ public extension Distribution {
             return T(bs_beta_find_alpha_d(Double(mean), Double(variance)))
             #endif
         }
-        
+
         /// Computes β given a desired mean and variance of a Beta(α, β) distribution.
         ///
         /// See `find_alpha(mean:variance:)` for the relationships among mean, variance, and parameters.
@@ -341,7 +356,7 @@ public extension Distribution {
         ///
         /// Warning:
         /// - No explicit validation is performed here; invalid combinations may yield nonsensical values.
-        public static func find_beta( mean: T, variance: T) -> T {
+        public static func find_beta(mean: T, variance: T) -> T {
             if T.self == Double.self {
                 return T(bs_beta_find_beta_d(Double(mean), Double(variance)))
             }
@@ -354,8 +369,7 @@ public extension Distribution {
             return T(bs_beta_find_beta_d(Double(mean), Double(variance)))
             #endif
         }
-        
-        
+
         /// Solves for α given a fixed β, a point x ∈ [0, 1], and a target probability P(X ≤ x) = probability.
         ///
         /// This is a convenience wrapper around Boost-based numerical inversion routines.
@@ -368,7 +382,7 @@ public extension Distribution {
         ///
         /// Note:
         /// - Convergence and validity depend on the input combination; no explicit validation is performed here.
-        public static func find_alpha_from_beta( beta: T, x: T, probability: T) -> T {
+        public static func find_alpha_from_beta(beta: T, x: T, probability: T) -> T {
             if T.self == Double.self {
                 return T(bs_beta_find_alpha_from_beta_d(Double(beta), Double(x), Double(probability)))
             }
@@ -378,13 +392,7 @@ public extension Distribution {
             #if arch(x86_64) || arch(i386)
             return T(bs_beta_find_alpha_from_beta_l(Float80(beta), Float80(x), Float80(probability)))
             #else
-            return T(
-                bs_beta_find_alpha_from_beta_d(
-                    Double(beta),
-                    Double(x),
-                    Double(probability)
-                )
-            )
+            return T(bs_beta_find_alpha_from_beta_d(Double(beta), Double(x), Double(probability)))
             #endif
         }
 
@@ -400,7 +408,7 @@ public extension Distribution {
         ///
         /// Note:
         /// - Convergence and validity depend on the input combination; no explicit validation is performed here.
-        public static func find_beta_from_alpha( beta: T, x: T, probability: T) -> T {
+        public static func find_beta_from_alpha(beta: T, x: T, probability: T) -> T {
             if T.self == Double.self {
                 return T(bs_beta_find_beta_from_alpha_d(Double(beta), Double(x), Double(probability)))
             }
@@ -408,15 +416,9 @@ public extension Distribution {
                 return T(bs_beta_find_beta_from_alpha_f(Float(beta), Float(x), Float(probability)))
             }
             #if arch(x86_64) || arch(i386)
-            return T(bs_beta_find_alpha_from_beta_l(Float80(beta), Float80(x), Float80(probability)))
+            return T(bs_beta_find_beta_from_alpha_l(Float80(beta), Float80(x), Float80(probability)))
             #else
-            return T(
-                bs_beta_find_beta_from_alpha_d(
-                    Double(beta),
-                    Double(x),
-                    Double(probability)
-                )
-            )
+            return T(bs_beta_find_beta_from_alpha_d(Double(beta), Double(x), Double(probability)))
             #endif
         }
     }

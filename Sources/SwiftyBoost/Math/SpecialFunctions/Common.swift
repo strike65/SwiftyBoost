@@ -123,9 +123,9 @@ extension SpecialFunctions {
     @inlinable static func expm1<T: BinaryFloatingPoint>(_ x: T) throws -> T {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return T(bs_expm1(dx))
+        return T(bs_expm1_d(dx))
     }
-    
+
     /// Computes `log(1 + x)` with improved numerical stability near zero.
     ///
     /// - Parameter x: The input value; must satisfy `x > -1`.
@@ -137,7 +137,7 @@ extension SpecialFunctions {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dx > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: -1.0.nextUp, max: Double.infinity) }
-        return T(bs_log1p(dx))
+        return T(bs_log1p_d(dx))
     }
     
     /// Computes `log(1 + x) - x` with improved numerical stability near zero.
@@ -151,7 +151,7 @@ extension SpecialFunctions {
         let dx = D(x)
         guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
         guard dx > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: -1.0.nextUp, max: Double.infinity) }
-        return T(bs_log1pmx(dx))
+        return T(bs_log1pmx_d(dx))
     }
     
     /// Computes `x^y - 1` with improved stability for small results.
@@ -172,7 +172,7 @@ extension SpecialFunctions {
         guard !(dx < 0 && !yIsInteger) else {
             throw SpecialFunctionError.invalidCombination(message: "powm1 is undefined for negative base with non-integer exponent in the reals")
         }
-        return T(bs_powm1(dx, dy))
+        return T(bs_powm1_d(dx, dy))
     }
     
     /// Computes the real cube root `cbrt(x)`.
@@ -192,7 +192,7 @@ extension SpecialFunctions {
     /// - Returns: `sqrt(1 + x) - 1` as `T`.
     /// - Note: This overload does not throw and relies on the underlying Boost implementation.
     @inlinable static func sqrt1pm1<T: BinaryFloatingPoint>(x: T) -> T {
-        return T(bs_sqrt1pm1(Double(x)))
+        return T(bs_sqrt1pm1_d(Double(x)))
     }
     
     /// Computes the reciprocal square root `1 / sqrt(x)` in a numerically stable way
@@ -447,3 +447,4 @@ extension SpecialFunctions {
     }
 #endif
 }
+

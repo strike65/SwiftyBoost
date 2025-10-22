@@ -56,5 +56,5 @@
 #include "impl/bs_sin_cardinal.hxx"
 
 // Unified generic distribution vtable (runtime factory)
-#include "impl/bs_generic_distribution.hxx"
-#include "impl/bs_distribution_helpers.hxx"
+#include "impl/distributions/bs_generic_distribution.hxx"
+#include "impl/distributions/bs_distribution_helpers.hxx"

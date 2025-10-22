@@ -23,18 +23,7 @@
 
 import Foundation
 import SwiftyBoost
-//import CBoostBridge
+// import CBoostBridge
 
-let g = try Distribution.Gamma<Double>(shape: 3.0, scale: 0.5)
-let s = try Distribution.StudentT<Double>(degreesOfFreedom: 400.5)
-let f = try Distribution.FisherF(degreesOfFreedom1: 100, degreesOfFreedom2: 200)
-print("\(f.entropy)")
-print("\(g.kurtosis)")
-print("\(g.mean)")
-print("\(g.median)")
-print("\(g.mode)")
-print("\(g.range)")
-print("\(g.supportLowerBound)")
-print("\(g.supportUpperBound)")
-print("\(try s.cdf(1.0))")
-print("\(s.kurtosis!)")
+let b = try Distribution.Bernoulli(p: 1.5)
+print("\(b.kurtosis)")

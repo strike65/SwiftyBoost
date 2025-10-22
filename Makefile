@@ -6,6 +6,9 @@ DOC_ARCHIVE := $(DOCS_DIR)/$(SWIFT_TARGET).doccarchive
 SYMBOL_GRAPH_DIR := .build/symbol-graphs
 HOSTING_BASE_PATH ?= swiftyboost
 
+format:
+	swift format -i -r --configuration swift-format.json Sources/
+
 debug:
 	swift build
 

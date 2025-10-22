@@ -23,7 +23,7 @@
 import CBoostBridge
 import Foundation
 
-public extension Distribution {
+extension Distribution {
     /// Fisher–Snedecor F distribution.
     ///
     /// This distribution arises as the ratio of two scaled chi-square random variables
@@ -38,13 +38,14 @@ public extension Distribution {
     /// only defined for certain ranges of the degrees of freedom; when undefined
     /// or numerically non-finite in the underlying backend, optional properties
     /// such as `mean`, `variance`, `skewness`, and `kurtosis` will return `nil`.
-    struct FisherF<T: BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
+    public struct FisherF<T: BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
         typealias Real = T
 
         /// Numerator degrees of freedom (df1). Must be positive and finite.
         public let degreesOfFreedom1: T
         /// Denominator degrees of freedom (df2). Must be positive and finite.
         public let degreesOfFreedom2: T
+
         private let dyn: Distribution.Dynamic<T>
 
         /// Creates a Fisher–Snedecor F distribution with the given degrees of freedom.
@@ -58,15 +59,27 @@ public extension Distribution {
         ///   - `DistributionError.parameterNotFinite` if either degree of freedom is not finite.
         ///   - `DistributionError.parameterOutOfRange` if the underlying backend rejects the parameters.
         public init(degreesOfFreedom1 df1: T, degreesOfFreedom2 df2: T) throws {
-            guard df1 > 0 else { throw DistributionError.parameterNotPositive(name: "degreesOfFreedom1") }
-            guard df2 > 0 else { throw DistributionError.parameterNotPositive(name: "degreesOfFreedom2") }
-            guard df1.isFinite else { throw DistributionError.parameterNotFinite(name: "degreesOfFreedom1") }
-            guard df2.isFinite else { throw DistributionError.parameterNotFinite(name: "degreesOfFreedom2") }
+            guard df1 > 0 else {
+                throw DistributionError.parameterNotPositive(name: "degreesOfFreedom1")
+            }
+            guard df2 > 0 else {
+                throw DistributionError.parameterNotPositive(name: "degreesOfFreedom2")
+            }
+            guard df1.isFinite else {
+                throw DistributionError.parameterNotFinite(name: "degreesOfFreedom1")
+            }
+            guard df2.isFinite else {
+                throw DistributionError.parameterNotFinite(name: "degreesOfFreedom2")
+            }
+
             self.degreesOfFreedom1 = df1
             self.degreesOfFreedom2 = df2
             self.dyn = try Distribution.Dynamic<T>(
                 distributionName: "fisherf",
-                parameters: ["df1": df1, "df2": df2]
+                parameters: [
+                    "df1": df1,
+                    "df2": df2,
+                ]
             )
         }
 
@@ -178,7 +191,7 @@ public extension Distribution {
         /// - Returns: The cumulative hazard at `x`.
         /// - Throws: Propagates any backend errors encountered during evaluation.
         public func chf(_ x: T) throws -> T { try dyn.chf(x) }
-        
+
         // Lattice/discrete-only properties (continuous ⇒ nil)
 
         /// For continuous distributions, this is `nil`.
@@ -194,9 +207,11 @@ public extension Distribution {
         /// Returns `nil` if parameters are invalid or the special functions fail.
         public var entropy: T? {
             guard self.degreesOfFreedom1 > 0, self.degreesOfFreedom2 > 0 else { return nil }
+
             let a: T = self.degreesOfFreedom1 / T(2)
             let b: T = self.degreesOfFreedom2 / T(2)
             let s: T = self.degreesOfFreedom2 / self.degreesOfFreedom1
+
             do {
                 let lgA: T = try SpecialFunctions.logGamma(a)
                 let lgB: T = try SpecialFunctions.logGamma(b)
@@ -204,15 +219,21 @@ public extension Distribution {
                 let psiA: T = try SpecialFunctions.digamma(a)
                 let psiB: T = try SpecialFunctions.digamma(b)
                 let psiAB: T = try SpecialFunctions.digamma(a + b)
+
                 let lnB: T = lgA + lgB - lgAB
-                let hBP: T = lnB - (a - 1) * psiA - (b + 1) * psiB + (a + b) * psiAB
+                let hBP: T = lnB
+                    - (a - 1) * psiA
+                    - (b + 1) * psiB
+                    + (a + b) * psiAB
+
                 #if arch(x86_64) || arch(i386)
                 return hBP + T(log(Float80(s)))
                 #else
                 return hBP + T(log(Double(s)))
                 #endif
-            } catch { return nil }
+            } catch {
+                return nil
+            }
         }
-
     }
 }

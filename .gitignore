@@ -8,6 +8,7 @@ DerivedData/
 .netrc
 Docs/
 boostcl/
+DistTemplate.txt
 ## OS
 .DS_Store
 .AppleDouble

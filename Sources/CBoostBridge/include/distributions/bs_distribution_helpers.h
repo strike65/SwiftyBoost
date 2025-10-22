@@ -33,6 +33,9 @@ float bs_beta_find_beta_from_alpha_f(float alpha, float x, float probability);
 double bs_beta_find_beta_from_alpha_d(double alpha, double x, double probability);
 long double bs_beta_find_beta_from_alpha_l(long double alpha, long double x, long double probability);
 
+float bs_chisquare_find_degreesOfFreedom_f(float difference_from_variance, float alpha, float beta, float variance, float hint);
+double bs_chisquare_find_degreesOfFreedom_d(double difference_from_variance, double alpha, double beta, double variance, double hint);
+long double bs_chisquare_find_degreesOfFreedom_l(long double difference_from_variance, long double alpha, long double beta, long double variance, long double hint);
 #ifdef __cplusplus
 }
 #endif

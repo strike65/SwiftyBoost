@@ -9,17 +9,18 @@
 #include <boost/math/special_functions/rsqrt.hpp>
 #include "../internal/bs_internal.hpp"
 
+
 extern "C" {
 
 // Exponential integrals and related
 double bs_expint_Ei_d(double x)        { return bs_wrap<double>([&] { return boost::math::expint(x); }); }
 double bs_expint_En_d(int n, double x) { return bs_wrap<double>([&] { return boost::math::expint(n, x); }); }
-double bs_expm1(double x)            { return bs_wrap<double>([&] { return boost::math::expm1(x); }); }
-double bs_log1p(double x)            { return bs_wrap<double>([&] { return boost::math::log1p(x); }); }
-double bs_log1pmx(double x)          { return bs_wrap<double>([&] { return boost::math::log1pmx(x); }); }
-double bs_powm1(double x, double y)  { return bs_wrap<double>([&] { return boost::math::powm1(x, y); }); }
+double bs_expm1_d(double x)            { return bs_wrap<double>([&] { return boost::math::expm1(x); }); }
+double bs_log1p_d(double x)            { return bs_wrap<double>([&] { return boost::math::log1p(x); }); }
+double bs_log1pmx_d(double x)          { return bs_wrap<double>([&] { return boost::math::log1pmx(x); }); }
+double bs_powm1_d(double x, double y)  { return bs_wrap<double>([&] { return boost::math::powm1(x, y); }); }
 double bs_cbrt_d(double x)           { return bs_wrap<double>([&] { return boost::math::cbrt(x); }); }
-double bs_sqrt1pm1(double x)         { return bs_wrap<double>([&] { return boost::math::sqrt1pm1(x); }); }
+double bs_sqrt1pm1_d(double x)         { return bs_wrap<double>([&] { return boost::math::sqrt1pm1(x); }); }
 double bs_hypot_d(double x, double y)  { return bs_wrap<double>([&] { return boost::math::hypot(x, y); }); }
 double bs_rsqrt_d(const double x)      { return bs_wrap<double>([&] { return boost::math::rsqrt(x); }); }
 
@@ -44,6 +45,7 @@ long double bs_cbrt_l(long double x)               { return bs_wrap<long double>
 long double bs_sqrt1pm1_l(long double x)           { return bs_wrap<long double>([&] { return boost::math::sqrt1pm1(x); }); }
 long double bs_hypot_l(long double x, long double y)  { return bs_wrap<long double>([&] { return boost::math::hypot(x, y); }); }
 long double bs_rsqrt_l(const long double x)        { return bs_wrap<long double>([&] { return boost::math::rsqrt(x); }); }
+
 
 } // extern "C"
 

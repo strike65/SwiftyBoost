@@ -31,14 +31,15 @@ extern "C" {
 // Exponential integrals and related helpers
 double bs_expint_Ei_d(double x);
 double bs_expint_En_d(int n, double x);
-double bs_expm1(double x);
-double bs_log1p(double x);
-double bs_log1pmx(double x);
-double bs_powm1(double x, double y);
+double bs_expm1_d(double x);
+double bs_log1p_d(double x);
+double bs_log1pmx_d(double x);
+double bs_powm1_d(double x, double y);
 double bs_cbrt_d(double x);
-double bs_sqrt1pm1(double x);
+double bs_sqrt1pm1_d(double x);
 double bs_hypot_d(double x, double y);
 double bs_rsqrt_d(const double x);
+double bs_log_d(const double x);
 
 float bs_expint_Ei_f(float x);
 float bs_expint_En_f(int n, float x);
@@ -50,6 +51,7 @@ float bs_cbrt_f(float x);
 float bs_sqrt1pm1_f(float x);
 float bs_hypot_f(float x, float y);
 float bs_rsqrt_f(const float x);
+float bs_log_f(const float x);
 
 long double bs_expint_Ei_l(long double x);
 long double bs_expint_En_l(int n, long double x);
@@ -61,6 +63,7 @@ long double bs_cbrt_l(long double x);
 long double bs_sqrt1pm1_l(long double x);
 long double bs_hypot_l(long double x, long double y);
 long double bs_rsqrt_l(const long double x);
+long double bs_log_l(const long double x);
 
 #ifdef __cplusplus
 }
