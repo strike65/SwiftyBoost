@@ -23,12 +23,12 @@ let package = Package(
             publicHeadersPath: "include",
             cSettings: [
                 // Für C/ObjC-Header-Suche (falls nötig)
-                .headerSearchPath("../../extern/boost")
+                .headerSearchPath("../../extern/boost/include")
             ],
             cxxSettings: [
                 // Für C++-Header-Suche (Boost)
                 .unsafeFlags(["-xc++", "-std=c++20"]),
-                .headerSearchPath("../../extern/boost")
+                .headerSearchPath("../../extern/boost/include")
             ],
         ),
         .target(
