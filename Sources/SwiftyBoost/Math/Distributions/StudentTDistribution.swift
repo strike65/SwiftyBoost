@@ -96,7 +96,7 @@ extension Distribution {
             beta: T,
             sd: T,
             hint: T = 1
-        ) -> T {
+        ) -> Int {
             let res: T
             if T.self == Double.self {
                 res = T(
@@ -140,7 +140,7 @@ extension Distribution {
                     )))
 #endif
             }
-            return res + 1
+            return Int(res) + 1
         }
     }
 }

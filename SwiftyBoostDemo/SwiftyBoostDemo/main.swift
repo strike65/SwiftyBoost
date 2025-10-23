@@ -19,11 +19,11 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
-//  
+//
 
 import Foundation
 import SwiftyBoost
-internal import ComplexModule
+internal import Numerics
 // import CBoostBridge
 
 // Example pattern (instantiation + property access):
@@ -120,6 +120,92 @@ do {
     print("  hazard(0) = \(try t.hazard(0.0))  chf(0) = \(try t.chf(0.0))")
 } catch {
     print("StudentT error: \(error)")
+}
+
+// MARK: - Distribution static helpers
+
+do {
+    print("Distribution static functions:")
+    // StudentT.findDegreesOfFreedom
+    do {
+        print("  StudentT.findDegreesOfFreedom:")
+        let diffD: Double = 1.0
+        let alphaD: Double = 0.05
+        let betaD: Double = 0.2
+        let sdD: Double = 1.5
+        let hintD: Double = 2.0
+        let nuD = Distribution.StudentT<Double>.findDegreesOfFreedom(
+            differenceFromMean: diffD,
+            alpha: alphaD,
+            beta: betaD,
+            sd: sdD,
+            hint: hintD
+        )
+        print("    Double -> ν = \(nuD)")
+        
+        let diffF: Float = 0.8
+        let alphaF: Float = 0.05
+        let betaF: Float = 0.2
+        let sdF: Float = 1.25
+        let hintF: Float = 2.0
+        let nuF = Distribution.StudentT<Float>.findDegreesOfFreedom(
+            differenceFromMean: diffF,
+            alpha: alphaF,
+            beta: betaF,
+            sd: sdF,
+            hint: hintF
+        )
+        print("    Float -> ν = \(nuF)")
+        
+        #if arch(x86_64)
+        let diffL: Float80 = 0.9
+        let alphaL: Float80 = 0.05
+        let betaL: Float80 = 0.2
+        let sdL: Float80 = 1.1
+        let hintL: Float80 = 2.0
+        let nuL = Distribution.StudentT<Float80>.findDegreesOfFreedom(
+            differenceFromMean: diffL,
+            alpha: alphaL,
+            beta: betaL,
+            sd: sdL,
+            hint: hintL
+        )
+        print("    Float80 -> ν = \(nuL)")
+        #endif
+    }
+    
+    // ChiSquared.find_degreesOfFreedom
+    do {
+        print("  ChiSquared.find_degreesOfFreedom:")
+        let dfvD = Distribution.ChiSquared<Double>.find_degreesOfFreedom(
+            difference_from_variance: 0.1,
+            alpha: 0.05,
+            beta: 0.2,
+            variance: 4.0,
+            hint: 50.0
+        )
+        print("    Double -> ν = \(dfvD)")
+        
+        let dfvF = Distribution.ChiSquared<Float>.find_degreesOfFreedom(
+            difference_from_variance: 0.1,
+            alpha: 0.05,
+            beta: 0.2,
+            variance: 3.0,
+            hint: 25.0
+        )
+        print("    Float -> ν = \(dfvF)")
+        
+        #if arch(x86_64)
+        let dfvL = Distribution.ChiSquared<Float80>.find_degreesOfFreedom(
+            difference_from_variance: 0.05,
+            alpha: 0.05,
+            beta: 0.2,
+            variance: 5.0,
+            hint: 75.0
+        )
+        print("    Float80 -> ν = \(dfvL)")
+        #endif
+    }
 }
 
 // MARK: - Complex.swift API coverage

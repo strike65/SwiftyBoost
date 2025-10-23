@@ -160,38 +160,46 @@ extension Distribution {
 
         public static func findMinimumNumberOfTrials(successes s: Int,
                                                      proposedSuccessFraction p0: T,
-                                                     alpha: T) -> T {
-            guard p0 >= 0.0, p0 <= 1.0 else { return .nan }
+                                                     alpha: T) throws -> Int {
+            guard p0 >= 0.0, p0 <= 1.0 else {
+                throw DistributionError
+                    .parameterOutOfRange(name: "p0", min: 0, max: 1)
+            }
+            let res : Int
             if T.self == Double.self {
-                return T(bs_binomial_find_minimum_number_of_trials_d(Double(s), Double(p0), Double(alpha)))
+                res = Int(ceil(bs_binomial_find_minimum_number_of_trials_d(Double(s), Double(p0), Double(alpha))))
             }
             else if T.self == Float.self {
-                return T(bs_binomial_find_minimum_number_of_trials_f(Float(s), Float(p0), Float(alpha)))
+                res = Int(ceil(bs_binomial_find_minimum_number_of_trials_f(Float(s), Float(p0), Float(alpha))))
             }
             else {
                 #if arch(i386) || arch(x86_64)
-                return T(bs_binomial_find_minimum_number_of_trials_f(Float80(s), Float80(p0), Float80(alpha)))
+                res = Int(ceil(bs_binomial_find_minimum_number_of_trials_f(Float80(s), Float80(p0), Float80(alpha))))
                 #else
-                return T(bs_binomial_find_minimum_number_of_trials_d(Double(s), Double(p0), Double(alpha)))
+                res = Int(ceil(bs_binomial_find_minimum_number_of_trials_d(Double(s), Double(p0), Double(alpha))))
                 #endif
             }
+            return res
         }
 
         public static func findMaximumNumberOfTrials(successes s: Int,
                                                      proposedSuccessFraction p0: T,
-                                                     alpha: T) -> T {
-            guard p0 >= 0.0, p0 <= 1.0 else { return .nan }
+                                                     alpha: T) throws -> Int {
+            guard p0 >= 0.0, p0 <= 1.0 else {
+                throw DistributionError
+                    .parameterOutOfRange(name: "p0", min: 0, max: 1)
+            }
             if T.self == Double.self {
-                return T(bs_binomial_find_maximum_number_of_trials_d(Double(s), Double(p0), Double(alpha)))
+                return Int(floor(bs_binomial_find_maximum_number_of_trials_d(Double(s), Double(p0), Double(alpha))))
             }
             else if T.self == Float.self {
-                return T(bs_binomial_find_maximum_number_of_trials_f(Float(s), Float(p0), Float(alpha)))
+                return Int(floor(bs_binomial_find_maximum_number_of_trials_f(Float(s), Float(p0), Float(alpha))))
             }
             else {
                 #if arch(i386) || arch(x86_64)
-                return T(bs_binomial_find_maximum_number_of_trials_f(Float80(s), Float80(p0), Float80(alpha)))
+                return Int(floor(bs_binomial_find_maximum_number_of_trials_f(Float80(s), Float80(p0), Float80(alpha))))
                 #else
-                return T(bs_binomial_find_maximum_number_of_trials_d(Double(s), Double(p0), Double(alpha)))
+                return Int(floor(bs_binomial_find_maximum_number_of_trials_d(Double(s), Double(p0), Double(alpha))))
                 #endif
             }
         }

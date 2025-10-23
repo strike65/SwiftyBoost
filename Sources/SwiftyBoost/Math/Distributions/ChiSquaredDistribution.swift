@@ -261,9 +261,10 @@ extension Distribution {
             beta: T,
             variance: T,
             hint: T = 100
-        ) -> T {
+        ) -> Int {
+            let res: T
             if T.self == Double.self {
-                return T(
+                res = T(
                     bs_chisquare_find_degreesOfFreedom_d(
                         Double(difference_from_variance),
                         Double(alpha),
@@ -273,8 +274,8 @@ extension Distribution {
                     )
                 )
             }
-            if T.self == Float.self {
-                return T(
+            else if T.self == Float.self {
+                res = T(
                     bs_chisquare_find_degreesOfFreedom_f(
                         Float(difference_from_variance),
                         Float(alpha),
@@ -284,27 +285,30 @@ extension Distribution {
                     )
                 )
             }
-            #if arch(x86_64) || arch(i386)
-            return T(
-                bs_chisquare_find_degreesOfFreedom_l(
-                    Float80(difference_from_variance),
-                    Float80(alpha),
-                    Float80(beta),
-                    Float80(variance),
-                    Float80(hint)
+            else {
+#if arch(x86_64) || arch(i386)
+                res = T(
+                    bs_chisquare_find_degreesOfFreedom_l(
+                        Float80(difference_from_variance),
+                        Float80(alpha),
+                        Float80(beta),
+                        Float80(variance),
+                        Float80(hint)
+                    )
                 )
-            )
-            #else
-            return T(
-                bs_chisquare_find_degreesOfFreedom_d(
-                    Double(difference_from_variance),
-                    Double(alpha),
-                    Double(beta),
-                    Double(variance),
-                    Double(hint)
+#else
+                res = T(
+                    bs_chisquare_find_degreesOfFreedom_d(
+                        Double(difference_from_variance),
+                        Double(alpha),
+                        Double(beta),
+                        Double(variance),
+                        Double(hint)
+                    )
                 )
-            )
-            #endif
+#endif
+            }
+            return Int(res) + 1
         }
     }
 }
