@@ -509,14 +509,7 @@ bool bs_dist_make_d(const char* name, const bs_param_d* params, size_t count, bs
     } else if (n == "exponential" || n == "exponential_distribution" || n == "exp") {
         double lambda = 0, scale = 0;
         const char* lamKeys[] = { "lambda", "rate" };
-        const char* scKeys[] = { "scale", "theta" };
-        bool haveLambda = find_param(params, count, lamKeys, 2, &lambda);
-        bool haveScale = find_param(params, count, scKeys, 2, &scale);
-        if (!haveLambda) {
-            if (!haveScale) return false;
-            if (scale == 0) return false;
-            lambda = 1.0 / scale;
-        }
+        find_param(params, count, lamKeys, 2, &lambda);
         auto* h = new (std::nothrow) exponential_d_handle(lambda);
         if (!h) return false;
         out->ctx = h;

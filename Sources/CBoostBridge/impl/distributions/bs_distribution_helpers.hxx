@@ -10,12 +10,14 @@
 #include <boost/math/distributions/chi_squared.hpp>
 #include <boost/math/distributions/complement.hpp>
 #include <boost/math/distributions/binomial.hpp>
+#include <boost/math/distributions/geometric.hpp>
 
 using boost::math::students_t_distribution;
 using boost::math::beta_distribution;
 using boost::math::complement;
 using boost::math::chi_squared_distribution;
 using boost::math::binomial_distribution;
+using boost::math::geometric_distribution;
 
 extern "C" {
 
@@ -161,6 +163,57 @@ double bs_binomial_find_maximum_number_of_trials_d(double events, double success
 long double bs_binomial_find_maximum_number_of_trials_l(long double events, long double success_fraction, long double alpha) {
     return bs_wrap<long double>([&]{ return binomial_distribution<long double>::find_maximum_number_of_trials(events, success_fraction, alpha); });
 }
+
+// geometric
+
+float bs_geometric_find_lower_bound_on_p_f(float trials,
+                                          float alpha) {
+    return bs_wrap<float>([&]{ return geometric_distribution<float>::find_lower_bound_on_p(trials, alpha);});
+}
+
+double bs_geometric_find_lower_bound_on_p_d(double trials, double alpha) {
+    return bs_wrap<float>([&]{ return geometric_distribution<float>::find_lower_bound_on_p(trials, alpha);});
+}
+
+long double bs_geometric_find_lower_bound_on_p_l(long double trials, long double alpha) {
+    return bs_wrap<long double>([&]{ return geometric_distribution<long double>::find_lower_bound_on_p(trials, alpha);});
+}
+
+float bs_geometric_find_upper_bound_on_p_f(float trials,
+                                          float alpha) {
+    return bs_wrap<float>([&]{ return geometric_distribution<float>::find_upper_bound_on_p(trials, alpha);});
+}
+
+double bs_geometric_find_upper_bound_on_p_d(double trials, double alpha) {
+    return bs_wrap<float>([&]{ return geometric_distribution<float>::find_upper_bound_on_p(trials, alpha);});
+}
+
+long double bs_geometric_find_upper_bound_on_p_l(long double trials, long double alpha) {
+    return bs_wrap<long double>([&]{ return geometric_distribution<long double>::find_upper_bound_on_p(trials, alpha);});
+}
+
+
+float bs_geometric_find_minimum_number_of_trials_f(float failures, float success_fraction, float alpha) {
+    return bs_wrap<float>([&]{ return geometric_distribution<float>::find_minimum_number_of_trials(failures, success_fraction, alpha); });
+}
+
+double bs_geometric_find_minimum_number_of_trials_d(double failures, double success_fraction, double alpha){
+    return bs_wrap<double>([&]{ return geometric_distribution<double>::find_minimum_number_of_trials(failures, success_fraction, alpha); });
+}
+long double bs_geometric_find_minimum_number_of_trials_l(long double failures, long double success_fraction, long double alpha){
+    return bs_wrap<long double>([&]{ return geometric_distribution<long double>::find_minimum_number_of_trials(failures, success_fraction, alpha); });
+}
+float bs_geometric_find_maximum_number_of_trials_f(float failures, float success_fraction, float alpha) {
+    return bs_wrap<float>([&]{ return geometric_distribution<float>::find_maximum_number_of_trials(failures, success_fraction, alpha); });
+}
+
+double bs_geometric_find_maximum_number_of_trials_d(double failures, double success_fraction, double alpha){
+    return bs_wrap<double>([&]{ return geometric_distribution<double>::find_maximum_number_of_trials(failures, success_fraction, alpha); });
+}
+long double bs_geometric_find_maximum_number_of_trials_l(long double failures, long double success_fraction, long double alpha){
+    return bs_wrap<long double>([&]{ return geometric_distribution<long double>::find_maximum_number_of_trials(failures, success_fraction, alpha); });
+}
+
 
 
 

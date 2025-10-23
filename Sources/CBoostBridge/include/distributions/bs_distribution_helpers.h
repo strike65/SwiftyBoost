@@ -54,6 +54,22 @@ float bs_binomial_find_maximum_number_of_trials_f(float events, float success_fr
 double bs_binomial_find_maximum_number_of_trials_d(double events, double success_fraction, double alpha);
 long double bs_binomial_find_maximum_number_of_trials_l(long double events, long double success_fraction, long double alpha);
 
+float bs_geometric_find_lower_bound_on_p_f(float trials, float alpha);
+double bs_geometric_find_lower_bound_on_p_d(double trials, double alpha);
+long double bs_geometric_find_lower_bound_on_p_l(long double trials, long double alpha);
+
+float bs_geometric_find_upper_bound_on_p_f(float trials,float alpha);
+double bs_geometric_find_upper_bound_on_p_d(double trials, double alpha);
+long double bs_geometric_find_upper_bound_on_p_l(long double trials, long double alpha);
+
+float bs_geometric_find_minimum_number_of_trials_f(float failures, float success_fraction, float alpha);
+double bs_geometric_find_minimum_number_of_trials_d(double failures, double success_fraction, double alpha);
+long double bs_geometric_find_minimum_number_of_trials_l(long double failures, long double success_fraction, long double alpha);
+
+float bs_geometric_find_maximum_number_of_trials_f(float failures, float success_fraction, float alpha);
+double bs_geometric_find_maximum_number_of_trials_d(double failures, double success_fraction, double alpha);
+long double bs_geometric_find_maximum_number_of_trials_l(long double failures, long double success_fraction, long double alpha);
+
 
 
 #ifdef __cplusplus
