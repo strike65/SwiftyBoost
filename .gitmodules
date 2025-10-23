@@ -1,3 +1,0 @@
-[submodule "extern/boost"]
-	path = extern/boost
-	url = git@github.com:strike65/boost.git
