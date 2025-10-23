@@ -64,13 +64,13 @@ public extension SpecialFunctions {
     ///     // Handle invalid inputs
     /// }
     /// ```
-    @inlinable static func owensT<T: Real & BinaryFloatingPoint>(h: T, a: T) throws -> T {
+    @inlinable static func owensT<T: Real & BinaryFloatingPoint & Sendable>(h: T, a: T) throws -> T {
         // Convert to Double for the C backend. Keep a single conversion point to
         // minimize rounding steps.
         let dh = D(h), da = D(a)
         // Validate finiteness before calling into the C layer.
-        guard dh.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "h") }
-        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
+        guard dh.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "h", value: h) }
+        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
         // Delegate to Boost-backed implementation and convert back to T.
         return T(bs_owens_t_d(dh, da))
     }
@@ -103,8 +103,8 @@ public extension SpecialFunctions {
     /// let tf = try owensT(h: 0.5 as Float, a: 1.0 as Float)
     /// ```
     @inlinable static func owensT(h: Float, a: Float) throws -> Float {
-        guard h.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "h") }
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
+        guard h.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "h", value: h) }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
         return bs_owens_t_f(h, a)
     }
     
@@ -137,8 +137,8 @@ public extension SpecialFunctions {
     /// #endif
     /// ```
     @inlinable static func owensT(h: Float80, a: Float80) throws -> Float80 {
-        guard h.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "h") }
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
+        guard h.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "h", value: h) }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
         return bs_owens_t_l(h, a)
     }
 

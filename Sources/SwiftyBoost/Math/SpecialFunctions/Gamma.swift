@@ -58,11 +58,12 @@ public extension SpecialFunctions {
     ///     // Handle invalid inputs or poles
     /// }
     /// ```
-    @inlinable static func gamma<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func gamma<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) throws -> T {
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         if dx <= 0, dx == dx.rounded(.towardZero) {
-            throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x")
+            throw SpecialFunctionError
+                .poleAtNonPositiveInteger(name: "x", value: x)
         }
         return T(bs_tgamma_d(dx))
     }
@@ -107,11 +108,12 @@ public extension SpecialFunctions {
     ///     // Handle invalid inputs or poles
     /// }
     /// ```
-    @inlinable static func logGamma<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func logGamma<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) throws -> T {
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         if dx <= 0, dx == dx.rounded(.towardZero) {
-            throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x")
+            throw SpecialFunctionError
+                .poleAtNonPositiveInteger(name: "x", value: x)
         }
         return T(bs_lgamma_d(dx))
     }
@@ -155,12 +157,15 @@ public extension SpecialFunctions {
     ///
     /// References:
     /// - Boost.Math `tgamma_ratio`
-    @inlinable static func gammaRatio<T: Real & BinaryFloatingPoint>(_ a: T, _ b: T) throws -> T {
+    @inlinable static func gammaRatio<T: Real & BinaryFloatingPoint & Sendable>(_ a: T, _ b: T) throws -> T {
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        if a <= 0, a == a.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a", value: a) }
+        if b <= 0, b == b.rounded(.towardZero) {
+            throw SpecialFunctionError
+                .poleAtNonPositiveInteger(name: "b", value: b)
+        }
         let da = D(a), db = D(b)
-        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard db.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        if da <= 0, da == da.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a") }
-        if db <= 0, db == db.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "b") }
         return T(bs_tgamma_ratio_d(da, db))
     }
 
@@ -203,13 +208,13 @@ public extension SpecialFunctions {
     ///
     /// References:
     /// - Boost.Math `tgamma_delta_ratio`
-    @inlinable static func gammaDeltaRatio<T: Real & BinaryFloatingPoint>(_ a: T, delta: T) throws -> T {
-        let da = D(a), dd = D(delta)
-        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard dd.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "delta") }
-        let adb = da + dd
-        if da <= 0, da == da.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a") }
-        if adb <= 0, adb == adb.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a + delta") }
+    @inlinable static func gammaDeltaRatio<T: Real & BinaryFloatingPoint & Sendable>(_ a: T, delta d: T) throws -> T {
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard d.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "delta", value: d) }
+        if a <= 0, a == a.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a", value: a) }
+        let adb = a + d
+        if adb <= 0, adb == adb.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a + delta", value: adb) }
+        let da = D(a), dd = D(d)
         return T(bs_tgamma_delta_ratio_d(da, dd))
     }
 
@@ -245,17 +250,17 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "a"|"x")` if inputs are NaN or ±∞.
-    /// - `SpecialFunctionError.parameterNotPositive(name: "a")` if `a ≤ 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "a", value: a)` if `a ≤ 0`.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞)` if `x < 0`.
     ///
     /// SeeAlso:
     /// - ``SpecialFunctions/incompleteGammaUpper(_:x:)->T``
     /// - ``SpecialFunctions/regularizedGammaP(_:x:)->T`` and ``SpecialFunctions/regularizedGammaQ(_:x:)->T``
-    @inlinable static func incompleteGammaLower<T: Real & BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
+    @inlinable static func incompleteGammaLower<T: Real & BinaryFloatingPoint & Sendable>(_ a: T, x: T) throws -> T {
         let da = D(a), dx = D(x)
-        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
+        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
         guard dx >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
         return T(bs_tgamma_lower_d(da, dx))
     }
@@ -289,17 +294,17 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "a"|"x")` if inputs are NaN or ±∞.
-    /// - `SpecialFunctionError.parameterNotPositive(name: "a")` if `a ≤ 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "a", value: a)` if `a ≤ 0`.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞)` if `x < 0`.
     ///
     /// SeeAlso:
     /// - ``SpecialFunctions/incompleteGammaLower(_:x:)->T``
     /// - ``SpecialFunctions/regularizedGammaP(_:x:)->T`` and ``SpecialFunctions/regularizedGammaQ(_:x:)->T``
-    @inlinable static func incompleteGammaUpper<T: Real & BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
+    @inlinable static func incompleteGammaUpper<T: Real & BinaryFloatingPoint & Sendable>(_ a: T, x: T) throws -> T {
         let da = D(a), dx = D(x)
-        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
+        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
         guard dx >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
         return T(bs_tgamma_upper_d(da, dx))
     }
@@ -334,17 +339,17 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "a"|"x")` if inputs are NaN or ±∞.
-    /// - `SpecialFunctionError.parameterNotPositive(name: "a")` if `a ≤ 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "a", value: a)` if `a ≤ 0`.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞)` if `x < 0`.
     ///
     /// SeeAlso:
     /// - ``SpecialFunctions/regularizedGammaQ(_:x:)->T``
     /// - ``SpecialFunctions/regularizedGammaPInv(_:p:)->T``
-    @inlinable static func regularizedGammaP<T: Real & BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
+    @inlinable static func regularizedGammaP<T: Real & BinaryFloatingPoint & Sendable>(_ a: T, x: T) throws -> T {
         let da = D(a), dx = D(x)
-        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
+        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
         guard dx >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
         return T(bs_gamma_p_d(da, dx))
     }
@@ -378,17 +383,17 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "a"|"x")` if inputs are NaN or ±∞.
-    /// - `SpecialFunctionError.parameterNotPositive(name: "a")` if `a ≤ 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "a", value: a)` if `a ≤ 0`.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞)` if `x < 0`.
     ///
     /// SeeAlso:
     /// - ``SpecialFunctions/regularizedGammaP(_:x:)->T``
     /// - ``SpecialFunctions/regularizedGammaQInv(_:q:)->T``
-    @inlinable static func regularizedGammaQ<T: Real & BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
+    @inlinable static func regularizedGammaQ<T: Real & BinaryFloatingPoint & Sendable>(_ a: T, x: T) throws -> T {
         let da = D(a), dx = D(x)
-        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
+        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
         guard dx >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
         return T(bs_gamma_q_d(da, dx))
     }
@@ -416,16 +421,16 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "a"|"p")` if inputs are NaN or ±∞.
-    /// - `SpecialFunctionError.parameterNotPositive(name: "a")` if `a ≤ 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "a", value: a)` if `a ≤ 0`.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "p", min: 0, max: 1)` if `p ∉ [0, 1]`.
     ///
     /// SeeAlso:
     /// - ``SpecialFunctions/regularizedGammaP(_:x:)->T``
-    @inlinable static func regularizedGammaPInv<T: Real & BinaryFloatingPoint>(_ a: T, p: T) throws -> T {
+    @inlinable static func regularizedGammaPInv<T: Real & BinaryFloatingPoint & Sendable>(_ a: T, p: T) throws -> T {
         let da = D(a), dp = D(p)
-        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard dp.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p") }
-        guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
+        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard dp.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p", value: p) }
+        guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
         guard dp >= 0 && dp <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
         return T(bs_gamma_p_inv_d(da, dp))
     }
@@ -453,16 +458,16 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "a"|"q")` if inputs are NaN or ±∞.
-    /// - `SpecialFunctionError.parameterNotPositive(name: "a")` if `a ≤ 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "a", value: a)` if `a ≤ 0`.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "q", min: 0, max: 1)` if `q ∉ [0, 1]`.
     ///
     /// SeeAlso:
     /// - ``SpecialFunctions/regularizedGammaQ(_:x:)->T``
-    @inlinable static func regularizedGammaQInv<T: Real & BinaryFloatingPoint>(_ a: T, q: T) throws -> T {
+    @inlinable static func regularizedGammaQInv<T: Real & BinaryFloatingPoint & Sendable>(_ a: T, q: T) throws -> T {
         let da = D(a), dq = D(q)
-        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard dq.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "q") }
-        guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
+        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard dq.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "q", value: q) }
+        guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
         guard dq >= 0 && dq <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "q", min: 0.0, max: 1.0) }
         return T(bs_gamma_q_inv_d(da, dq))
     }
@@ -502,17 +507,17 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "a"|"x")` if inputs are NaN or ±∞.
-    /// - `SpecialFunctionError.parameterNotPositive(name: "a")` if `a ≤ 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "a", value: a)` if `a ≤ 0`.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞)` if `x < 0`.
     ///
     /// SeeAlso:
     /// - ``SpecialFunctions/regularizedGammaP(_:x:)->T``
     /// - ``SpecialFunctions/regularizedGammaQ(_:x:)->T``
-    @inlinable static func regularizedGammaPDerivative<T: Real & BinaryFloatingPoint>(_ a: T, x: T) throws -> T {
+    @inlinable static func regularizedGammaPDerivative<T: Real & BinaryFloatingPoint & Sendable>(_ a: T, x: T) throws -> T {
         let da = D(a), dx = D(x)
-        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
+        guard da.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard da > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
         guard dx >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
         return T(bs_gamma_p_derivative_d(da, dx))
     }
@@ -545,8 +550,8 @@ public extension SpecialFunctions {
     /// let value = try gamma(3.5 as Float)
     /// ```
     @inlinable static func gamma(_ x: Float) throws -> Float {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        if x <= 0, x == x.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        if x <= 0, x == x.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x", value: x) }
         return bs_tgamma_f(x)
     }
     
@@ -569,8 +574,8 @@ public extension SpecialFunctions {
     /// let value = try logGamma(10 as Float)
     /// ```
     @inlinable static func logGamma(_ x: Float) throws -> Float {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        if x <= 0, x == x.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        if x <= 0, x == x.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x", value: x) }
         return bs_lgamma_f(x)
     }
     
@@ -582,10 +587,10 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/gammaRatio(_:_:)->T`` for domain, behavior, and references.
     @inlinable static func gammaRatio(_ a: Float, _ b: Float) throws -> Float {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        if a <= 0, a == a.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a") }
-        if b <= 0, b == b.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "b") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        if a <= 0, a == a.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a", value: a) }
+        if b <= 0, b == b.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "b", value: b) }
         return bs_tgamma_ratio_f(a, b)
     }
     
@@ -596,11 +601,11 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/gammaDeltaRatio(_:delta:)->T`` for domain, behavior, and references.
     @inlinable static func gammaDeltaRatio(_ a: Float, delta: Float) throws -> Float {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard delta.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "delta") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard delta.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "delta", value: delta) }
         let adb = a + delta
-        if a <= 0, a == a.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a") }
-        if adb <= 0, adb == adb.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a + delta") }
+        if a <= 0, a == a.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a", value: a) }
+        if adb <= 0, adb == adb.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a + delta", value: adb) }
         return bs_tgamma_delta_ratio_f(a, delta)
     }
     
@@ -608,10 +613,10 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/incompleteGammaLower(_:x:)->T`` for definition, domain, and discussion.
     @inlinable static func incompleteGammaLower(_ a: Float, x: Float) throws -> Float {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Float.infinity) }
         return bs_tgamma_lower_f(a, x)
     }
     
@@ -619,10 +624,10 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/incompleteGammaUpper(_:x:)->T`` for definition, domain, and discussion.
     @inlinable static func incompleteGammaUpper(_ a: Float, x: Float) throws -> Float {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Float.infinity) }
         return bs_tgamma_upper_f(a, x)
     }
     
@@ -630,10 +635,10 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/regularizedGammaP(_:x:)->T`` for definition, domain, and discussion.
     @inlinable static func regularizedGammaP(_ a: Float, x: Float) throws -> Float {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Float.infinity) }
         return bs_gamma_p_f(a, x)
     }
     
@@ -641,10 +646,10 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/regularizedGammaQ(_:x:)->T`` for definition, domain, and discussion.
     @inlinable static func regularizedGammaQ(_ a: Float, x: Float) throws -> Float {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Float.infinity) }
         return bs_gamma_q_f(a, x)
     }
     
@@ -652,9 +657,9 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/regularizedGammaPInv(_:p:)->T`` for domain and discussion.
     @inlinable static func regularizedGammaPInv(_ a: Float, p: Float) throws -> Float {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p", value: p) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
         guard p >= 0 && p <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
         return bs_gamma_p_inv_f(a, p)
     }
@@ -663,9 +668,9 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/regularizedGammaQInv(_:q:)->T`` for domain and discussion.
     @inlinable static func regularizedGammaQInv(_ a: Float, q: Float) throws -> Float {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard q.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "q") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard q.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "q", value: q) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
         guard q >= 0 && q <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "q", min: 0.0, max: 1.0) }
         return bs_gamma_q_inv_f(a, q)
     }
@@ -674,10 +679,10 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/regularizedGammaPDerivative(_:x:)->T`` for definition, domain, and discussion.
     @inlinable static func regularizedGammaPDerivative(_ a: Float, x: Float) throws -> Float {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Float.infinity) }
         return bs_gamma_p_derivative_f(a, x)
     }
     
@@ -703,8 +708,12 @@ public extension SpecialFunctions {
     /// Availability:
     /// - Only on x86_64 architectures where `Float80` is available.
     @inlinable static func gamma(_ x: Float80) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        if x <= 0, x == x.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        if x <= 0, x == x
+            .rounded(.towardZero) {
+            throw SpecialFunctionError
+                .poleAtNonPositiveInteger(name: "x", value: x)
+        }
         return bs_tgamma_l(x)
     }
 
@@ -727,8 +736,12 @@ public extension SpecialFunctions {
     /// Availability:
     /// - Only on x86_64 architectures where `Float80` is available.
     @inlinable static func logGamma(_ x: Float80) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        if x <= 0, x == x.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        if x <= 0, x == x
+            .rounded(.towardZero) {
+            throw SpecialFunctionError
+                .poleAtNonPositiveInteger(name: "x", value: x)
+        }
         return bs_lgamma_l(x)
     }
 
@@ -738,10 +751,18 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/gammaRatio(_:_: )`` for discussion of domain and motivation.
     @inlinable static func gammaRatio(_ a: Float80, _ b: Float80) throws -> Float80 {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        if a <= 0, a == a.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a") }
-        if b <= 0, b == b.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "b") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        if a <= 0, a == a
+            .rounded(.towardZero) {
+            throw SpecialFunctionError
+                .poleAtNonPositiveInteger(name: "a", value: a)
+        }
+        if b <= 0, b == b
+            .rounded(.towardZero) {
+            throw SpecialFunctionError
+                .poleAtNonPositiveInteger(name: "b", value: b)
+        }
         return bs_tgamma_ratio_l(a, b)
     }
 
@@ -755,11 +776,19 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/gammaDeltaRatio(_:delta:)`` for discussion of domain and motivation.
     @inlinable static func gammaDeltaRatio(_ a: Float80, delta: Float80) throws -> Float80 {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard delta.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "delta") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard delta.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "delta", value: delta) }
         let adb = a + delta
-        if a <= 0, a == a.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a") }
-        if adb <= 0, adb == adb.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "a + delta") }
+        if a <= 0, a == a
+            .rounded(.towardZero) {
+            throw SpecialFunctionError
+                .poleAtNonPositiveInteger(name: "a", value: a)
+        }
+        if adb <= 0, adb == adb
+            .rounded(.towardZero) {
+            throw SpecialFunctionError
+                .poleAtNonPositiveInteger(name: "a + delta", value: adb)
+        }
         return bs_tgamma_delta_ratio_l(a, delta)
     }
 
@@ -773,10 +802,10 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/incompleteGammaLower(_:x:)`` for definition, domain, and discussion.
     @inlinable static func incompleteGammaLower(_ a: Float80, x: Float80) throws -> Float80 {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Float80.infinity) }
         return bs_tgamma_lower_l(a, x)
     }
 
@@ -790,10 +819,10 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/incompleteGammaUpper(_:x:)`` for definition, domain, and discussion.
     @inlinable static func incompleteGammaUpper(_ a: Float80, x: Float80) throws -> Float80 {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Float80.infinity) }
         return bs_tgamma_upper_l(a, x)
     }
 
@@ -807,10 +836,10 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/regularizedGammaP(_:x:)`` for definition, domain, and discussion.
     @inlinable static func regularizedGammaP(_ a: Float80, x: Float80) throws -> Float80 {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Float80.infinity) }
         return bs_gamma_p_l(a, x)
     }
 
@@ -824,10 +853,10 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/regularizedGammaQ(_:x:)`` for definition, domain, and discussion.
     @inlinable static func regularizedGammaQ(_ a: Float80, x: Float80) throws -> Float80 {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Float80.infinity) }
         return bs_gamma_q_l(a, x)
     }
 
@@ -841,9 +870,9 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/regularizedGammaPInv(_:p:)`` for domain and discussion.
     @inlinable static func regularizedGammaPInv(_ a: Float80, p: Float80) throws -> Float80 {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p", value: p) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
         guard p >= 0 && p <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
         return bs_gamma_p_inv_l(a, p)
     }
@@ -858,9 +887,9 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/regularizedGammaQInv(_:q:)`` for domain and discussion.
     @inlinable static func regularizedGammaQInv(_ a: Float80, q: Float80) throws -> Float80 {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard q.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "q") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard q.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "q", value: q) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
         guard q >= 0 && q <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "q", min: 0.0, max: 1.0) }
         return bs_gamma_q_inv_l(a, q)
     }
@@ -875,9 +904,9 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/regularizedGammaPDerivative(_:x:)`` for definition, domain, and discussion.
     @inlinable static func regularizedGammaPDerivative(_ a: Float80, x: Float80) throws -> Float80 {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
         guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
         return bs_gamma_p_derivative_l(a, x)
     }

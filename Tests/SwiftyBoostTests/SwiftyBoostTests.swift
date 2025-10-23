@@ -22,7 +22,7 @@ struct FactorialAndCombinatoricsTests {
     @Test("factorial Double throws past 170")
     func factorialDoubleOverflow() {
         let n = SpecialFunctions.maxFactorialInputDouble + 1
-        #expect(throws: SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(SpecialFunctions.maxFactorialInputDouble))) {
+        #expect(throws: SpecialFunctionError<Double>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(SpecialFunctions.maxFactorialInputDouble))) {
             _ = try SpecialFunctions.factorial(n)
         }
     }
@@ -40,7 +40,7 @@ struct FactorialAndCombinatoricsTests {
     @Test("factorial Float throws past 34")
     func factorialFloatOverflow() {
         let n = SpecialFunctions.maxFactorialInputFloat + 1
-        #expect(throws: SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(SpecialFunctions.maxFactorialInputFloat))) {
+        #expect(throws: SpecialFunctionError<Float>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(SpecialFunctions.maxFactorialInputFloat))) {
             _ = try SpecialFunctions.factorial_f(n)
         }
     }
@@ -81,7 +81,7 @@ struct FactorialAndCombinatoricsTests {
     @Test("factorial Float80 throws past 1754")
     func factorialFloat80Overflow() {
         let n = SpecialFunctions.maxFactorialInputFloat80 + 1
-        #expect(throws: SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(SpecialFunctions.maxFactorialInputFloat80))) {
+        #expect(throws: SpecialFunctionError<Float80>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(SpecialFunctions.maxFactorialInputFloat80))) {
             _ = try SpecialFunctions.factorial_l(n)
         }
     }
@@ -293,7 +293,7 @@ struct GammaAndRelatedTests {
             #expect(got == expected, "Γ mismatch at x=\(x)")
         }
         for x in [0.0, -1.0, -2.0] {
-            #expect(throws: SpecialFunctionError.poleAtNonPositiveInteger(name: "x")) {
+            #expect(throws: SpecialFunctionError<Double>.poleAtNonPositiveInteger(name: "x", value: x)) {
                 _ = try SpecialFunctions.gamma(x)
             }
         }
@@ -391,10 +391,11 @@ struct BesselAndLegendreTests {
             #expect(try SpecialFunctions.modifiedBesselI(v: v, x: x) == bs_cyl_bessel_i_d(v, x))
         }
         for x in xs {
-            #expect(throws: SpecialFunctionError.parameterNotPositive(name: "x")) {
-                _ = try SpecialFunctions.besselY(v: v, x: -abs(x))
+            let negativeX = -abs(x)
+            #expect(throws: SpecialFunctionError<Double>.parameterNotPositive(name: "x", value: negativeX)) {
+                _ = try SpecialFunctions.besselY(v: v, x: negativeX)
             }
-            #expect(throws: SpecialFunctionError.parameterNotPositive(name: "x")) {
+            #expect(throws: SpecialFunctionError<Double>.parameterNotPositive(name: "x", value: 0.0)) {
                 _ = try SpecialFunctions.modifiedBesselK(v: v, x: 0.0)
             }
             #expect(try SpecialFunctions.besselY(v: v, x: x) == bs_cyl_neumann_d(v, x))
@@ -417,10 +418,10 @@ struct BesselAndLegendreTests {
                 }
             }
         }
-        #expect(throws: SpecialFunctionError.parameterNotPositive(name: "n")) {
+        #expect(throws: SpecialFunctionError<Double>.parameterNotPositive(name: "n", value: -1)) {
             _ = try SpecialFunctions.legendreP(-1, 0.1 as Double)
         }
-        #expect(throws: SpecialFunctionError.parameterOutOfRange(name: "m", min: Double(-3), max: Double(3))) {
+        #expect(throws: SpecialFunctionError<Double>.parameterOutOfRange(name: "m", min: -3, max: 3)) {
             _ = try SpecialFunctions.associatedLegendreP(3, 4, 0.1 as Double)
         }
     }
@@ -442,7 +443,7 @@ struct EllipticAndLambertWTests {
                 #expect(try SpecialFunctions.incompleteEllipticIntegralF(k, phi: phi) == bs_ellint_1(k, phi))
                 #expect(try SpecialFunctions.incompleteEllipticIntegralE(k, phi: phi) == bs_ellint_2(k, phi))
             }
-            #expect(throws: SpecialFunctionError.parameterOutOfRange(name: "k", min: -1, max: 1)) {
+            #expect(throws: SpecialFunctionError<Double>.parameterOutOfRange(name: "k", min: -1, max: 1)) {
                 _ = try SpecialFunctions.completeEllipticIntegralK(1.1)
             }
         }
@@ -493,8 +494,7 @@ struct EllipticAndLambertWTests {
 
     @Test
     func lambertW_Double() throws {
-        let e = bs_const_e_d()
-        let minX = -1.0 / e
+        let minX: Double = -Constants.oneDivE()
         let xs0: [Double] = [minX, -0.2, 0.0, 0.5, 2.0]
         for x in xs0 {
             if x >= minX {
@@ -506,7 +506,7 @@ struct EllipticAndLambertWTests {
             if x >= minX && x < 0 {
                 #expect(try SpecialFunctions.lambertWm1(x) == bs_lambert_wm1(x))
             } else {
-                #expect(throws: SpecialFunctionError.parameterOutOfRange(name: "x", min: minX, max: 0.0)) {
+                #expect(throws: SpecialFunctionError<Double>.parameterOutOfRange(name: "x", min: minX, max: 0.0)) {
                     _ = try SpecialFunctions.lambertWm1(x)
                 }
             }
@@ -518,7 +518,7 @@ struct EllipticAndLambertWTests {
         do {
             _ = try SpecialFunctions.lambertW0(minX - 1e-6)
             #expect(Bool(false), "lambertW0 should throw for x < -1/e")
-        } catch let e as SpecialFunctionError {
+        } catch let e as SpecialFunctionError<Double> {
             switch e {
             case .parameterOutOfRange(let name, let min, let max):
                 #expect(name == "x")
@@ -535,7 +535,7 @@ struct EllipticAndLambertWTests {
         do {
             _ = try SpecialFunctions.lambertWm1(0.1)
             #expect(Bool(false), "lambertWm1 should throw for x >= 0")
-        } catch let e as SpecialFunctionError {
+        } catch let e as SpecialFunctionError<Double> {
             switch e {
             case .parameterOutOfRange(let name, let min, let max):
                 #expect(name == "x")
@@ -572,7 +572,7 @@ struct ExponentialIntegralsAndErrorFunctionTests {
                 #expect(try SpecialFunctions.exponentialIntegralEn(n, x) == bs_expint_En_d(Int32(n), x))
             }
         }
-        #expect(throws: SpecialFunctionError.parameterNotPositive(name: "n")) {
+        #expect(throws: SpecialFunctionError<Double>.parameterNotPositive(name: "n", value: -1)) {
             _ = try SpecialFunctions.exponentialIntegralEn(-1, 1.0 as Double)
         }
     }
@@ -600,10 +600,10 @@ struct DigammaPolygammaZetaTests {
             #expect(try SpecialFunctions.trigamma(x) == bs_trigamma_d(x))
         }
         for x in [0.0, -1.0, -2.0] {
-            #expect(throws: SpecialFunctionError.poleAtNonPositiveInteger(name: "x")) {
+            #expect(throws: SpecialFunctionError<Double>.poleAtNonPositiveInteger(name: "x", value: x)) {
                 _ = try SpecialFunctions.digamma(x)
             }
-            #expect(throws: SpecialFunctionError.poleAtNonPositiveInteger(name: "x")) {
+            #expect(throws: SpecialFunctionError<Double>.poleAtNonPositiveInteger(name: "x", value: x)) {
                 _ = try SpecialFunctions.trigamma(x)
             }
         }
@@ -617,7 +617,7 @@ struct DigammaPolygammaZetaTests {
                 #expect(try SpecialFunctions.polygamma(order: n, x) == bs_polygamma_d(Int32(n), x))
             }
         }
-        #expect(throws: SpecialFunctionError.parameterNotPositive(name: "order")) {
+        #expect(throws: SpecialFunctionError<Double>.parameterNotPositive(name: "order", value: -1)) {
             _ = try SpecialFunctions.polygamma(order: -1, 1.0 as Double)
         }
     }
@@ -628,7 +628,7 @@ struct DigammaPolygammaZetaTests {
         for x in xs where x != 1.0 {
             #expect(try SpecialFunctions.riemannZeta(x) == bs_riemann_zeta_d(x))
         }
-        #expect(throws: SpecialFunctionError.invalidCombination(message: "riemannZeta has a pole at x = 1")) {
+        #expect(throws: SpecialFunctionError.invalidCombination(message: "riemannZeta has a pole at x = 1", value: 1.0)) {
             _ = try SpecialFunctions.riemannZeta(1.0 as Double)
         }
     }
@@ -702,10 +702,10 @@ struct CommonHelpersTests {
                 #expect(try SpecialFunctions.log1p(x) == bs_log1p_d(x))
                 #expect(try SpecialFunctions.log1pmx(x) == bs_log1pmx_d(x))
             } else {
-                #expect(throws: SpecialFunctionError.parameterOutOfRange(name: "x", min: -1.0.nextUp, max: Double.infinity)) {
+                #expect(throws: SpecialFunctionError<Double>.parameterOutOfRange(name: "x", min: -1.0.nextUp, max: Double.infinity)) {
                     _ = try SpecialFunctions.log1p(x)
                 }
-                #expect(throws: SpecialFunctionError.parameterOutOfRange(name: "x", min: -1.0.nextUp, max: Double.infinity)) {
+                #expect(throws: SpecialFunctionError<Double>.parameterOutOfRange(name: "x", min: -1.0.nextUp, max: Double.infinity)) {
                     _ = try SpecialFunctions.log1pmx(x)
                 }
             }
@@ -719,7 +719,7 @@ struct CommonHelpersTests {
         for (x, y) in cases {
             #expect(try SpecialFunctions.powm1(x, y) == bs_powm1_d(x, y))
         }
-        #expect(throws: SpecialFunctionError.invalidCombination(message: "powm1 is undefined for negative base with non-integer exponent in the reals")) {
+        #expect(throws: SpecialFunctionError.invalidCombination(message: "powm1 is undefined for negative base with non-integer exponent in the reals", value: -2.0)) {
             _ = try SpecialFunctions.powm1(-2.0 as Double, 0.5 as Double)
         }
     }

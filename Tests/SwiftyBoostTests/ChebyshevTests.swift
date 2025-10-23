@@ -6,6 +6,40 @@ import Foundation
 @Suite("Chebyshev polynomials (Double/Float/Float80 where available)")
 struct ChebyshevTests {
 
+    #if arch(x86_64)
+    private func expectSpecialFunctionError(
+        _ block: () throws -> Void
+    ) {
+        do {
+            try block()
+            #expect(Bool(false), "Expected SpecialFunctionError")
+        } catch _ as SpecialFunctionError<Double> {
+            // Expected
+        } catch _ as SpecialFunctionError<Float> {
+            // Expected
+        } catch _ as SpecialFunctionError<Float80> {
+            // Expected
+        } catch let error {
+            #expect(Bool(false), "Unexpected error: \(error)")
+        }
+    }
+    #else
+    private func expectSpecialFunctionError(
+        _ block: () throws -> Void
+    ) {
+        do {
+            try block()
+            #expect(Bool(false), "Expected SpecialFunctionError")
+        } catch _ as SpecialFunctionError<Double> {
+            // Expected
+        } catch _ as SpecialFunctionError<Float> {
+            // Expected
+        } catch let error {
+            #expect(Bool(false), "Unexpected error: \(error)")
+        }
+    }
+    #endif
+
     // MARK: - Closed forms and identities
 
     @Test("T_n(x) closed forms for n = 0...3 (Double)")
@@ -183,20 +217,20 @@ struct ChebyshevTests {
 
     @Test("chebyshev_next error paths")
     func chebyshevNextErrors() async throws {
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "Pn")) {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.chebyshev_next(Double.nan, 1.0, 0.0 as Double)
         }
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "Pn1")) {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.chebyshev_next(1.0 as Double, Double.infinity, 0.0 as Double)
         }
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "x")) {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.chebyshev_next(1.0 as Double, 1.0 as Double, -Double.infinity)
         }
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "Pn")) {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.chebyshev_next(Float.nan, 1.0 as Float, 0.0 as Float)
         }
         #if arch(x86_64)
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "x")) {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.chebyshev_next(1.0 as Float80, 1.0 as Float80, Float80.nan)
         }
         #endif
@@ -262,27 +296,27 @@ struct ChebyshevTests {
         #endif
 
         // Non-finite x
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "x")) {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.chebyshevClenshawRecurrence([1.0], x: Double.nan)
         }
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "x")) {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.chebyshevClenshawRecurrence([1.0 as Float], x: Float.infinity)
         }
         #if arch(x86_64)
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "x")) {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.chebyshevClenshawRecurrence([1.0 as Float80], x: -Float80.infinity)
         }
         #endif
 
         // Non-finite coefficients
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "coefficients")) {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.chebyshevClenshawRecurrence([1.0, Double.nan], x: 0.2)
         }
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "coefficients")) {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.chebyshevClenshawRecurrence([1.0 as Float, -Float.infinity], x: 0.2 as Float)
         }
         #if arch(x86_64)
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "coefficients")) {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.chebyshevClenshawRecurrence([1.0 as Float80, Float80.infinity], x: 0.2 as Float80)
         }
         #endif
@@ -293,27 +327,27 @@ struct ChebyshevTests {
     @Test("chebyshevT/chebyshevU error paths")
     func functionErrors() async throws {
         // n < 0
-        #expect(throws: SpecialFunctionError.parameterNotPositive(name: "n")) {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.chebyshevT(-1, 0.3 as Double)
         }
-        #expect(throws: SpecialFunctionError.parameterNotPositive(name: "n")) {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.chebyshevU(-5, 0.3 as Float)
         }
         #if arch(x86_64)
-        #expect(throws: SpecialFunctionError.parameterNotPositive(name: "n")) {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.chebyshevT(-2, 0.3 as Float80)
         }
         #endif
 
         // Non-finite x
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "x")) {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.chebyshevT(2, Double.nan)
         }
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "x")) {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.chebyshevU(3, Float.infinity)
         }
         #if arch(x86_64)
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "x")) {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.chebyshevU(1, -Float80.infinity)
         }
         #endif

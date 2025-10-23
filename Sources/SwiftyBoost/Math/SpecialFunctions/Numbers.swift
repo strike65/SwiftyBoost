@@ -70,7 +70,7 @@ public extension SpecialFunctions {
     /// - let b0: Double = SpecialFunctions.bernoulli_b2n(0)   // 1.0
     /// - let b1: Float  = SpecialFunctions.bernoulli_b2n(1)   // ≈ 0.16666667
     /// - let b2 = SpecialFunctions.bernoulli_b2n(2) as Double // -1/30
-    @inlinable static func bernoulli_b2n<T: Real & BinaryFloatingPoint>(_ n: Int32) -> T {
+    @inlinable static func bernoulli_b2n<T: Real & BinaryFloatingPoint & Sendable>(_ n: Int32) -> T {
         return T(bs_bernoulli_b2n(Int32(n)))
     }
 
@@ -145,7 +145,7 @@ public extension SpecialFunctions {
     ///
     /// Complexity:
     /// - Delegated to Boost.Math; consult its documentation for complexity and range behavior.
-    @inlinable static func tangent_t2n<T: Real & BinaryFloatingPoint>(_ n: Int32) -> T {
+    @inlinable static func tangent_t2n<T: Real & BinaryFloatingPoint & Sendable>(_ n: Int32) -> T {
         return T(bs_tangent_t2n(Int32(n)))
     }
 
@@ -287,7 +287,7 @@ public extension SpecialFunctions {
     /// - prime(1) → 2
     /// - prime(5) → 11
     @inlinable static func prime(_ n: UInt32) throws -> UInt32 {
-        guard n < 10000 else {throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: 10000)}
+        guard n < 10000 else {throw SpecialFunctionError<Double>.parameterExceedsMaximumIntegerValue(name: "n", max: 10000)}
         return bs_prime(n)
     }
     

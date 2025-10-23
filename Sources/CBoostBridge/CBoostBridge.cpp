@@ -33,7 +33,6 @@
 #include "impl/bs_beta.hxx"
 #include "impl/bs_cardinal_b_splines.hxx"
 #include "impl/bs_chebyshev.hxx"
-#include "impl/bs_constants.hxx"
 #include "impl/bs_digamma_polygamma_zeta.hxx"
 #include "impl/bs_elliptic_carlson_forms.hxx"
 #include "impl/bs_elliptic_legendre_forms.hxx"

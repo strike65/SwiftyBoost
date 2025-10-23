@@ -47,14 +47,14 @@ internal protocol DistributionProtocol {
     /// The lower bound of the distribution's support (domain where the distribution is defined).
     ///
     /// Depending on the distribution, the lower bound may be finite or infinite (represented
-    /// by `-infinity` if supported by `Real`). Whether the bound is inclusive or exclusive
+    /// by `-infinity` if supported by [Real](https://github.com/apple/swift-numerics)). Whether the bound is inclusive or exclusive
     /// is distribution-specific and should be documented by the conforming type.
     var supportLowerBound: RealType { get }
 
     /// The upper bound of the distribution's support (domain where the distribution is defined).
     ///
     /// Depending on the distribution, the upper bound may be finite or infinite (represented
-    /// by `+infinity` if supported by `Real`). Whether the bound is inclusive or exclusive
+    /// by `+infinity` if supported by [Real](https://github.com/apple/swift-numerics)). Whether the bound is inclusive or exclusive
     /// is distribution-specific and should be documented by the conforming type.
     var supportUpperBound: RealType { get }
 

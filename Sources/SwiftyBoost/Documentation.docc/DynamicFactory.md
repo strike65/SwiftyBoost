@@ -48,7 +48,7 @@ let chi2 = try Distribution.Dynamic<Double>(
   distributionName: "chisquared",
   parameters: ["df": 8.0]
 )
-let sf = try chi2.sf(12.0)
+let chiSF = try chi2.sf(12.0)
 
 // Bernoulli
 let bern = try Distribution.Dynamic<Double>(
@@ -57,12 +57,40 @@ let bern = try Distribution.Dynamic<Double>(
 )
 let pmf = try bern.pdf(1)
 
+// Binomial
+let bin = try Distribution.Dynamic<Double>(
+  distributionName: "binomial",
+  parameters: ["n": 12.0, "p": 0.35]
+)
+let countCdf = try bin.cdf(4.0)
+
 // Arcsine (aliases: arcsine_distribution)
 let a = try Distribution.Dynamic<Float>(
   distributionName: "arcsine",
   parameters: ["minX": 0, "maxX": 1]
 )
 let c = try a.cdf(0.25)
+
+// Continuous location-scale family (Cauchy, includes alias set)
+let cauchy = try Distribution.Dynamic<Double>(
+  distributionName: "cauchy",
+  parameters: ["loc": 0.25, "scale": 1.5]
+)
+let median = cauchy.median
+
+// Exponential (aliases: exponential_distribution, exp)
+let exp = try Distribution.Dynamic<Double>(
+  distributionName: "exp",
+  parameters: ["rate": 1.2]
+)
+let tail = try exp.sf(2.0)
+
+// Gumbel / Extreme Value
+let gumbel = try Distribution.Dynamic<Double>(
+  distributionName: "gumbel",
+  parameters: ["loc": 1.0, "scale": 0.75]
+)
+let peak = gumbel.mode
 ```
 
 ## Supported Names and Aliases
@@ -79,8 +107,24 @@ let c = try a.cdf(0.25)
   - Params: `df1|d1|m|degreesOfFreedom1` (required), `df2|d2|n|degreesOfFreedom2` (required)
 - Bernoulli: `bernoulli`, `bernoulli_distribution`
   - Params: `p|prob|probability|success|theta` (required)
+- Binomial: `binomial`, `binomial_distribution`
+  - Params: `n|trials` (required, interpreted as the trial count), `p|prob|probability|success` (required)
+- Cauchy: `cauchy`, `cauchy_distribution`
+  - Params: `location|loc|mu|median|x0` (optional, defaults to 0), `scale|gamma|sigma|b` (required, > 0)
+- Exponential: `exponential`, `exponential_distribution`, `exp`
+  - Params: `lambda|rate` (required, > 0)
+- Extreme value (Gumbel): `extremevalue`, `extreme_value`, `gumbel`, `extreme_value_distribution`
+  - Params: `location|loc|mu` (optional, defaults to 0), `scale|gamma|sigma|b` (required, > 0)
+- Geometric: `geometric`, `geometric_distribution`
+  - Params: `p|prob|probability|success|theta` (required)
+- Holtsmark: `holtsmark`, `holtsmark_distribution`
+  - Params: `location|loc|mu|median|x0` (optional, defaults to 0), `scale|gamma|sigma|b` (required, > 0)
 - Arcsine: `arcsine`, `arcsine_distribution`
   - Params: `minX|min|a|lower` (required), `maxX|max|b|upper` (required)
+
+### Additional Notes
+
+- ``Distribution/Geometric`` and ``Distribution/Holtsmark`` both reuse the factory under the hood; the dynamic entries remain valuable for configuration-driven scenarios that need to swap distributions at runtime.
 
 ## Nullability and Initialization
 
@@ -90,7 +134,7 @@ let c = try a.cdf(0.25)
 
 ## Errors
 
-- Unknown name or missing required parameters → the Swift initializer throws ``DistributionError/invalidCombination(message:)``.
+- Unknown name or missing required parameters → the Swift initializer throws ``DistributionError/invalidCombination(message:value:)`` and, when available, populates ``value`` with the problematic argument.
 - Domain violations and numerical errors are mapped to IEEE‑754 values by the bridge; Swift then exposes them as `nil` for optional metrics or returns numeric values for queries.
 
 ## Extensibility

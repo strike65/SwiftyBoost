@@ -28,30 +28,30 @@ import SwiftyBoostPrelude
 ///
 /// You can pattern match on the associated values (e.g., parameter name or
 /// min/max bounds) to build user-facing diagnostics.
-public enum SpecialFunctionError: Error & Equatable {
+public enum SpecialFunctionError<T: Real & BinaryFloatingPoint & Sendable>: Error & Equatable {
     /// Parameter must be strictly positive (e.g., `n >= 0`).
     ///
     /// - Parameter name: The name of the offending parameter.
-    case parameterNotPositive(name: String)
+    case parameterNotPositive(name: String, value: T)
     /// Parameter is outside the valid range [min, max].
     ///
     /// - Parameters:
     ///   - name: The name of the offending parameter.
     ///   - min: The inclusive lower bound.
     ///   - max: The inclusive upper bound.
-    case parameterOutOfRange(name: String, min: Double, max: Double)
+    case parameterOutOfRange(name: String, min: T, max: T)
     /// Parameter is not finite (NaN or ±∞).
     ///
     /// - Parameter name: The name of the offending parameter.
-    case parameterNotFinite(name: String)
+    case parameterNotFinite(name: String, value: T)
     /// A simple pole occurs at a non-positive integer for this function (e.g., Γ(x)).
     ///
     /// - Parameter name: The name of the offending parameter.
-    case poleAtNonPositiveInteger(name: String)
+    case poleAtNonPositiveInteger(name: String, value: T)
     /// Inputs form an invalid combination for the real-valued function.
     ///
     /// - Parameter message: A human-readable explanation of the invalid combination.
-    case invalidCombination(message: String)
+    case invalidCombination(message: String, value: T)
     /// Parameter is greater than the maximum allowed integer value.
     ///
     /// - Parameters:
@@ -68,22 +68,22 @@ public enum SpecialFunctionError: Error & Equatable {
 ///
 /// You can pattern match on the associated values (e.g., parameter name or
 /// min/max bounds) to build user-facing diagnostics.
-public enum DistributionError: Error & Equatable {
+public enum DistributionError<T: Real & BinaryFloatingPoint & Sendable>: Error & Equatable {
     /// Parameter must be strictly positive (e.g., `n >= 0`).
     ///
     /// - Parameter name: The name of the offending parameter.
-    case parameterNotPositive(name: String)
+    case parameterNotPositive(name: String, value: T)
     /// Parameter is outside the valid range [min, max].
     ///
     /// - Parameters:
     ///   - name: The name of the offending parameter.
     ///   - min: The inclusive lower bound.
     ///   - max: The inclusive upper bound.
-    case parameterOutOfRange(name: String, min: Double, max: Double)
+    case parameterOutOfRange(name: String, min: T, max: T)
     /// Parameter is not finite (NaN or ±∞).
     ///
     /// - Parameter name: The name of the offending parameter.
-    case parameterNotFinite(name: String)
+    case parameterNotFinite(name: String, value: T)
     /// A simple pole occurs at a non-positive integer for this function (e.g., Γ(x)).
     ///
     /// - Parameter name: The name of the offending parameter.
@@ -91,7 +91,7 @@ public enum DistributionError: Error & Equatable {
     /// Inputs form an invalid combination for the real-valued function.
     ///
     /// - Parameter message: A human-readable explanation of the invalid combination.
-    case invalidCombination(message: String)
+    case invalidCombination(message: String, value: T?)
     /// Parameter is greater than the maximum allowed integer value.
     ///
     /// - Parameters:
@@ -110,7 +110,7 @@ public enum DistributionError: Error & Equatable {
 ///
 /// - Parameter x: A `BinaryFloatingPoint` value.
 /// - Returns: `x` converted to `Double`.
-@usableFromInline internal func D<T: Real & BinaryFloatingPoint>(_ x: T) -> Double { Double(x) }
+@usableFromInline internal func D<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) -> Double { Double(x) }
 
 // MARK: - Numerically stable helpers
 extension SpecialFunctions {
@@ -120,9 +120,9 @@ extension SpecialFunctions {
     /// - Parameter x: The exponent.
     /// - Returns: `exp(x) - 1` as `T`.
     /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
-    @inlinable static func expm1<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func expm1<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) throws -> T {
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_expm1_d(dx))
     }
 
@@ -133,9 +133,9 @@ extension SpecialFunctions {
     /// - Throws:
     ///   - `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
     ///   - `SpecialFunctionError.parameterOutOfRange` if `x <= -1`.
-    @inlinable static func log1p<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func log1p<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) throws -> T {
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         guard dx > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: -1.0.nextUp, max: Double.infinity) }
         return T(bs_log1p_d(dx))
     }
@@ -147,9 +147,9 @@ extension SpecialFunctions {
     /// - Throws:
     ///   - `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
     ///   - `SpecialFunctionError.parameterOutOfRange` if `x <= -1`.
-    @inlinable static func log1pmx<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func log1pmx<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) throws -> T {
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         guard dx > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: -1.0.nextUp, max: Double.infinity) }
         return T(bs_log1pmx_d(dx))
     }
@@ -164,13 +164,13 @@ extension SpecialFunctions {
     ///   - `SpecialFunctionError.parameterNotFinite` if `x` or `y` is not finite.
     ///   - `SpecialFunctionError.invalidCombination` if `x < 0` and `y` is non-integer
     ///     (undefined in the reals).
-    @inlinable static func powm1<T: Real & BinaryFloatingPoint>(_ x: T, _ y: T) throws -> T {
+    @inlinable static func powm1<T: Real & BinaryFloatingPoint & Sendable>(_ x: T, _ y: T) throws -> T {
         let dx = D(x), dy = D(y)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard dy.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard dy.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y", value: y) }
         let yIsInteger = dy == dy.rounded(.towardZero)
         guard !(dx < 0 && !yIsInteger) else {
-            throw SpecialFunctionError.invalidCombination(message: "powm1 is undefined for negative base with non-integer exponent in the reals")
+            throw SpecialFunctionError.invalidCombination(message: "powm1 is undefined for negative base with non-integer exponent in the reals", value: x)
         }
         return T(bs_powm1_d(dx, dy))
     }
@@ -180,9 +180,9 @@ extension SpecialFunctions {
     /// - Parameter x: The input value.
     /// - Returns: The real cube root of `x` as `T`.
     /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
-    @inlinable static func cbrt<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func cbrt<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) throws -> T {
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_cbrt_d(dx))
     }
     
@@ -191,7 +191,7 @@ extension SpecialFunctions {
     /// - Parameter x: The input value.
     /// - Returns: `sqrt(1 + x) - 1` as `T`.
     /// - Note: This overload does not throw and relies on the underlying Boost implementation.
-    @inlinable static func sqrt1pm1<T: Real & BinaryFloatingPoint>(x: T) -> T {
+    @inlinable static func sqrt1pm1<T: Real & BinaryFloatingPoint & Sendable>(x: T) -> T {
         return T(bs_sqrt1pm1_d(Double(x)))
     }
     
@@ -203,9 +203,9 @@ extension SpecialFunctions {
     /// - Throws:
     ///   - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     ///   - `SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞)` if `x < 0`.
-    @inlinable static func rsqrt<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func rsqrt<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) throws -> T {
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         guard dx >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
         return T(bs_rsqrt_d(dx))
     }
@@ -222,7 +222,7 @@ extension SpecialFunctions {
     /// - Returns: `exp(x) - 1` as `Float`.
     /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
     @inlinable static func expm1(_ x: Float) throws -> Float {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_expm1_f(x)
     }
     
@@ -234,8 +234,8 @@ extension SpecialFunctions {
     ///   - `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
     ///   - `SpecialFunctionError.parameterOutOfRange` if `x <= -1`.
     @inlinable static func log1p(_ x: Float) throws -> Float {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard x > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: Double(Float(-1).nextUp), max: Double.infinity) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard x > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: Float(-1).nextUp, max: Float.infinity) }
         return bs_log1p_f(x)
     }
     
@@ -247,8 +247,8 @@ extension SpecialFunctions {
     ///   - `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
     ///   - `SpecialFunctionError.parameterOutOfRange` if `x <= -1`.
     @inlinable static func log1pmx(_ x: Float) throws -> Float {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard x > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: Double(Float(-1).nextUp), max: Double.infinity) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard x > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: Float(-1).nextUp, max: Float.infinity) }
         return bs_log1pmx_f(x)
     }
     
@@ -262,11 +262,11 @@ extension SpecialFunctions {
     ///   - `SpecialFunctionError.parameterNotFinite` if `x` or `y` is not finite.
     ///   - `SpecialFunctionError.invalidCombination` if `x < 0` and `y` is non-integer.
     @inlinable static func powm1(_ x: Float, _ y: Float) throws -> Float {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard y.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard y.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y", value: y) }
         let yIsInteger = y == y.rounded(.towardZero)
         guard !(x < 0 && !yIsInteger) else {
-            throw SpecialFunctionError.invalidCombination(message: "powm1 is undefined for negative base with non-integer exponent in the reals")
+            throw SpecialFunctionError.invalidCombination(message: "powm1 is undefined for negative base with non-integer exponent in the reals", value: x)
         }
         return bs_powm1_f(x, y)
     }
@@ -277,7 +277,7 @@ extension SpecialFunctions {
     /// - Returns: The real cube root of `x` as `Float`.
     /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
     @inlinable static func cbrt(_ x: Float) throws -> Float {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_cbrt_f(x)
     }
     
@@ -289,8 +289,8 @@ extension SpecialFunctions {
     ///   - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     ///   - `SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞)` if `x < 0`.
     @inlinable static func rsqrt(_ x: Float) throws -> Float {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Float.infinity) }
         return bs_rsqrt_f(x)
     }
     
@@ -304,7 +304,7 @@ extension SpecialFunctions {
     /// - Returns: `exp(x) - 1` as `Float80`.
     /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
     @inlinable static func expm1(_ x: Float80) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_expm1_l(x)
     }
     
@@ -316,7 +316,7 @@ extension SpecialFunctions {
     ///   - `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
     ///   - `SpecialFunctionError.parameterOutOfRange` if `x <= -1`.
     @inlinable static func log1p(_ x: Float80) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         guard x > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: Double(-1).nextUp, max: Double.infinity) }
         return bs_log1p_l(x)
     }
@@ -329,7 +329,7 @@ extension SpecialFunctions {
     ///   - `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
     ///   - `SpecialFunctionError.parameterOutOfRange` if `x <= -1`.
     @inlinable static func log1pmx(_ x: Float80) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         guard x > -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: Double(-1).nextUp, max: Double.infinity) }
         return bs_log1pmx_l(x)
     }
@@ -344,11 +344,11 @@ extension SpecialFunctions {
     ///   - `SpecialFunctionError.parameterNotFinite` if `x` or `y` is not finite.
     ///   - `SpecialFunctionError.invalidCombination` if `x < 0` and `y` is non-integer.
     @inlinable static func powm1(_ x: Float80, _ y: Float80) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard y.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard y.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "y", value: y) }
         let yIsInteger = y == y.rounded(.towardZero)
         guard !(x < 0 && !yIsInteger) else {
-            throw SpecialFunctionError.invalidCombination(message: "powm1 is undefined for negative base with non-integer exponent in the reals")
+            throw SpecialFunctionError.invalidCombination(message: "powm1 is undefined for negative base with non-integer exponent in the reals", value: x)
         }
         return bs_powm1_l(x, y)
     }
@@ -359,7 +359,7 @@ extension SpecialFunctions {
     /// - Returns: The real cube root of `x` as `Float80`.
     /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
     @inlinable static func cbrt(_ x: Float80) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_cbrt_l(x)
     }
     
@@ -371,7 +371,7 @@ extension SpecialFunctions {
     ///   - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     ///   - `SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞)` if `x < 0`.
     @inlinable static func rsqrt(_ x: Float80) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
         return bs_rsqrt_l(x)
     }
@@ -384,9 +384,9 @@ extension SpecialFunctions {
     /// - Parameter x: The input value.
     /// - Returns: `sin(πx)` as `T`.
     /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
-    @inlinable static func sinPi<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func sinPi<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) throws -> T {
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_sin_pi_d(dx))
     }
     
@@ -395,9 +395,9 @@ extension SpecialFunctions {
     /// - Parameter x: The input value.
     /// - Returns: `cos(πx)` as `T`.
     /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
-    @inlinable static func cosPi<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func cosPi<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) throws -> T {
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_cos_pi_d(dx))
     }
     
@@ -409,7 +409,7 @@ extension SpecialFunctions {
     /// - Returns: `sin(πx)` as `Float`.
     /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
     @inlinable static func sinPi(_ x: Float) throws -> Float {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_sin_pi_f(x)
     }
     
@@ -419,7 +419,7 @@ extension SpecialFunctions {
     /// - Returns: `cos(πx)` as `Float`.
     /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
     @inlinable static func cosPi(_ x: Float) throws -> Float {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_cos_pi_f(x)
     }
     
@@ -432,7 +432,7 @@ extension SpecialFunctions {
     /// - Returns: `sin(πx)` as `Float80`.
     /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
     @inlinable static func sinPi(_ x: Float80) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_sin_pi_l(x)
     }
     
@@ -442,7 +442,7 @@ extension SpecialFunctions {
     /// - Returns: `cos(πx)` as `Float80`.
     /// - Throws: `SpecialFunctionError.parameterNotFinite` if `x` is not finite.
     @inlinable static func cosPi(_ x: Float80) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_cos_pi_l(x)
     }
 #endif

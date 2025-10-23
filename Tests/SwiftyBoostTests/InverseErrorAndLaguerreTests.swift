@@ -49,50 +49,110 @@ struct InverseErrorFunctionTests {
 
     @Test("Domain errors for inverseErrorFunction (Double)")
     func domainErrorsDouble() async throws {
-        // Non-finite
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "z")) {
-            _ = try SpecialFunctions.inverseErrorFunction(Double.nan)
+        func expectNotFinite(_ z: Double) {
+            do {
+                _ = try SpecialFunctions.inverseErrorFunction(z)
+                #expect(Bool(false), "Expected parameterNotFinite for z=\(z)")
+            } catch let error as SpecialFunctionError<Double> {
+                switch error {
+                case let .parameterNotFinite(name: actualName, value):
+                    #expect(actualName == "z")
+                    #expect(value.isNaN || value.isInfinite)
+                default:
+                    #expect(Bool(false), "Unexpected error: \(error)")
+                }
+            } catch {
+                #expect(Bool(false), "Unexpected error type: \(error)")
+            }
         }
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "z")) {
-            _ = try SpecialFunctions.inverseErrorFunction(Double.infinity)
+        expectNotFinite(.nan)
+        expectNotFinite(.infinity)
+        expectNotFinite(-.infinity)
+
+        func expectOutOfRange(_ z: Double) {
+            do {
+                _ = try SpecialFunctions.inverseErrorFunction(z)
+                #expect(Bool(false), "Expected parameterOutOfRange for z=\(z)")
+            } catch let error as SpecialFunctionError<Double> {
+                switch error {
+                case let .parameterOutOfRange(name: actualName, min: minValue, max: maxValue):
+                    #expect(actualName == "z")
+                    #expect(abs(minValue - (-1.0).nextUp) <= 1e-12)
+                    #expect(abs(maxValue - (1.0).nextDown) <= 1e-12)
+                default:
+                    #expect(Bool(false), "Unexpected error: \(error)")
+                }
+            } catch {
+                #expect(Bool(false), "Unexpected error type: \(error)")
+            }
         }
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "z")) {
-            _ = try SpecialFunctions.inverseErrorFunction(-Double.infinity)
-        }
-        // |z| >= 1
-        #expect(throws: SpecialFunctionError.parameterOutOfRange(name: "z", min: (-1.0).nextUp, max: (1.0).nextDown)) {
-            _ = try SpecialFunctions.inverseErrorFunction(1.0)
-        }
-        #expect(throws: SpecialFunctionError.parameterOutOfRange(name: "z", min: (-1.0).nextUp, max: (1.0).nextDown)) {
-            _ = try SpecialFunctions.inverseErrorFunction(-1.0)
-        }
-        #expect(throws: SpecialFunctionError.parameterOutOfRange(name: "z", min: (-1.0).nextUp, max: (1.0).nextDown)) {
-            _ = try SpecialFunctions.inverseErrorFunction(1.0000001)
-        }
-        #expect(throws: SpecialFunctionError.parameterOutOfRange(name: "z", min: (-1.0).nextUp, max: (1.0).nextDown)) {
-            _ = try SpecialFunctions.inverseErrorFunction(-1.0000001)
-        }
+
+        expectOutOfRange(1.0)
+        expectOutOfRange(-1.0)
+        expectOutOfRange(1.0000001)
+        expectOutOfRange(-1.0000001)
     }
 
     @Test("Domain errors for inverseErrorFunction (Float)")
     func domainErrorsFloat() async throws {
-        // Non-finite
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "z")) {
-            _ = try SpecialFunctions.inverseErrorFunction(Float.nan)
+        func expectNotFinite(_ z: Float) {
+            do {
+                _ = try SpecialFunctions.inverseErrorFunction(z)
+                #expect(Bool(false), "Expected parameterNotFinite for z=\(z)")
+            } catch let error as SpecialFunctionError<Float> {
+                switch error {
+                case let .parameterNotFinite(name: actualName, value):
+                    #expect(actualName == "z")
+                    #expect(value.isNaN || value.isInfinite)
+                default:
+                    #expect(Bool(false), "Unexpected error: \(error)")
+                }
+            } catch let error as SpecialFunctionError<Double> {
+                switch error {
+                case let .parameterNotFinite(name: actualName, value):
+                    #expect(actualName == "z")
+                    #expect(value.isNaN || value.isInfinite)
+                default:
+                    #expect(Bool(false), "Unexpected error: \(error)")
+                }
+            } catch {
+                #expect(Bool(false), "Unexpected error type: \(error)")
+            }
         }
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "z")) {
-            _ = try SpecialFunctions.inverseErrorFunction(Float.infinity)
+
+        expectNotFinite(.nan)
+        expectNotFinite(.infinity)
+        expectNotFinite(-.infinity)
+
+        func expectOutOfRange(_ z: Float) {
+            do {
+                _ = try SpecialFunctions.inverseErrorFunction(z)
+                #expect(Bool(false), "Expected parameterOutOfRange for z=\(z)")
+            } catch let error as SpecialFunctionError<Float> {
+                switch error {
+                case let .parameterOutOfRange(name: actualName, min: minValue, max: maxValue):
+                    #expect(actualName == "z")
+                    #expect(abs(Double(minValue) - Double(Float(-1).nextUp)) <= 1e-6)
+                    #expect(abs(Double(maxValue) - Double(Float(1).nextDown)) <= 1e-6)
+                default:
+                    #expect(Bool(false), "Unexpected error: \(error)")
+                }
+            } catch let error as SpecialFunctionError<Double> {
+                switch error {
+                case let .parameterOutOfRange(name: actualName, min: minValue, max: maxValue):
+                    #expect(actualName == "z")
+                    #expect(abs(minValue - Double(Float(-1).nextUp)) <= 1e-6)
+                    #expect(abs(maxValue - Double(Float(1).nextDown)) <= 1e-6)
+                default:
+                    #expect(Bool(false), "Unexpected error: \(error)")
+                }
+            } catch {
+                #expect(Bool(false), "Unexpected error type: \(error)")
+            }
         }
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "z")) {
-            _ = try SpecialFunctions.inverseErrorFunction(-Float.infinity)
-        }
-        // |z| >= 1
-        #expect(throws: SpecialFunctionError.parameterOutOfRange(name: "z", min: Double(Float(-1).nextUp), max: Double(Float(1).nextDown))) {
-            _ = try SpecialFunctions.inverseErrorFunction(Float(1))
-        }
-        #expect(throws: SpecialFunctionError.parameterOutOfRange(name: "z", min: Double(Float(-1).nextUp), max: Double(Float(1).nextDown))) {
-            _ = try SpecialFunctions.inverseErrorFunction(Float(-1))
-        }
+
+        expectOutOfRange(1)
+        expectOutOfRange(-1)
     }
 }
 
@@ -207,53 +267,140 @@ struct LaguerreTests {
     @Test("Laguerre error paths (Double)")
     func laguerreErrorsDouble() async throws {
         // n < 0
-        #expect(throws: SpecialFunctionError.parameterNotPositive(name: "n")) {
-            _ = try SpecialFunctions.laguerre(-1, 0.5 as Double)
+        func expectNotPositive(name expectedName: String, value expected: Double, block: () throws -> Void) {
+            do {
+                _ = try block()
+                #expect(Bool(false), "Expected parameterNotPositive")
+            } catch let error as SpecialFunctionError<Double> {
+                if case let .parameterNotPositive(name: actualName, value) = error {
+                    #expect(actualName == expectedName)
+                    #expect(abs(Double(value) - expected) <= 1e-12)
+                } else {
+                    #expect(Bool(false), "Unexpected error: \(error)")
+                }
+            } catch {
+                #expect(Bool(false), "Unexpected error type: \(error)")
+            }
         }
-        // m < 0
-        #expect(throws: SpecialFunctionError.parameterNotPositive(name: "m")) {
-            _ = try SpecialFunctions.assocLaguerre(2, -3, 1.0 as Double)
+
+        expectNotPositive(name: "n", value: -1) { let _ = try SpecialFunctions.laguerre(-1, 0.5 as Double) }
+        expectNotPositive(name: "m", value: -3) { let _ = try SpecialFunctions.assocLaguerre(2, -3, 1.0 as Double) }
+
+        func expectNotFinite(_ block: () throws -> Void) {
+            do {
+                _ = try block()
+                #expect(Bool(false), "Expected parameterNotFinite")
+            } catch let error as SpecialFunctionError<Double> {
+                if case let .parameterNotFinite(name: actualName, value) = error {
+                    #expect(actualName == "x")
+                    #expect(value.isNaN || value.isInfinite)
+                } else {
+                    #expect(Bool(false), "Unexpected error: \(error)")
+                }
+            } catch {
+                #expect(Bool(false), "Unexpected error type: \(error)")
+            }
         }
-        // non-finite x
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "x")) {
-            _ = try SpecialFunctions.laguerre(1, Double.nan)
-        }
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "x")) {
-            _ = try SpecialFunctions.assocLaguerre(1, 1, Double.infinity)
-        }
+
+        expectNotFinite { let _ = try SpecialFunctions.laguerre(1, Double.nan) }
+        expectNotFinite { let _ = try SpecialFunctions.assocLaguerre(1, 1, Double.infinity) }
     }
 
     @Test("Laguerre error paths (Float)")
     func laguerreErrorsFloat() async throws {
-        #expect(throws: SpecialFunctionError.parameterNotPositive(name: "n")) {
-            _ = try SpecialFunctions.laguerre(-1, 0.5 as Float)
+        func expectNotPositive(name expectedName: String, expected: Float, block: () throws -> Void) {
+            do {
+                _ = try block()
+                #expect(Bool(false), "Expected parameterNotPositive")
+            } catch let error as SpecialFunctionError<Float> {
+                if case let .parameterNotPositive(name: actualName, value) = error {
+                    #expect(actualName == expectedName)
+                    #expect(abs(Double(value) - Double(expected)) <= 1e-6)
+                } else {
+                    #expect(Bool(false), "Unexpected error: \(error)")
+                }
+            } catch let error as SpecialFunctionError<Double> {
+                if case let .parameterNotPositive(name: actualName, value) = error {
+                    #expect(actualName == expectedName)
+                    #expect(abs(value - Double(expected)) <= 1e-6)
+                } else {
+                    #expect(Bool(false), "Unexpected error: \(error)")
+                }
+            } catch {
+                #expect(Bool(false), "Unexpected error type: \(error)")
+            }
         }
-        #expect(throws: SpecialFunctionError.parameterNotPositive(name: "m")) {
-            _ = try SpecialFunctions.assocLaguerre(2, -3, 1.0 as Float)
+
+        expectNotPositive(name: "n", expected: -1) {let _ =  try SpecialFunctions.laguerre(-1, 0.5 as Float) }
+        expectNotPositive(name: "m", expected: -3) { let _ = try SpecialFunctions.assocLaguerre(2, -3, 1.0 as Float) }
+
+        func expectNotFinite(_ block: () throws -> Void) {
+            do {
+                _ = try block()
+                #expect(Bool(false), "Expected parameterNotFinite")
+            } catch let error as SpecialFunctionError<Float> {
+                if case let .parameterNotFinite(name: actualName, value) = error {
+                    #expect(actualName == "x")
+                    #expect(value.isNaN || value.isInfinite)
+                } else {
+                    #expect(Bool(false), "Unexpected error: \(error)")
+                }
+            } catch let error as SpecialFunctionError<Double> {
+                if case let .parameterNotFinite(name: actualName, value) = error {
+                    #expect(actualName == "x")
+                    #expect(value.isNaN || value.isInfinite)
+                } else {
+                    #expect(Bool(false), "Unexpected error: \(error)")
+                }
+            } catch {
+                #expect(Bool(false), "Unexpected error type: \(error)")
+            }
         }
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "x")) {
-            _ = try SpecialFunctions.laguerre(1, Float.nan)
-        }
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "x")) {
-            _ = try SpecialFunctions.assocLaguerre(1, 1, Float.infinity)
-        }
+
+        expectNotFinite { let _ = try SpecialFunctions.laguerre(1, Float.nan) }
+        expectNotFinite { let _ = try SpecialFunctions.assocLaguerre(1, 1, Float.infinity) }
     }
 
     #if arch(x86_64)
     @Test("Laguerre error paths (Float80)")
     func laguerreErrorsFloat80() async throws {
-        #expect(throws: SpecialFunctionError.parameterNotPositive(name: "n")) {
-            _ = try SpecialFunctions.laguerre(-1, 0.5 as Float80)
+        func expectNotPositive(name expectedName: String, expected: Float80, block: () throws -> Void) {
+            do {
+                _ = try block()
+                #expect(Bool(false), "Expected parameterNotPositive")
+            } catch let error as SpecialFunctionError<Float80> {
+                if case let .parameterNotPositive(name: actualName, value) = error {
+                    #expect(actualName == expectedName)
+                    #expect(abs(Double(value) - Double(expected)) <= 1e-12)
+                } else {
+                    #expect(Bool(false), "Unexpected error: \(error)")
+                }
+            } catch {
+                #expect(Bool(false), "Unexpected error type: \(error)")
+            }
         }
-        #expect(throws: SpecialFunctionError.parameterNotPositive(name: "m")) {
-            _ = try SpecialFunctions.assocLaguerre(2, -3, 1.0 as Float80)
+
+        expectNotPositive(name: "n", expected: -1) { let _ = try SpecialFunctions.laguerre(-1, 0.5 as Float80) }
+        expectNotPositive(name: "m", expected: -3) { let _ = try SpecialFunctions.assocLaguerre(2, -3, 1.0 as Float80) }
+
+        func expectNotFinite(_ block: () throws -> Void) {
+            do {
+                _ = try block()
+                #expect(Bool(false), "Expected parameterNotFinite")
+            } catch let error as SpecialFunctionError<Float80> {
+                if case let .parameterNotFinite(name: actualName, value) = error {
+                    #expect(actualName == "x")
+                    #expect(value.isNaN || value.isInfinite)
+                } else {
+                    #expect(Bool(false), "Unexpected error: \(error)")
+                }
+            } catch {
+                #expect(Bool(false), "Unexpected error type: \(error)")
+            }
         }
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "x")) {
-            _ = try SpecialFunctions.laguerre(1, Float80.nan)
-        }
-        #expect(throws: SpecialFunctionError.parameterNotFinite(name: "x")) {
-            _ = try SpecialFunctions.assocLaguerre(1, 1, Float80.infinity)
-        }
+
+        expectNotFinite { let _ = try SpecialFunctions.laguerre(1, Float80.nan) }
+        expectNotFinite { let _ = try SpecialFunctions.assocLaguerre(1, 1, Float80.infinity) }
     }
     #endif
 }

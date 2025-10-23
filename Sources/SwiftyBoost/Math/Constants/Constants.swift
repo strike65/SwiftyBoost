@@ -22,459 +22,426 @@
 
 import SwiftyBoostPrelude
 
-/// A namespace-like generic that exposes high-precision mathematical constants
-/// specialized for concrete floating-point types.
+/// High-precision mathematical constants with on-demand conversion to floating-point.
 ///
-/// Overview
-/// - This type provides a set of well-known mathematical constants (π, e, √2, Euler–Mascheroni, Catalan, etc.)
-///   and several derived variants (e.g. 2π, π/2, π/3, 2π/3, 3π/4, π/6, π², 1/π, 2/π, √π, 1/√π, ln(2), ln(10), ln(ln(2)), φ).
-/// - The values are provided via Boost.Math and bridged from C using `CBoostBridge`.
-/// - You access constants through the generic `Constants<T>` with `T` constrained to `BinaryFloatingPoint`.
-///   Separate specializations exist for `Double`, `Float`, and (on x86_64) `Float80`.
+/// - Source: Values are taken from Boost.Math big constant tables and stored as decimal strings,
+///   so they can be converted at runtime to any `Real & BinaryFloatingPoint` type (`Float`,
+///   `Double`, `Float80`, or user-defined types that conform).
+/// - Precision: Strings typically contain more digits than any standard binary float can represent
+///   to minimize conversion error.
+/// - Performance: Conversion prefers `LosslessStringConvertible` when available on the target type,
+///   falling back to a lightweight custom parser for general `BinaryFloatingPoint`.
 ///
-/// Precision and performance
-/// - Each specialization calls a dedicated C function that returns a constant computed or represented
-///   in that precision. This avoids conversion overhead and preserves as much precision as the underlying
-///   Boost.Math implementation provides for that type.
-/// - Accessors are `static` computed properties with trivial cost.
+/// Usage examples:
+/// - `let piAsDouble: Double = Constants.pi()`
+/// - `let eAsFloat: Float = Constants.e()`
+/// - `let tauAsFloat80: Float80 = Constants.twoPi()`
+/// - `let gammaAsDouble = Constants.value(.euler, as: Double.self)`
 ///
-/// Availability
-/// - `Float80` specializations are available only on x86_64 architectures. The extension is conditionally
-///   compiled with `#if arch(x86_64)`.
-///
-/// Usage
-/// - let tau = Constants<Double>.twoPi
-/// - let halfPiF = Constants<Float>.halfPi
-/// - #if arch(x86_64)
-///     let sqrtPi80 = Constants<Float80>.rootPi
-///   #endif
-///
-/// Notes
-/// - All values are pure constants with no side effects.
-/// - Thread-safe by construction (no mutable state).
+/// Mathematical insight:
+/// - Angles: Many constants are multiples/fractions of π and arise in trigonometry and Fourier analysis.
+/// - Growth/decay: e and its reciprocal are fundamental to exponentials, logarithms, and probability.
+/// - Special numbers: Euler–Mascheroni, Catalan, Apery’s ζ(3), and φ (golden ratio) appear in number
+///   theory, combinatorics, geometry, and analysis.
+public enum Constants {
 
-// MARK: - Double specializations
-
-extension Constants where T == Double {
-
-    /// The mathematical constant π (pi) ≈ 3.14159...
+    /// Enumerates the constant catalogue.
     ///
-    /// Backed by: `bs_const_pi_d()`
-    public static var pi: Double { bs_const_pi_d() }
+    /// For each case you’ll find:
+    /// - Symbol: Common mathematical symbol
+    /// - Definition: Canonical definition
+    /// - Appears in: Typical areas where the constant naturally occurs
+    public enum Identifier: CaseIterable, Sendable {
+        /// π (pi)
+        /// - Definition: The ratio of a circle’s circumference to its diameter.
+        /// - Appears in: Geometry, trigonometry, Fourier analysis, probability (normal distribution),
+        ///   complex analysis (Euler’s identity).
+        case pi
 
-    /// Euler’s number e ≈ 2.71828...
-    ///
-    /// Backed by: `bs_const_e_d()`
-    public static var e: Double { bs_const_e_d() }
+        /// 2π (tau)
+        /// - Definition: The full angle in radians for one revolution; 2π = circumference/radius.
+        /// - Appears in: Periodic phenomena, Fourier transforms, frequency-domain analysis.
+        case twoPi
 
-    /// 2π (tau), often used as a full rotation in radians.
-    ///
-    /// Backed by: `bs_const_two_pi_d()`
-    public static var twoPi: Double { bs_const_two_pi_d() }
+        /// π/2 (half pi)
+        /// - Definition: Right angle in radians; principal quarter-period for many trig functions.
+        /// - Appears in: Trigonometric identities, orthogonality of sin/cos at quadrature points.
+        case halfPi
 
-    /// π/2 (half-pi), i.e. 90 degrees in radians.
-    ///
-    /// Backed by: `bs_const_half_pi_d()`
-    public static var halfPi: Double { bs_const_half_pi_d() }
+        /// π/4 (quarter pi)
+        /// - Definition: 45° in radians; tan(π/4) = 1; sin(π/4) = cos(π/4) = √2/2.
+        /// - Appears in: Rotations, symmetry arguments, Gaussian integrals.
+        case quarterPi
 
-    /// π/4 (quarter-pi), i.e. 45 degrees in radians.
-    ///
-    /// Backed by: `bs_const_quarter_pi_d()`
-    public static var quarterPi: Double { bs_const_quarter_pi_d() }
+        /// π/3 (third pi)
+        /// - Definition: 60° in radians; cos(π/3) = 1/2; sin(π/3) = √3/2.
+        /// - Appears in: Equilateral triangles, hexagonal lattices.
+        case thirdPi
 
-    /// π/3 (third-pi), i.e. 60 degrees in radians.
-    ///
-    /// Backed by: `bs_const_third_pi_d()`
-    public static var thirdPi: Double { bs_const_third_pi_d() }
+        /// 2π/3 (two thirds pi)
+        /// - Definition: 120° in radians; key angle in cubic roots of unity geometry.
+        /// - Appears in: Symmetries of regular polygons, phasors.
+        case twoThirdsPi
 
-    /// 2π/3 (two-thirds-pi), i.e. 120 degrees in radians.
-    ///
-    /// Backed by: `bs_const_two_thirds_pi_d()`
-    public static var twoThirdsPi: Double {
-        bs_const_two_thirds_pi_d()
+        /// 3π/4 (three quarters pi)
+        /// - Definition: 135° in radians; sin and cos have equal magnitude with opposite signs.
+        /// - Appears in: Rotational symmetries, signal phase shifts.
+        case threeQuartersPi
+
+        /// π/6 (sixth pi)
+        /// - Definition: 30° in radians; sin(π/6) = 1/2; cos(π/6) = √3/2.
+        /// - Appears in: Triangulations, classical trig problems.
+        case sixthPi
+
+        /// π² (pi squared)
+        /// - Definition: Square of π.
+        /// - Appears in: Basel problem (ζ(2) = π²/6), Fourier series, integrals over circles/spheres.
+        case piSqr
+
+        /// √2 (square root of two)
+        /// - Definition: Hypotenuse of a unit right triangle; first known irrational.
+        /// - Appears in: Rotations by 45°, normalization, lattice geometry.
+        case rootTwo
+
+        /// √3 (square root of three)
+        /// - Definition: Height of an equilateral triangle of side 2.
+        /// - Appears in: Hexagonal close packing, 60° rotations, power systems (√3 factors).
+        case rootThree
+
+        /// √π (square root of pi)
+        /// - Definition: Principal square root of π.
+        /// - Appears in: Gaussian integrals (∫ e^{-x²} dx = √π), normal distribution normalization.
+        case rootPi
+
+        /// 1/π (reciprocal of pi)
+        /// - Definition: Reciprocal of π.
+        /// - Appears in: Normalization constants, series for 1/π (Ramanujan-type).
+        case oneDivPi
+
+        /// 1/(2π) (reciprocal of two pi)
+        /// - Definition: 1 divided by 2π.
+        /// - Appears in: Fourier transform conventions, spectral densities.
+        case oneDivTwoPi
+
+        /// 1/√π (reciprocal of square root of pi)
+        /// - Definition: Reciprocal of √π.
+        /// - Appears in: Normalization of Gaussian kernels, error function derivatives.
+        case oneDivRootPi
+
+        /// 2/π (two over pi)
+        /// - Definition: 2 divided by π.
+        /// - Appears in: Fourier series of square waves, sinc integrals.
+        case twoDivPi
+
+        /// 2/√π (two over square root of pi)
+        /// - Definition: 2 divided by √π.
+        /// - Appears in: Derivative of the error function: d/dx erf(x) = (2/√π) e^{-x²}.
+        case twoDivRootPi
+
+        /// ln 2 (natural logarithm of two)
+        /// - Definition: The natural log of 2.
+        /// - Appears in: Information theory (bits ↔ nats), doubling times, binary scaling.
+        case lnTwo
+
+        /// ln 10 (natural logarithm of ten)
+        /// - Definition: The natural log of 10.
+        /// - Appears in: Base conversion between natural logs and common logs (log10).
+        case lnTen
+
+        /// ln ln 2 (natural logarithm of ln 2)
+        /// - Definition: The natural log of ln 2.
+        /// - Appears in: Asymptotics, iterated logarithms in analysis and number theory.
+        case lnLnTwo
+
+        /// e (Euler’s number)
+        /// - Definition: Unique base where the derivative of a^x equals a^x at x=0; limit (1+1/n)^n.
+        /// - Appears in: Exponential growth/decay, calculus, probability (Poisson, normal).
+        case e
+
+        /// 1/e (reciprocal of Euler’s number)
+        /// - Definition: Reciprocal of e.
+        /// - Appears in: Memoryless processes, exponential waiting times, optimization heuristics.
+        case oneDivE
+
+        /// γ (Euler–Mascheroni constant)
+        /// - Definition: Limit of (H_n − ln n) as n → ∞ where H_n is the nth harmonic number.
+        /// - Appears in: Analytic number theory, integrals and series involving logs and harmonic sums.
+        case euler
+
+        /// G (Catalan’s constant)
+        /// - Definition: Σ_{n≥0} (-1)^n / (2n+1)^2.
+        /// - Appears in: Combinatorics, geometry of lattice sums, integrals of inverse trigs.
+        case catalan
+
+        /// ζ(3) (Apéry’s constant)
+        /// - Definition: Riemann zeta function at 3: Σ_{n≥1} 1/n^3.
+        /// - Appears in: Quantum field theory, knot theory, multiple zeta values; irrational (Apéry).
+        case zetaThree
+
+        /// φ (golden ratio)
+        /// - Definition: (1 + √5)/2; unique positive root of x^2 = x + 1.
+        /// - Appears in: Recursive sequences (Fibonacci), geometry, continued fractions.
+        case phi
+
+        /// h (Holtsmark distribution differential entropy)
+        /// - Definition: Differential entropy of the Holtsmark distribution (a stable law with α=3/2).
+        /// - Appears in: Astrophysics (gravitational fields of random star distributions), stable laws.
+        /// - Source of the numeric value: ``https://github.com/tk-yoshimura/HoltsmarkDistribution``
+        case holtsmarkEntropy
     }
 
-    /// 3π/4 (three-quarters-pi), i.e. 135 degrees in radians.
+    /// Stores the raw decimal string for each constant.
+    /// - Note: Strings are intentionally long to minimize rounding when converting to binary formats.
+    private static let catalogue: [Identifier: String] = [
+        .pi: "3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651e+00",
+        .twoPi: "6.28318530717958647692528676655900576839433879875021164194988918461563281257241799725606965068423413596429617303e+00",
+        .halfPi: "1.57079632679489661923132169163975144209858469968755291048747229615390820314310449931401741267105853399107404326e+00",
+        .quarterPi: "0.785398163397448309615660845819875721049292349843776455243736148076954101571552249657008706335529266995537021628320576661773",
+        .thirdPi: "1.04719755119659774615421446109316762806572313312503527365831486410260546876206966620934494178070568932738269550e+00",
+        .twoThirdsPi: "2.09439510239319549230842892218633525613144626625007054731662972820521093752413933241868988356141137865476539101e+00",
+        .threeQuartersPi: "2.35619449019234492884698253745962716314787704953132936573120844423086230471465674897102611900658780098661106488e+00",
+        .sixthPi: "5.23598775598298873077107230546583814032861566562517636829157432051302734381034833104672470890352844663691347752e-01",
+        .piSqr: "9.86960440108935861883449099987615113531369940724079062641334937622004482241920524300177340371855223182402591377e+00",
+        .rootTwo: "1.41421356237309504880168872420969807856967187537694807317667973799073247846210703885038753432764157273501384623e+00",
+        .rootThree: "1.73205080756887729352744634150587236694280525381038062805580697945193301690880003708114618675724857567562614142e+00",
+        .rootPi: "1.77245385090551602729816748334114518279754945612238712821380778985291128459103218137495065673854466541622682362e+00",
+        .oneDivPi: "0.31830988618379067153776752674502872406891929148091289749533468811779359526845307018022760553250617191214568545351",
+        .oneDivTwoPi: "1.59154943091895335768883763372514362034459645740456448747667344058896797634226535090113802766253085956072842727e-01",
+        .oneDivRootPi: "5.64189583547756286948079451560772585844050629328998856844085721710642468441493414486743660202107363443028347906e-01",
+        .twoDivPi: "6.36619772367581343075535053490057448137838582961825794990669376235587190536906140360455211065012343824291370907e-01",
+        .twoDivRootPi: "1.12837916709551257389615890312154517168810125865799771368817144342128493688298682897348732040421472688605669581272",
+        .lnTwo: "6.93147180559945309417232121458176568075500134360255254120680009493393621969694715605863326996418687542001481021e-01",
+        .lnTen: "2.30258509299404568401799145468436420760110148862877297603332790096757260967735248023599720508959829834196778404e+00",
+        .lnLnTwo: "-3.66512920581664327012439158232669469454263447837105263053677713670561615319352738549455822856698908358302523045e-01",
+        .e: "2.71828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193e+00",
+        .oneDivE:  "3.67879441171442321595523770161460867445811131031767834507836801697461495744899803357147274345919643746627325277e-01",
+        .euler: "5.77215664901532860606512090082402431042159335939923598805767234884867726777664670936947063291746749514631447250e-01",
+        .catalan: "9.15965594177219015054603514932384110774149374281672134266498119621763019776254769479356512926115106248574422619e-01",
+        .zetaThree: "1.20205690315959428539973816151144999076498629234049888179227155534183820578631309018645587360933525814619915780e+00",
+        .phi: "1.61803398874989484820458683436563811772030917980576286213544862270526046281890244970720720418939113748475408808e+00",
+        .holtsmarkEntropy: "2.06944850513462440031558003845421663807675255168165702483694991535648437010785015575051452878363155526878657629"
+    ]
+
+    // MARK: - Public API
+
+    /// Returns the requested constant converted to the supplied floating-point type.
     ///
-    /// Backed by: `bs_const_three_quarters_pi_d()`
-    public static var threeQuartersPi: Double {
-        bs_const_three_quarters_pi_d()
+    /// - Parameters:
+    ///   - identifier: The constant to fetch from the catalogue.
+    ///   - type: The target floating-point type to convert into.
+    /// - Returns: The value as `T`.
+    /// - Notes:
+    ///   - If `T` conforms to `LosslessStringConvertible`, parsing delegates to the type’s initializer.
+    ///   - Otherwise, a small numeric parser reads the decimal string (including scientific notation)
+    ///     and constructs a `T` via repeated scaling by powers of ten.
+    public static func value<T: Real & BinaryFloatingPoint>(
+        _ identifier: Identifier,
+        as type: T.Type = T.self
+    ) -> T {
+        guard let string = catalogue[identifier] else {
+            preconditionFailure("Unsupported constant identifier: \(identifier)")
+        }
+        return convert(decimal: string, as: type)
     }
 
-    /// π/6 (sixth-pi), i.e. 30 degrees in radians.
-    ///
-    /// Backed by: `bs_const_sixth_pi_d()`
-    public static var sixthPi: Double { bs_const_sixth_pi_d() }
+    // Convenience overloads mirror the existing static constants.
 
-    /// π² (pi squared).
-    ///
-    /// Backed by: `bs_const_pi_sqr_d()`
-    public static var piSqr: Double { bs_const_pi_sqr_d() }
+    /// π (pi). See `Identifier.pi` for mathematical context.
+    public static func pi<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.pi, as: type) }
 
-    /// √2 (square root of 2).
-    ///
-    /// Backed by: `bs_const_root_two_d()`
-    public static var rootTwo: Double { bs_const_root_two_d() }
+    /// 2π (tau). See `Identifier.twoPi` for mathematical context.
+    public static func twoPi<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.twoPi, as: type) }
 
-    /// √3 (square root of 3).
-    ///
-    /// Backed by: `bs_const_root_three_d()`
-    public static var rootThree: Double { bs_const_root_three_d() }
+    /// π/2. See `Identifier.halfPi` for mathematical context.
+    public static func halfPi<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.halfPi, as: type) }
 
-    /// √π (square root of pi).
-    ///
-    /// Backed by: `bs_const_root_pi_d()`
-    public static var rootPi: Double { bs_const_root_pi_d() }
+    /// π/4. See `Identifier.quarterPi` for mathematical context.
+    public static func quarterPi<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.quarterPi, as: type) }
 
-    /// 1/π (reciprocal of pi).
-    ///
-    /// Backed by: `bs_const_one_div_pi_d()`
-    public static var oneDivPi: Double { bs_const_one_div_pi_d() }
+    /// π/3. See `Identifier.thirdPi` for mathematical context.
+    public static func thirdPi<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.thirdPi, as: type) }
 
-    /// 1/(2π) (one over two-pi).
+    /// 2π/3. See `Identifier.twoThirdsPi` for mathematical context.
+    public static func twoThirdsPi<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.twoThirdsPi, as: type) }
+
+    /// 3π/4. See `Identifier.threeQuartersPi` for mathematical context.
+    public static func threeQuartersPi<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.threeQuartersPi, as: type) }
+
+    /// π/6. See `Identifier.sixthPi` for mathematical context.
+    public static func sixthPi<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.sixthPi, as: type) }
+
+    /// π². See `Identifier.piSqr` for mathematical context.
+    public static func piSqr<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.piSqr, as: type) }
+
+    /// √2. See `Identifier.rootTwo` for mathematical context.
+    public static func rootTwo<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.rootTwo, as: type) }
+
+    /// √3. See `Identifier.rootThree` for mathematical context.
+    public static func rootThree<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.rootThree, as: type) }
+
+    /// √π. See `Identifier.rootPi` for mathematical context.
+    public static func rootPi<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.rootPi, as: type) }
+
+    /// 1/π. See `Identifier.oneDivPi` for mathematical context.
+    public static func oneDivPi<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.oneDivPi, as: type) }
+
+    /// 1/(2π). See `Identifier.oneDivTwoPi` for mathematical context.
+    public static func oneDivTwoPi<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.oneDivTwoPi, as: type) }
+
+    /// 1/√π. See `Identifier.oneDivRootPi` for mathematical context.
+    public static func oneDivRootPi<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.oneDivRootPi, as: type) }
+
+    /// 2/π. See `Identifier.twoDivPi` for mathematical context.
+    public static func twoDivPi<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.twoDivPi, as: type) }
+
+    /// 2/√π. See `Identifier.twoDivRootPi` for mathematical context.
+    public static func twoDivRootPi<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.twoDivRootPi, as: type) }
+
+    /// ln 2. See `Identifier.lnTwo` for mathematical context.
+    public static func lnTwo<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.lnTwo, as: type) }
+
+    /// ln 10. See `Identifier.lnTen` for mathematical context.
+    public static func lnTen<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.lnTen, as: type) }
+
+    /// ln ln 2. See `Identifier.lnLnTwo` for mathematical context.
+    public static func lnLnTwo<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.lnLnTwo, as: type) }
+
+    /// e. See `Identifier.e` for mathematical context.
+    public static func e<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.e, as: type) }
+
+    /// 1/e. See `Identifier.oneDivE` for mathematical context.
+    public static func oneDivE<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.oneDivE, as: type) }
+
+    /// Euler–Mascheroni constant γ. See `Identifier.euler` for mathematical context.
+    public static func euler<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.euler, as: type) }
+
+    /// Catalan’s constant G. See `Identifier.catalan` for mathematical context.
+    public static func catalan<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.catalan, as: type) }
+
+    /// Apéry’s constant ζ(3). See `Identifier.zetaThree` for mathematical context.
+    public static func zetaThree<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.zetaThree, as: type) }
+
+    /// Golden ratio φ. See `Identifier.phi` for mathematical context.
+    public static func phi<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.phi, as: type) }
+
+    /// Holtsmark distribution differential entropy. See `Identifier.holtsmarkEntropy` for context.
+    public static func holtsmarkEntropy<T: Real & BinaryFloatingPoint>(_ type: T.Type = T.self) -> T { value(.holtsmarkEntropy, as: type) }
+
+    // MARK: - Conversion helpers
+
+    /// Converts a decimal string (optionally in scientific notation) into a `BinaryFloatingPoint` value.
     ///
-    /// Backed by: `bs_const_one_div_two_pi_d()`
-    public static var oneDivTwoPi: Double {
-        bs_const_one_div_two_pi_d()
+    /// - Parameters:
+    ///   - decimal: A decimal literal, possibly containing a leading sign, a decimal point, and an
+    ///     exponent part (`e` or `E`).
+    ///   - as: The destination floating-point type.
+    /// - Returns: The parsed value as `T`.
+    /// - Parsing strategy:
+    ///   - Try `LosslessStringConvertible.init` when available on `T` for fast, locale-independent parsing.
+    ///   - Otherwise, parse digits and exponent manually and construct the value using scaling by powers of 10.
+    /// - Preconditions:
+    ///   - `decimal` must be a valid decimal literal; invalid characters trigger a precondition failure.
+    static func convert<T: Real & BinaryFloatingPoint>(
+        decimal: String,
+        as _: T.Type
+    ) -> T {
+        let trimmed = decimal.trimmingCharacters(in: .whitespacesAndNewlines)
+        precondition(!trimmed.isEmpty, "Empty decimal constant string.")
+
+        if let convertibleType = T.self as? LosslessStringConvertible.Type,
+            let parsed = convertibleType.init(trimmed) as? T
+        {
+            return parsed
+        }
+
+        var index = trimmed.startIndex
+        let isNegative: Bool
+        if trimmed[index] == "-" {
+            isNegative = true
+            index = trimmed.index(after: index)
+        } else if trimmed[index] == "+" {
+            isNegative = false
+            index = trimmed.index(after: index)
+        } else {
+            isNegative = false
+        }
+
+        var exponent = 0
+        var digits: [UInt8] = []
+        var seenDecimalPoint = false
+
+        while index < trimmed.endIndex {
+            let character = trimmed[index]
+            if character == "e" || character == "E" {
+                let expStart = trimmed.index(after: index)
+                let exponentSlice = trimmed[expStart..<trimmed.endIndex]
+                guard let parsedExponent = Int(exponentSlice) else {
+                    preconditionFailure("Invalid exponent in decimal literal: \(decimal)")
+                }
+                exponent += parsedExponent
+                break
+            } else if character == "." {
+                seenDecimalPoint = true
+            } else if let value = character.wholeNumberValue {
+                digits.append(UInt8(value))
+                if seenDecimalPoint {
+                    exponent -= 1
+                }
+            } else {
+                preconditionFailure("Unsupported character in decimal literal: \(character)")
+            }
+
+            index = trimmed.index(after: index)
+        }
+
+        guard !digits.isEmpty else { return .zero }
+
+        var firstNonZero = 0
+        while firstNonZero < digits.count && digits[firstNonZero] == 0 {
+            firstNonZero += 1
+        }
+
+        if firstNonZero == digits.count {
+            return .zero
+        }
+
+        var magnitude: T = .zero
+        let ten: T = 10
+        for digit in digits[firstNonZero...] {
+            magnitude = magnitude * ten + T(digit)
+        }
+
+        if exponent > 0 {
+            magnitude *= powTen(of: exponent)
+        } else if exponent < 0 {
+            magnitude /= powTen(of: -exponent)
+        }
+
+        return isNegative ? -magnitude : magnitude
     }
 
-    /// 1/√π (reciprocal of root-pi).
+    /// Computes 10^exponent for `BinaryFloatingPoint` types using exponentiation by squaring.
     ///
-    /// Backed by: `bs_const_one_div_root_pi_d()`
-    public static var oneDivRootPi: Double {
-        bs_const_one_div_root_pi_d()
+    /// - Parameter exponent: Non-negative integer exponent.
+    /// - Returns: 10 raised to `exponent` as `T`.
+    /// - Complexity: O(log exponent) multiplications.
+    static func powTen<T: BinaryFloatingPoint>(of exponent: Int) -> T {
+        precondition(exponent >= 0, "Exponent must be non-negative.")
+        if exponent == 0 { return 1 }
+
+        var result: T = 1
+        var base: T = 10
+        var remaining = exponent
+
+        while remaining > 0 {
+            if remaining & 1 == 1 {
+                result *= base
+            }
+            remaining >>= 1
+            if remaining > 0 {
+                base *= base
+            }
+        }
+        return result
     }
-
-    /// 2/π (two over pi).
-    ///
-    /// Backed by: `bs_const_two_div_pi_d()`
-    public static var twoDivPi: Double { bs_const_two_div_pi_d() }
-
-    /// 2/√π (two over root-pi).
-    ///
-    /// Backed by: `bs_const_two_div_root_pi_d()`
-    public static var twoDivRootPi: Double {
-        bs_const_two_div_root_pi_d()
-    }
-
-    /// ln(2) (natural logarithm of 2).
-    ///
-    /// Backed by: `bs_const_ln_two_d()`
-    public static var lnTwo: Double { bs_const_ln_two_d() }
-
-    /// ln(10) (natural logarithm of 10).
-    ///
-    /// Backed by: `bs_const_ln_ten_d()`
-    public static var lnTen: Double { bs_const_ln_ten_d() }
-
-    /// ln(ln(2)) (natural logarithm of ln(2)).
-    ///
-    /// Backed by: `bs_const_ln_ln_two_d()`
-    public static var lnLnTwo: Double { bs_const_ln_ln_two_d() }
-
-    /// Euler–Mascheroni constant γ ≈ 0.57721...
-    ///
-    /// Backed by: `bs_const_euler_d()`
-    public static var euler: Double { bs_const_euler_d() }
-
-    /// Catalan’s constant G ≈ 0.91596...
-    ///
-    /// Backed by: `bs_const_catalan_d()`
-    public static var catalan: Double { bs_const_catalan_d() }
-
-    /// Apery’s constant ζ(3) ≈ 1.2020569...
-    ///
-    /// Backed by: `bs_const_zeta_three_d()`
-    public static var zetaThree: Double { bs_const_zeta_three_d() }
-
-    /// Golden ratio φ = (1 + √5)/2 ≈ 1.61803...
-    ///
-    /// Backed by: `bs_const_phi_d()`
-    public static var phi: Double { bs_const_phi_d() }
 }
-
-// MARK: - Float specializations
-
-extension Constants where T == Float {
-
-    /// The mathematical constant π (pi) as `Float`.
-    ///
-    /// Backed by: `bs_const_pi_f()`
-    public static var pi: Float { bs_const_pi_f() }
-
-    /// Euler’s number e as `Float`.
-    ///
-    /// Backed by: `bs_const_e_f()`
-    public static var e: Float { bs_const_e_f() }
-
-    /// 2π (tau) as `Float`.
-    ///
-    /// Backed by: `bs_const_two_pi_f()`
-    public static var twoPi: Float { bs_const_two_pi_f() }
-
-    /// π/2 (half-pi) as `Float`.
-    ///
-    /// Backed by: `bs_const_half_pi_f()`
-    public static var halfPi: Float { bs_const_half_pi_f() }
-
-    /// π/4 (quarter-pi) as `Float`.
-    ///
-    /// Backed by: `bs_const_quarter_pi_f()`
-    public static var quarterPi: Float { bs_const_quarter_pi_f() }
-
-    /// π/3 (third-pi) as `Float`.
-    ///
-    /// Backed by: `bs_const_third_pi_f()`
-    public static var thirdPi: Float { bs_const_third_pi_f() }
-
-    /// 2π/3 (two-thirds-pi) as `Float`.
-    ///
-    /// Backed by: `bs_const_two_thirds_pi_f()`
-    public static var twoThirdsPi: Float { bs_const_two_thirds_pi_f() }
-
-    /// 3π/4 (three-quarters-pi) as `Float`.
-    ///
-    /// Backed by: `bs_const_three_quarters_pi_f()`
-    public static var threeQuartersPi: Float {
-        bs_const_three_quarters_pi_f()
-    }
-
-    /// π/6 (sixth-pi) as `Float`.
-    ///
-    /// Backed by: `bs_const_sixth_pi_f()`
-    public static var sixthPi: Float { bs_const_sixth_pi_f() }
-
-    /// π² (pi squared) as `Float`.
-    ///
-    /// Backed by: `bs_const_pi_sqr_f()`
-    public static var piSqr: Float { bs_const_pi_sqr_f() }
-
-    /// √2 as `Float`.
-    ///
-    /// Backed by: `bs_const_root_two_f()`
-    public static var rootTwo: Float { bs_const_root_two_f() }
-
-    /// √3 as `Float`.
-    ///
-    /// Backed by: `bs_const_root_three_f()`
-    public static var rootThree: Float { bs_const_root_three_f() }
-
-    /// √π as `Float`.
-    ///
-    /// Backed by: `bs_const_root_pi_f()`
-    public static var rootPi: Float { bs_const_root_pi_f() }
-
-    /// 1/π as `Float`.
-    ///
-    /// Backed by: `bs_const_one_div_pi_f()`
-    public static var oneDivPi: Float { bs_const_one_div_pi_f() }
-
-    /// 1/(2π) as `Float`.
-    ///
-    /// Backed by: `bs_const_one_div_two_pi_f()`
-    public static var oneDivTwoPi: Float {
-        bs_const_one_div_two_pi_f()
-    }
-
-    /// 1/√π as `Float`.
-    ///
-    /// Backed by: `bs_const_one_div_root_pi_f()`
-    public static var oneDivRootPi: Float {
-        bs_const_one_div_root_pi_f()
-    }
-
-    /// 2/π as `Float`.
-    ///
-    /// Backed by: `bs_const_two_div_pi_f()`
-    public static var twoDivPi: Float { bs_const_two_div_pi_f() }
-
-    /// 2/√π as `Float`.
-    ///
-    /// Backed by: `bs_const_two_div_root_pi_f()`
-    public static var twoDivRootPi: Float {
-        bs_const_two_div_root_pi_f()
-    }
-
-    /// ln(2) as `Float`.
-    ///
-    /// Backed by: `bs_const_ln_two_f()`
-    public static var lnTwo: Float { bs_const_ln_two_f() }
-
-    /// ln(10) as `Float`.
-    ///
-    /// Backed by: `bs_const_ln_ten_f()`
-    public static var lnTen: Float { bs_const_ln_ten_f() }
-
-    /// ln(ln(2)) as `Float`.
-    ///
-    /// Backed by: `bs_const_ln_ln_two_f()`
-    public static var lnLnTwo: Float { bs_const_ln_ln_two_f() }
-
-    /// Euler–Mascheroni constant γ as `Float`.
-    ///
-    /// Backed by: `bs_const_euler_f()`
-    public static var euler: Float { bs_const_euler_f() }
-
-    /// Catalan’s constant G as `Float`.
-    ///
-    /// Backed by: `bs_const_catalan_f()`
-    public static var catalan: Float { bs_const_catalan_f() }
-
-    /// Apery’s constant ζ(3) as `Float`.
-    ///
-    /// Backed by: `bs_const_zeta_three_f()`
-    public static var zetaThree: Float { bs_const_zeta_three_f() }
-
-    /// Golden ratio φ as `Float`.
-    ///
-    /// Backed by: `bs_const_phi_f()`
-    public static var phi: Float { bs_const_phi_f() }
-}
-
-// MARK: - Float80 specializations (x86_64 only)
-
-#if arch(x86_64)
-    extension Constants where T == Float80 {
-
-        /// The mathematical constant π (pi) as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_pi_l()`
-        public static var pi: Float80 {
-            bs_const_pi_l()
-        }
-
-        /// Euler’s number e as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_e_l()`
-        public static var e: Float80 {
-            bs_const_e_l()
-        }
-
-        /// 2π (tau) as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_two_pi_l()`
-        public static var twoPi: Float80 {
-            bs_const_two_pi_l()
-        }
-
-        /// π/2 (half-pi) as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_half_pi_l()`
-        public static var halfPi: Float80 { bs_const_half_pi_l() }
-
-        /// π/4 (quarter-pi) as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_quarter_pi_l()`
-        public static var quarterPi: Float80 { bs_const_quarter_pi_l() }
-
-        /// π/3 (third-pi) as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_third_pi_l()`
-        public static var thirdPi: Float80 { bs_const_third_pi_l() }
-
-        /// 2π/3 (two-thirds-pi) as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_two_thirds_pi_l()`
-        public static var twoThirdsPi: Float80 { bs_const_two_thirds_pi_l() }
-
-        /// 3π/4 (three-quarters-pi) as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_three_quarters_pi_l()`
-        public static var threeQuartersPi: Float80 { bs_const_three_quarters_pi_l() }
-
-        /// π/6 (sixth-pi) as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_sixth_pi_l()`
-        public static var sixthPi: Float80 { bs_const_sixth_pi_l() }
-
-        /// π² (pi squared) as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_pi_sqr_l()`
-        public static var piSqr: Float80 {
-            bs_const_pi_sqr_l()
-        }
-
-        /// √2 as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_root_two_l()`
-        public static var rootTwo: Float80 { bs_const_root_two_l() }
-
-        /// √3 as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_root_three_l()`
-        public static var rootThree: Float80 { bs_const_root_three_l() }
-
-        /// √π as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_root_pi_l()`
-        public static var rootPi: Float80 { bs_const_root_pi_l() }
-
-        /// 1/π as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_one_div_pi_l()`
-        public static var oneDivPi: Float80 { bs_const_one_div_pi_l() }
-
-        /// 1/(2π) as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_one_div_two_pi_l()`
-        public static var oneDivTwoPi: Float80 { bs_const_one_div_two_pi_l() }
-
-        /// 1/√π as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_one_div_root_pi_l()`
-        public static var oneDivRootPi: Float80 { bs_const_one_div_root_pi_l() }
-
-        /// 2/π as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_two_div_pi_l()`
-        public static var twoDivPi: Float80 { bs_const_two_div_pi_l() }
-
-        /// 2/√π as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_two_div_root_pi_l()`
-        public static var twoDivRootPi: Float80 { bs_const_two_div_root_pi_l() }
-
-        /// ln(2) as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_ln_two_l()`
-        public static var lnTwo: Float80 {
-            bs_const_ln_two_l()
-        }
-
-        /// ln(10) as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_ln_ten_l()`
-        public static var lnTen: Float80 {
-            bs_const_ln_ten_l()
-        }
-
-        /// ln(ln(2)) as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_ln_ln_two_l()`
-        public static var lnLnTwo: Float80 { bs_const_ln_ln_two_l() }
-
-        /// Euler–Mascheroni constant γ as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_euler_l()`
-        public static var euler: Float80 {
-            bs_const_euler_l()
-        }
-
-        /// Catalan’s constant G as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_catalan_l()`
-        public static var catalan: Float80 { bs_const_catalan_l() }
-
-        /// Apery’s constant ζ(3) as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_zeta_three_l()`
-        public static var zetaThree: Float80 { bs_const_zeta_three_l() }
-
-        /// Golden ratio φ as `Float80` (x86_64 only).
-        ///
-        /// Backed by: `bs_const_phi_l()`
-        public static var phi: Float80 {
-            bs_const_phi_l()
-        }
-    }
-#endif

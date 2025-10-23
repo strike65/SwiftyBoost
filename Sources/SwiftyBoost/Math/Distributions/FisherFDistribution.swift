@@ -57,21 +57,18 @@ extension Distribution {
         ///   - `DistributionError.parameterNotFinite` if either degree of freedom is not finite.
         ///   - `DistributionError.parameterOutOfRange` if the underlying backend rejects the parameters.
         public init(degreesOfFreedom1 df1: T, degreesOfFreedom2 df2: T) throws {
-            guard df1 > 0 else {
-                throw DistributionError.parameterNotPositive(name: "degreesOfFreedom1")
-            }
-            guard df2 > 0 else {
-                throw DistributionError.parameterNotPositive(name: "degreesOfFreedom2")
-            }
-            guard df1.isFinite else {
-                throw DistributionError.parameterNotFinite(name: "degreesOfFreedom1")
-            }
-            guard df2.isFinite else {
-                throw DistributionError.parameterNotFinite(name: "degreesOfFreedom2")
-            }
-
             self.degreesOfFreedom1 = df1
             self.degreesOfFreedom2 = df2
+            guard df1 > 0 else {
+                throw DistributionError.parameterNotPositive(name: "degreesOfFreedom1", value: df1)
+            }
+            guard df2 > 0 else {
+                throw DistributionError.parameterNotPositive(name: "degreesOfFreedom2", value: df2)
+            }
+            guard df1.isFinite else {
+                throw DistributionError.parameterNotFinite(name: "degreesOfFreedom1", value: df1) }
+            guard df2.isFinite else {
+                throw DistributionError.parameterNotFinite(name: "degreesOfFreedom2", value: df2) }
             self.dyn = try Distribution.Dynamic<T>(
                 distributionName: "fisherf",
                 parameters: [

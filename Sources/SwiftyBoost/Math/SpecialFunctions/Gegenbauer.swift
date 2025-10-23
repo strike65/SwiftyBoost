@@ -61,15 +61,15 @@ public extension SpecialFunctions {
     /// - The value of Cₙ^(λ)(x) as `T`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "n", value: n)` if `n < 0`.
     /// - `SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: ...)` if `n > UInt32.max`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "lambda"|"x")` if inputs are NaN or ±∞.
-    @inlinable static func gegenbauer<T: Real & BinaryFloatingPoint>(n: Int, lambda: T, x: T) throws -> T {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+    @inlinable static func gegenbauer<T: Real & BinaryFloatingPoint & Sendable>(n: Int, lambda: T, x: T) throws -> T {
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: T(n)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Double>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
         let dl = D(lambda), dx = D(x)
-        guard dl.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda") }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dl.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda", value: lambda) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_gegenbauer_d(UInt32(n), dl, dx))
     }
 
@@ -90,15 +90,15 @@ public extension SpecialFunctions {
     /// - d/dx Cₙ^(λ)(x) as `T`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "n", value: n)` if `n < 0`.
     /// - `SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: ...)` if `n > UInt32.max`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "lambda"|"x")` if inputs are NaN or ±∞.
-    @inlinable static func gegenbauerPrime<T: Real & BinaryFloatingPoint>(n: Int, lambda: T, x: T) throws -> T {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+    @inlinable static func gegenbauerPrime<T: Real & BinaryFloatingPoint & Sendable>(n: Int, lambda: T, x: T) throws -> T {
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: T(n)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Double>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
         let dl = D(lambda), dx = D(x)
-        guard dl.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda") }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dl.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda", value: lambda) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_gegenbauer_prime_d(UInt32(n), dl, dx))
     }
 
@@ -120,19 +120,19 @@ public extension SpecialFunctions {
     /// - dᵏ/dxᵏ Cₙ^(λ)(x) as `T`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "n", value: n)` if `n < 0`.
     /// - `SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: ...)` if `n > UInt32.max`.
-    /// - `SpecialFunctionError.parameterNotPositive(name: "k")` if `k < 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "k", value: k)` if `k < 0`.
     /// - `SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "k", max: ...)` if `k > UInt32.max`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "lambda"|"x")` if inputs are NaN or ±∞.
-    @inlinable static func gegenbauerDerivative<T: Real & BinaryFloatingPoint>(n: Int, lambda: T, x: T, k: Int) throws -> T {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard k >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "k") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard k <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "k", max: Int(UInt32.max)) }
+    @inlinable static func gegenbauerDerivative<T: Real & BinaryFloatingPoint & Sendable>(n: Int, lambda: T, x: T, k: Int) throws -> T {
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: T(n)) }
+        guard k >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "k", value: T(k)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Double>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard k <= Int(UInt32.max) else { throw SpecialFunctionError<Double>.parameterExceedsMaximumIntegerValue(name: "k", max: Int(UInt32.max)) }
         let dl = D(lambda), dx = D(x)
-        guard dl.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda") }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dl.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda", value: lambda) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_gegenbauer_derivative_d(UInt32(n), dl, dx, UInt32(k)))
     }
 
@@ -147,30 +147,30 @@ public extension SpecialFunctions {
     
     /// Cₙ^(λ)(x) for `Float`. Requires `n ≥ 0`, finite `lambda` and `x`.
     @inlinable static func gegenbauer(n: Int, lambda: Float, x: Float) throws -> Float {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard lambda.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float(n)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Float>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard lambda.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda", value: lambda) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_gegenbauer_f(UInt32(n), lambda, x)
     }
     
     /// d/dx Cₙ^(λ)(x) for `Float`. Requires `n ≥ 0`, finite `lambda` and `x`.
     @inlinable static func gegenbauerPrime(n: Int, lambda: Float, x: Float) throws -> Float {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard lambda.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float(n)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Float>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard lambda.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda", value: lambda) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_gegenbauer_prime_f(UInt32(n), lambda, x)
     }
     
     /// dᵏ/dxᵏ Cₙ^(λ)(x) for `Float`. Requires `n, k ≥ 0`, finite `lambda` and `x`.
     @inlinable static func gegenbauerDerivative(n: Int, lambda: Float, x: Float, k: Int) throws -> Float {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard k >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "k") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard k <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "k", max: Int(UInt32.max)) }
-        guard lambda.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float(n)) }
+        guard k >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "k", value: Float(k)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Float>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard k <= Int(UInt32.max) else { throw SpecialFunctionError<Float>.parameterExceedsMaximumIntegerValue(name: "k", max: Int(UInt32.max)) }
+        guard lambda.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda", value: lambda) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_gegenbauer_derivative_f(UInt32(n), lambda, x, UInt32(k))
     }
     
@@ -180,10 +180,10 @@ public extension SpecialFunctions {
 #if arch(x86_64)
     /// Cₙ^(λ)(x) for `Float80` (x86_64 only). Requires `n ≥ 0`, finite `lambda` and `x`.
     @inlinable static func gegenbauer(n: Int, lambda: Float80, x: Float80) throws -> Float80 {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard lambda.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float80(n)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Float80>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard lambda.isFinite else { throw SpecialFunctionError<Float80>.parameterNotFinite(name: "lambda", value: lambda) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_gegenbauer_l(UInt32(n), lambda, x)
     }
 
@@ -195,10 +195,10 @@ public extension SpecialFunctions {
     
     /// d/dx Cₙ^(λ)(x) for `Float80` (x86_64 only). Requires `n ≥ 0`, finite `lambda` and `x`.
     @inlinable static func gegenbauerPrime(n: Int, lambda: Float80, x: Float80) throws -> Float80 {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard lambda.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float80(n)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Float80>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard lambda.isFinite else { throw SpecialFunctionError<Float80>.parameterNotFinite(name: "lambda", value: lambda) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_gegenbauer_prime_l(UInt32(n), lambda, x)
     }
 
@@ -210,12 +210,12 @@ public extension SpecialFunctions {
     
     /// dᵏ/dxᵏ Cₙ^(λ)(x) for `Float80` (x86_64 only). Requires `n, k ≥ 0`, finite `lambda` and `x`.
     @inlinable static func gegenbauerDerivative(n: Int, lambda: Float80, x: Float80, k: Int) throws -> Float80 {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard k >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "k") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard k <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "k", max: Int(UInt32.max)) }
-        guard lambda.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float80(n)) }
+        guard k >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "k", value: Float80(k)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Float80>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard k <= Int(UInt32.max) else { throw SpecialFunctionError<Float80>.parameterExceedsMaximumIntegerValue(name: "k", max: Int(UInt32.max)) }
+        guard lambda.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "lambda", value: lambda) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_gegenbauer_derivative_l(UInt32(n), lambda, x, UInt32(k))
     }
 

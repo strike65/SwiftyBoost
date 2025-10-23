@@ -27,6 +27,40 @@ import Testing
 @Suite("Cardinal B-splines basic behavior")
 struct CardinalBSplinesTests {
 
+    #if arch(x86_64)
+    private func expectSpecialFunctionError(
+        _ block: () throws -> Void
+    ) {
+        do {
+            try block()
+            #expect(Bool(false), "Expected SpecialFunctionError")
+        } catch _ as SpecialFunctionError<Double> {
+            // Expected type
+        } catch _ as SpecialFunctionError<Float> {
+            // Expected type
+        } catch _ as SpecialFunctionError<Float80> {
+            // Expected type (Float80 path)
+        } catch let error {
+            #expect(Bool(false), "Unexpected error: \(error)")
+        }
+    }
+    #else
+    private func expectSpecialFunctionError(
+        _ block: () throws -> Void
+    ) {
+        do {
+            try block()
+            #expect(Bool(false), "Expected SpecialFunctionError")
+        } catch _ as SpecialFunctionError<Double> {
+            // Expected type
+        } catch _ as SpecialFunctionError<Float> {
+            // Expected type
+        } catch let error {
+            #expect(Bool(false), "Unexpected error: \(error)")
+        }
+    }
+    #endif
+
     @Test("Value is finite and non-negative for x in [-1, 1] (Double/Float)")
     func inRangeEvaluations() throws {
         // Representative orders
@@ -104,25 +138,25 @@ struct CardinalBSplinesTests {
         let badXsF: [Float] = [-1.0001, 1.0001]
 
         for x in badXsD {
-            #expect(throws: SpecialFunctionError.self) {
+            expectSpecialFunctionError {
                 _ = try SpecialFunctions.cardinal_B_Spline(n, x)
             }
-            #expect(throws: SpecialFunctionError.self) {
+            expectSpecialFunctionError {
                 _ = try SpecialFunctions.cardinal_B_Spline_prime(n, x)
             }
-            #expect(throws: SpecialFunctionError.self) {
+            expectSpecialFunctionError {
                 _ = try SpecialFunctions.cardinal_B_Spline_double_prime(n, x)
             }
         }
 
         for x in badXsF {
-            #expect(throws: SpecialFunctionError.self) {
+            expectSpecialFunctionError {
                 _ = try SpecialFunctions.cardinal_B_Spline(n, x)
             }
-            #expect(throws: SpecialFunctionError.self) {
+            expectSpecialFunctionError {
                 _ = try SpecialFunctions.cardinal_B_Spline_prime(n, x)
             }
-            #expect(throws: SpecialFunctionError.self) {
+            expectSpecialFunctionError {
                 _ = try SpecialFunctions.cardinal_B_Spline_double_prime(n, x)
             }
         }
@@ -130,13 +164,13 @@ struct CardinalBSplinesTests {
         #if arch(i386) || arch(x86_64)
         let badXsL: [Float80] = [-1.0001, 1.0001]
         for x in badXsL {
-            #expect(throws: SpecialFunctionError.self) {
+            expectSpecialFunctionError {
                 _ = try SpecialFunctions.cardinal_B_Spline(n, x)
             }
-            #expect(throws: SpecialFunctionError.self) {
+            expectSpecialFunctionError {
                 _ = try SpecialFunctions.cardinal_B_Spline_prime(n, x)
             }
-            #expect(throws: SpecialFunctionError.self) {
+            expectSpecialFunctionError {
                 _ = try SpecialFunctions.cardinal_B_Spline_double_prime(n, x)
             }
         }
@@ -150,25 +184,25 @@ struct CardinalBSplinesTests {
         let xF: Float = 0.0
 
         for n in badNs {
-            #expect(throws: SpecialFunctionError.self) {
+            expectSpecialFunctionError {
                 _ = try SpecialFunctions.cardinal_B_Spline_prime(n, xD)
             }
-            #expect(throws: SpecialFunctionError.self) {
+            expectSpecialFunctionError {
                 _ = try SpecialFunctions.cardinal_B_Spline_double_prime(n, xD)
             }
-            #expect(throws: SpecialFunctionError.self) {
+            expectSpecialFunctionError {
                 _ = try SpecialFunctions.cardinal_B_Spline_prime(n, xF)
             }
-            #expect(throws: SpecialFunctionError.self) {
+            expectSpecialFunctionError {
                 _ = try SpecialFunctions.cardinal_B_Spline_double_prime(n, xF)
             }
 
             #if arch(i386) || arch(x86_64)
             let xL: Float80 = 0.0
-            #expect(throws: SpecialFunctionError.self) {
+            expectSpecialFunctionError {
                 _ = try SpecialFunctions.cardinal_B_Spline_prime(n, xL)
             }
-            #expect(throws: SpecialFunctionError.self) {
+            expectSpecialFunctionError {
                 _ = try SpecialFunctions.cardinal_B_Spline_double_prime(n, xL)
             }
             #endif

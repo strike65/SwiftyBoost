@@ -24,8 +24,6 @@
 
 // Umbrella header for CBoostBridge: composed of focused public headers.
 
-#include "bs_constants.h"
-
 #include "complex.h"
 #include "special/bs_error.h"
 #include "special/bs_gamma.h"

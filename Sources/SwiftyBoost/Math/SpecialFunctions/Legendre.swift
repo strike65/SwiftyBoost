@@ -64,20 +64,20 @@ public extension SpecialFunctions {
     /// - The value of Pₙ(x) as `T`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "n", value: n)` if `n < 0`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     ///
     /// Example:
     /// ```swift
     /// let p3: Double = try legendreP(3, 0.5) // P3(0.5) = (5x^3 − 3x)/2 at x=0.5
     /// ```
-    @inlinable static func legendreP<T: Real & BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
+    @inlinable static func legendreP<T: Real & BinaryFloatingPoint & Sendable>(_ n: Int, _ x: T) throws -> T {
         // Degree must be non-negative.
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: T(n)) }
         // Convert to Double for the C backend. Keep a single conversion point to minimize rounding steps.
         let dx = D(x)
         // Validate finiteness prior to calling the C layer.
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         // Delegate to Boost-backed implementation and convert back to T.
         return T(bs_legendre_p_d(Int32(n), dx))
     }
@@ -118,7 +118,7 @@ public extension SpecialFunctions {
     /// - The value of Pₙᵐ(x) as `T`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "n", value: n)` if `n < 0`.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "m", min: -n, max: n)` if `|m| > n`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     ///
@@ -126,14 +126,14 @@ public extension SpecialFunctions {
     /// ```swift
     /// let p32: Double = try associatedLegendreP(3, 2, 0.3) // P3^2(0.3)
     /// ```
-    @inlinable static func associatedLegendreP<T: Real & BinaryFloatingPoint>(_ n: Int, _ m: Int, _ x: T) throws -> T {
+    @inlinable static func associatedLegendreP<T: Real & BinaryFloatingPoint & Sendable>(_ n: Int, _ m: Int, _ x: T) throws -> T {
         // Degree/order constraints.
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: T(n)) }
         guard abs(m) <= n else { throw SpecialFunctionError.parameterOutOfRange(name: "m", min: Double(-n), max: Double(n)) }
         // Convert to Double for the C backend. Keep a single conversion point to minimize rounding steps.
         let dx = D(x)
         // Validate finiteness prior to calling the C layer.
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         // Delegate to Boost-backed implementation and convert back to T.
         return T(bs_assoc_legendre_p_d(Int32(n), Int32(m), dx))
     }
@@ -148,12 +148,12 @@ public extension SpecialFunctions {
     /// - Pₙ′(x) as `T`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "n", value: n)` if `n < 0`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    @inlinable static func legendrePPrime<T: Real & BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
+    @inlinable static func legendrePPrime<T: Real & BinaryFloatingPoint & Sendable>(_ n: Int, _ x: T) throws -> T {
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: T(n)) }
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_legendre_p_prime_d(Int32(n), dx))
     }
     
@@ -168,8 +168,8 @@ public extension SpecialFunctions {
     ///
     /// Returns:
     /// - An array [x_i] of length l containing the zeros of Pₗ(x), converted to `T`.
-    @inlinable static func legendrePZeros<T: Real & BinaryFloatingPoint>(degree l: Int) throws -> [T] {
-        guard l >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "degree") }
+    @inlinable static func legendrePZeros<T: Real & BinaryFloatingPoint & Sendable>(degree l: Int) throws -> [T] {
+        guard l >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "degree", value: T(l)) }
         guard l > 0 else { return [] }
         var tmp = Array<Double>(repeating: .zero, count: l)
         tmp.withUnsafeMutableBufferPointer { buf in
@@ -192,7 +192,7 @@ public extension SpecialFunctions {
     /// - `Pₙ(x)` as `Float`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "n", value: n)` if `n < 0`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     ///
     /// Example:
@@ -200,8 +200,8 @@ public extension SpecialFunctions {
     /// let pf = try legendreP(2, 0.1 as Float)
     /// ```
     @inlinable static func legendreP(_ n: Int, _ x: Float) throws -> Float {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float(n)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_legendre_p_f(Int32(n), x)
     }
     
@@ -216,7 +216,7 @@ public extension SpecialFunctions {
     /// - `Pₙᵐ(x)` as `Float`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "n", value: n)` if `n < 0`.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "m", min: -n, max: n)` if `|m| > n`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     ///
@@ -225,22 +225,22 @@ public extension SpecialFunctions {
     /// let paf = try associatedLegendreP(4, 1, 0.25 as Float)
     /// ```
     @inlinable static func associatedLegendreP(_ n: Int, _ m: Int, _ x: Float) throws -> Float {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float(n)) }
         guard abs(m) <= n else { throw SpecialFunctionError.parameterOutOfRange(name: "m", min: Double(-n), max: Double(n)) }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_assoc_legendre_p_f(Int32(n), Int32(m), x)
     }
     
     /// Pₙ′(x) for `Float`. Requires `n ≥ 0` and finite `x`.
     @inlinable static func legendrePPrime(_ n: Int, _ x: Float) throws -> Float {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float(n)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_legendre_p_prime_f(Int32(n), x)
     }
     
     /// Zeros of Pₗ(x) for `Float`. For l ≤ 0 returns [].
     @inlinable static func legendrePZeros(degree l: Int) throws -> [Float] {
-        guard l >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "degree") }
+        guard l >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "degree", value: Float(l)) }
         guard l > 0 else { return [] }
         var out = Array<Float>(repeating: .zero, count: l)
         out.withUnsafeMutableBufferPointer { buf in
@@ -265,14 +265,14 @@ public extension SpecialFunctions {
     /// - `Pₙ(x)` as `Float80`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "n", value: n)` if `n < 0`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     ///
     /// Availability:
     /// - Only on x86_64 architectures where `Float80` is available.
     @inlinable static func legendreP(_ n: Int, _ x: Float80) throws -> Float80 {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float80(n)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_legendre_p_l(Int32(n), x)
     }
     
@@ -289,29 +289,29 @@ public extension SpecialFunctions {
     /// - `Pₙᵐ(x)` as `Float80`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "n", value: n)` if `n < 0`.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "m", min: -n, max: n)` if `|m| > n`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     ///
     /// Availability:
     /// - Only on x86_64 architectures where `Float80` is available.
     @inlinable static func associatedLegendreP(_ n: Int, _ m: Int, _ x: Float80) throws -> Float80 {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float80(n)) }
         guard abs(m) <= n else { throw SpecialFunctionError.parameterOutOfRange(name: "m", min: Double(-n), max: Double(n)) }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_assoc_legendre_p_l(Int32(n), Int32(m), x)
     }
     
     /// Pₙ′(x) for `Float80` (x86_64 only). Requires `n ≥ 0` and finite `x`.
     @inlinable static func legendrePPrime(_ n: Int, _ x: Float80) throws -> Float80 {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float80(n)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_legendre_p_prime_l(Int32(n), x)
     }
     
     /// Zeros of Pₗ(x) for `Float80` (x86_64 only). For l ≤ 0 returns [].
     @inlinable static func legendrePZeros(degree l: Int) throws -> [Float80] {
-        guard l >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "degree") }
+        guard l >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "degree", value: Float80(l)) }
         guard l > 0 else { return [] }
         var out = Array<Float80>(repeating: .zero, count: l)
         out.withUnsafeMutableBufferPointer { buf in

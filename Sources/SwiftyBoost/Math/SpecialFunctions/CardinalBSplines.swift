@@ -65,7 +65,7 @@ public extension SpecialFunctions {
     ///   ```swift
     ///   let y: Double = try SpecialFunctions.cardinal_B_Spline(4, 0.25)
     ///   ```
-    static func cardinal_B_Spline<T: Real & BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
+    static func cardinal_B_Spline<T: Real & BinaryFloatingPoint & Sendable>(_ n: Int, _ x: T) throws -> T {
         guard x <= 1, x >= -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 1, max: 1) }
         return T(bs_cardinal_b_spline_d(UInt32(n), D(x)))
     }
@@ -120,7 +120,7 @@ public extension SpecialFunctions {
     ///   ```swift
     ///   let dy: Double = try SpecialFunctions.cardinal_B_Spline_prime(5, 0.1)
     ///   ```
-    static func cardinal_B_Spline_prime<T: Real & BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
+    static func cardinal_B_Spline_prime<T: Real & BinaryFloatingPoint & Sendable>(_ n: Int, _ x: T) throws -> T {
         guard x <= 1, x >= -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 1, max: 1) }
         guard  n >= 3 else { throw SpecialFunctionError.parameterOutOfRange(name: "n", min: 3, max: .infinity) }
         return T(bs_cardinal_b_spline_prime_d(UInt32(n), D(x)))
@@ -177,7 +177,7 @@ public extension SpecialFunctions {
     ///   ```swift
     ///   let d2y: Double = try SpecialFunctions.cardinal_B_Spline_double_prime(6, -0.2)
     ///   ```
-    static func cardinal_B_Spline_double_prime<T: Real & BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
+    static func cardinal_B_Spline_double_prime<T: Real & BinaryFloatingPoint & Sendable>(_ n: Int, _ x: T) throws -> T {
         guard x <= 1, x >= -1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 1, max: 1) }
         guard  n >= 3 else { throw SpecialFunctionError.parameterOutOfRange(name: "n", min: 3, max: .infinity) }
         return T(bs_cardinal_b_spline_double_prime_d(UInt32(n), D(x)))

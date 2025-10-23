@@ -57,12 +57,14 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x", min: −1/e, max: +∞)` if `x < −1/e`.
-    @inlinable static func lambertW0<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
-        let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        let minX = -1.0 / bs_const_e_d()
-        guard dx >= minX else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: minX, max: Double.infinity) }
-        return T(bs_lambert_w0(dx))
+    @inlinable static func lambertW0<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) throws -> T {
+        let minX: T = -Constants.oneDivE()
+        guard x.isFinite else {
+            throw SpecialFunctionError.parameterNotFinite(name: "x", value: x)
+        }
+//        let minX: T = -1.0 / bs_const_e_d()
+        guard x >= minX else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: minX, max: T.infinity) }
+        return T(bs_lambert_w0(Double(x)))
     }
     
     /// Lower branch Lambert W, W−1(x), satisfying W e^W = x, with domain x ∈ [−1/e, 0).
@@ -79,11 +81,11 @@ public extension SpecialFunctions {
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "x", min: −1/e, max: 0)` if `x ∉ [−1/e, 0)`.
-    @inlinable static func lambertWm1<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func lambertWm1<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) throws -> T {
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        let minX = -1.0 / bs_const_e_d()
-        guard dx >= minX && dx < 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: minX, max: 0.0) }
+        let minX: T = -Constants.oneDivE()
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard x >= minX && x < 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: minX, max: 0.0) }
         return T(bs_lambert_wm1(dx))
     }
     
@@ -91,16 +93,16 @@ public extension SpecialFunctions {
     
     /// W0(x) for `Float`. Requires x ≥ −1/e.
     @inlinable static func lambertW0(_ x: Float) throws -> Float {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        let minX = -1.0 as Float / bs_const_e_f()
+        let minX: Float = -Constants.oneDivE()
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         guard x >= minX else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: Double(minX), max: Double.infinity) }
         return bs_lambert_w0_f(x)
     }
     
     /// W−1(x) for `Float`. Requires −1/e ≤ x < 0.
     @inlinable static func lambertWm1(_ x: Float) throws -> Float {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        let minX = -1.0 as Float / bs_const_e_f()
+        let minX: Float = -Constants.oneDivE()
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         guard x >= minX && x < 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: Double(minX), max: 0.0) }
         return bs_lambert_wm1_f(x)
     }
@@ -110,16 +112,16 @@ public extension SpecialFunctions {
 #if arch(x86_64)
     /// W0(x) for `Float80` (x86_64 only). Requires x ≥ −1/e.
     @inlinable static func lambertW0(_ x: Float80) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        let minX = -1.0 as Float80 / bs_const_e_l()
+        let minX: Float80 = -Constants.oneDivE(Float80.self)
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         guard x >= minX else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: Double(minX), max: Double.infinity) }
         return bs_lambert_w0_l(x)
     }
     
     /// W−1(x) for `Float80` (x86_64 only). Requires −1/e ≤ x < 0.
     @inlinable static func lambertWm1(_ x: Float80) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        let minX = -1.0 as Float80 / bs_const_e_l()
+        let minX: Float80 = -Constants.oneDivE(Float80.self)
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         guard x >= minX && x < 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: Double(minX), max: 0.0) }
         return bs_lambert_wm1_l(x)
     }

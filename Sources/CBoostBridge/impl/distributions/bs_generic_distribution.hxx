@@ -587,11 +587,11 @@ bool bs_dist_make_d(const char* name, const bs_param_d* params, size_t count, bs
         out->free = &free_fn<geometric_d_handle>;
         return true;
     } else if (n == "holtsmark" || n == "holtsmark_distribution") {
-        double loc = 0, scale = 0;
+        double loc = 0, scale = 1;
         const char* locKeys[] = { "location", "loc", "mu", "median", "x0" };
         const char* scaleKeys[] = { "scale", "gamma", "sigma", "b" };
         find_param(params, count, locKeys, 5, &loc);
-        if (!find_param(params, count, scaleKeys, 4, &scale)) return false;
+        find_param(params, count, scaleKeys, 4, &scale);
         auto* h = new (std::nothrow) holtsmark_d_handle(loc, scale);
         if (!h) return false;
         out->ctx = h;

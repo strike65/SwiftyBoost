@@ -57,7 +57,7 @@
 //    numerically stable Clenshaw algorithm.
 //
 //  Error model:
-//  - n < 0 throws SpecialFunctionError.parameterNotPositive(name: "n").
+//  - n < 0 throws SpecialFunctionError.parameterNotPositive(name: "n", value: n).
 //  - Non-finite x throws SpecialFunctionError.parameterNotFinite(name: "x").
 //  - chebyshev_next throws SpecialFunctionError.parameterNotFinite if any input is non-finite.
 //  - chebyshevClenshawRecurrence throws SpecialFunctionError.parameterNotFinite if x or any coefficient is non-finite.
@@ -126,15 +126,15 @@ public extension SpecialFunctions {
     /// - Tₙ(x) as `T`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "n", value: n)` if `n < 0`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     ///
     /// Notes:
     /// - For |x| ≤ 1, Tₙ(x) ∈ [−1, 1]. For |x| > 1, magnitude can grow quickly with n.
-    @inlinable static func chebyshevT<T: Real & BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
+    @inlinable static func chebyshevT<T: Real & BinaryFloatingPoint & Sendable>(_ n: Int, _ x: T) throws -> T {
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: T(n)) }
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_chebyshev_T_d(UInt32(n), dx))
     }
 
@@ -154,15 +154,15 @@ public extension SpecialFunctions {
     /// - Uₙ(x) as `T`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "n", value: n)` if `n < 0`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     ///
     /// Notes:
     /// - Uₙ has (n) simple zeros in (−1, 1). Uₙ(±1) = (±1)ⁿ (n + 1).
-    @inlinable static func chebyshevU<T: Real & BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
+    @inlinable static func chebyshevU<T: Real & BinaryFloatingPoint & Sendable>(_ n: Int, _ x: T) throws -> T {
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: T(n)) }
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_chebyshev_U_d(UInt32(n), dx))
     }
 
@@ -184,10 +184,10 @@ public extension SpecialFunctions {
     ///
     /// - If `halfWeightC0 == false`, we pass a modified coefficient vector with c₀' = 2·c₀
     ///   so that Boost’s half-weight interpretation yields the desired unweighted c₀.
-    @inlinable static func chebyshevClenshawRecurrence<T: Real & BinaryFloatingPoint>(_ coefficients: [T], x: T, halfWeightC0: Bool = true) throws -> T {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+    @inlinable static func chebyshevClenshawRecurrence<T: Real & BinaryFloatingPoint & Sendable>(_ coefficients: [T], x: T, halfWeightC0: Bool = true) throws -> T {
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         for c in coefficients {
-            guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients") }
+            guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients", value: c) }
         }
         if coefficients.isEmpty { return .zero }
 
@@ -205,9 +205,9 @@ public extension SpecialFunctions {
 
     /// Float overload for Chebyshev T-series via Clenshaw recurrence (bridged).
     @inlinable static func chebyshevClenshawRecurrence(_ coefficients: [Float], x: Float, halfWeightC0: Bool = true) throws -> Float {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         for c in coefficients {
-            guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients") }
+            guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients", value: c) }
         }
         if coefficients.isEmpty { return 0 }
 
@@ -227,8 +227,8 @@ public extension SpecialFunctions {
     // Mixed-precision promotions for Clenshaw (Float ↔ Double) → Double
     /// Chebyshev T-series with Float coefficients and Double x; returns Double.
     @inlinable static func chebyshevClenshawRecurrence(_ coefficients: [Float], x: Double, halfWeightC0: Bool = true) throws -> Double {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        for c in coefficients { guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients") } }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        for c in coefficients { guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients", value: c) } }
         if coefficients.isEmpty { return 0 }
         if halfWeightC0 {
             return coefficients.map(Double.init).withUnsafeBufferPointer { bp in
@@ -245,8 +245,8 @@ public extension SpecialFunctions {
 
     /// Chebyshev T-series with Double coefficients and Float x; returns Double.
     @inlinable static func chebyshevClenshawRecurrence(_ coefficients: [Double], x: Float, halfWeightC0: Bool = true) throws -> Double {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        for c in coefficients { guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients") } }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        for c in coefficients { guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients", value: c) } }
         if coefficients.isEmpty { return 0 }
         if halfWeightC0 {
             return coefficients.withUnsafeBufferPointer { bp in
@@ -264,9 +264,9 @@ public extension SpecialFunctions {
     #if arch(x86_64)
     /// Float80 overload for Chebyshev T-series via Clenshaw recurrence (bridged, x86_64 only).
     @inlinable static func chebyshevClenshawRecurrence(_ coefficients: [Float80], x: Float80, halfWeightC0: Bool = true) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         for c in coefficients {
-            guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients") }
+            guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients", value: c) }
         }
         if coefficients.isEmpty { return 0 }
 
@@ -286,8 +286,8 @@ public extension SpecialFunctions {
     // Mixed-precision promotions for Clenshaw with Float80 (x86_64) → Float80
     /// Chebyshev T-series with Float80 coefficients and Double x; returns Float80.
     @inlinable static func chebyshevClenshawRecurrence(_ coefficients: [Float80], x: Double, halfWeightC0: Bool = true) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        for c in coefficients { guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients") } }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        for c in coefficients { guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients", value: c) } }
         if coefficients.isEmpty { return 0 }
         if halfWeightC0 {
             return coefficients.withUnsafeBufferPointer { bp in
@@ -304,8 +304,8 @@ public extension SpecialFunctions {
 
     /// Chebyshev T-series with Double coefficients and Float80 x; returns Float80.
     @inlinable static func chebyshevClenshawRecurrence(_ coefficients: [Double], x: Float80, halfWeightC0: Bool = true) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        for c in coefficients { guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients") } }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        for c in coefficients { guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients", value: c) } }
         if coefficients.isEmpty { return 0 }
         let coeffs = coefficients.map(Float80.init)
         if halfWeightC0 {
@@ -323,8 +323,8 @@ public extension SpecialFunctions {
 
     /// Chebyshev T-series with Float coefficients and Float80 x; returns Float80.
     @inlinable static func chebyshevClenshawRecurrence(_ coefficients: [Float], x: Float80, halfWeightC0: Bool = true) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        for c in coefficients { guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients") } }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        for c in coefficients { guard c.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "coefficients", value: c) } }
         if coefficients.isEmpty { return 0 }
         let coeffs = coefficients.map(Float80.init)
         if halfWeightC0 {
@@ -373,27 +373,27 @@ public extension SpecialFunctions {
     /// var U0 = 1.0, U1 = 2.0 * x
     /// let U2 = try SpecialFunctions.chebyshev_next(U1, U0, x) // 0.0
     /// ```
-    @inlinable static func chebyshev_next<T: Real & BinaryFloatingPoint>(_ Pn: T, _ Pn1: T, _ x: T) throws -> T {
-        guard Pn.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "Pn") }
-        guard Pn1.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "Pn1") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        return (2 as T) * x * Pn - Pn1
+    @inlinable static func chebyshev_next<T: Real & BinaryFloatingPoint & Sendable>(_ Pn: T, _ Pn1: T, _ x: T) throws -> T {
+        guard Pn.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "Pn", value: Pn) }
+        guard Pn1.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "Pn1", value: Pn1) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        return 2 * x * Pn - Pn1
     }
 
     /// Float overload of chebyshev_next.
     @inlinable static func chebyshev_next(_ Pn: Float, _ Pn1: Float, _ x: Float) throws -> Float {
-        guard Pn.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "Pn") }
-        guard Pn1.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "Pn1") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard Pn.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "Pn", value: Pn) }
+        guard Pn1.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "Pn1", value: Pn1) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return 2 * x * Pn - Pn1
     }
 
     #if arch(x86_64)
     /// Float80 overload of chebyshev_next (x86_64 only).
     @inlinable static func chebyshev_next(_ Pn: Float80, _ Pn1: Float80, _ x: Float80) throws -> Float80 {
-        guard Pn.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "Pn") }
-        guard Pn1.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "Pn1") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard Pn.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "Pn", value: Pn) }
+        guard Pn1.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "Pn1", value: Pn1) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return 2 * x * Pn - Pn1
     }
     #endif

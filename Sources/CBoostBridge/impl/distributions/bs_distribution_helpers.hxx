@@ -172,7 +172,7 @@ float bs_geometric_find_lower_bound_on_p_f(float trials,
 }
 
 double bs_geometric_find_lower_bound_on_p_d(double trials, double alpha) {
-    return bs_wrap<float>([&]{ return geometric_distribution<float>::find_lower_bound_on_p(trials, alpha);});
+    return bs_wrap<double>([&]{ return geometric_distribution<double>::find_lower_bound_on_p(trials, alpha);});
 }
 
 long double bs_geometric_find_lower_bound_on_p_l(long double trials, long double alpha) {

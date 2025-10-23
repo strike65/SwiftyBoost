@@ -138,7 +138,7 @@ struct ComplexDoubleBasicTests {
     @Test("Polar construction and phase")
     func polarAndPhase() {
         let r: Double = 2.0
-        let theta = Constants<Double>.pi / 4.0 // 45°
+        let theta = Constants.pi() / 4.0 // 45°
         let z = Complex<Double>.fromPolar(radius: r, phase: theta)
         // Expected: (sqrt(2), sqrt(2))
         let rt2 = r * sqrt(0.5)

@@ -62,10 +62,10 @@ extension Distribution {
         /// - Throws: `DistributionError.parameterNotPositive` if parameters are invalid.
         public init(shape: T, scale: T = 1) throws {
             guard shape > 0 else {
-                throw DistributionError.parameterNotPositive(name: "shape")
+                throw DistributionError.parameterNotPositive(name: "shape", value: shape)
             }
             guard scale > 0 else {
-                throw DistributionError.parameterNotPositive(name: "scale")
+                throw DistributionError.parameterNotPositive(name: "scale", value: scale)
             }
             self.shape = shape
             self.scale = scale

@@ -16,15 +16,16 @@ For complex `z` (double/float/(x86_64) long double):
 
 ## Type and Precision
 
-- Real overloads are available generically for `T: BinaryFloatingPoint` and specialized for `Double`, `Float`, and (x86_64) `Float80`.
+- [Real](https://github.com/apple/swift-numerics) overloads are available generically for `T: BinaryFloatingPoint` and specialized for `Double`, `Float`, and (x86_64) `Float80`.
 - Complex overloads exist for `ComplexD`, `ComplexF`, and (x86_64) `ComplexL`.
 
 ## Usage
 
+This snippet first exercises the [Real](https://github.com/apple/swift-numerics) overloads before demonstrating the complex identity.
+
 ```swift
 import SwiftyBoost
 
-// Real
 let s0  = SpecialFunctions.sinc_pi(0.0)     // 1
 let s12 = SpecialFunctions.sinc_pi(0.5)     // ≈ 2/π
 let sh0 = SpecialFunctions.sinhc_pi(0.0)    // 1
@@ -39,4 +40,3 @@ let sh = SpecialFunctions.sinhc_pi(0.7)
 
 - Values propagate IEEE-754 NaN and infinities per the backend.
 - Implementations delegate to Boost via `CBoostBridge` with stable `bs_` functions: `bs_sinc_pi`, `bs_sinhc_pi`, `bs_sincc_pi`, `bs_sinhcc_pi` (and `_f`, `_l` float/long variants).
-

@@ -24,10 +24,10 @@ extension Distribution {
         /// Creates a Bernoulli distribution with success probability `p`.
         ///
         /// - Parameter p: Probability of success in `[0, 1]`.
-        /// - Throws: ``DistributionError/invalidCombination(message:)`` when `p` lies outside `[0, 1]`.
+        /// - Throws: ``DistributionError/invalidCombination(message:value:)`` when `p` lies outside `[0, 1]`; the `value` payload surfaces the invalid probability.
         public init(p: T) throws {
             guard p >= 0, p <= 1 else {
-                throw DistributionError.invalidCombination(message: "p must be in [0,1]")
+                throw DistributionError.invalidCombination(message: "p must be in [0,1]", value: p)
             }
             self.success_fraction = p
             self.dyn = try Distribution.Dynamic<T>(

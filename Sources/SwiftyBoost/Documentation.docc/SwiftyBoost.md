@@ -35,6 +35,12 @@ Use this documentation catalog with DocC to explore how to configure Boost-backe
 - ``Distribution/ChiSquared``
 - ``Distribution/StudentT``
 - ``Distribution/FisherF``
+- ``Distribution/Exponential``
+- ``Distribution/ExtremeValueGumpel``
+- ``Distribution/Cauchy``
+- ``Distribution/Geometric``
+- ``Distribution/Binomial``
 - ``Distribution/Bernoulli``
+- ``Distribution/Holtsmark``
 - ``Distribution/Arcsine``
 - <doc:Distributions>

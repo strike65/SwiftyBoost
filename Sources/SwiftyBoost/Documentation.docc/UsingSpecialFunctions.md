@@ -14,7 +14,7 @@ Discover common entry points and best practices when calling into ``SwiftyBoost`
 
 ## Error Handling and Validation
 
-- All throwing APIs emit ``SpecialFunctionError`` cases; handle `parameterExceedsMaximumIntegerValue` to detect when inputs fall outside documented bounds.
+- All throwing APIs emit ``SpecialFunctionError`` cases; ``invalidCombination`` includes a `value` payload echoing the offending input when available, while `parameterExceedsMaximumIntegerValue` flags arguments outside documented bounds.
 - Use non-throwing helpers (for example `sinhc_pi(_:)`) when you need guarantees about domain coverage and Boost already constrains the evaluation.
 
 ## Testing and Verification

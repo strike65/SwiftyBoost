@@ -112,17 +112,15 @@ extension Distribution {
         /// - For extreme values of α or β, numerical stability is delegated to Boost.
         public init(alpha: T = 0, beta: T = 0) throws {
             guard alpha > 0 else {
-                throw DistributionError.invalidCombination(message: "alpha must be > 0")
+                throw DistributionError.invalidCombination(message: "alpha must be > 0", value: alpha)
             }
             guard beta > 0 else {
-                throw DistributionError.invalidCombination(message: "beta must be > 0")
+                throw DistributionError.invalidCombination(message: "beta must be > 0", value: beta)
             }
             guard alpha.isFinite else {
-                throw DistributionError.parameterNotFinite(name: "alpha")
-            }
+                throw DistributionError.parameterNotFinite(name: "alpha", value: alpha) }
             guard beta.isFinite else {
-                throw DistributionError.parameterNotFinite(name: "beta")
-            }
+                throw DistributionError.parameterNotFinite(name: "beta", value: beta) }
 
             self.alpha = alpha
             self.beta = beta

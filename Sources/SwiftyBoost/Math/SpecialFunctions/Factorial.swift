@@ -92,7 +92,7 @@ public extension SpecialFunctions {
     ///
     /// Returns:
     /// - The largest n such that n! is finite in type `T`.
-    @inlinable static func maxFactorialInput<T: Real & BinaryFloatingPoint>(for _: T.Type) -> UInt32 {
+    @inlinable static func maxFactorialInput<T: Real & BinaryFloatingPoint & Sendable>(for _: T.Type) -> UInt32 {
         if T.self == Float.self { return maxFactorialInputFloat }
 #if arch(i386) || arch(x86_64)
         if T.self == Float80.self { return maxFactorialInputFloat80 }
@@ -120,10 +120,10 @@ public extension SpecialFunctions {
     ///
     /// Notes:
     /// - The computation is delegated to a Double-backed backend and then converted to `T`.
-    @inlinable static func factorial<T: Real & BinaryFloatingPoint> (_ n: UInt32) throws -> T {
+    @inlinable static func factorial<T: Real & BinaryFloatingPoint & Sendable> (_ n: UInt32) throws -> T {
         let limit = maxFactorialInput(for: T.self)
         guard n <= limit else {
-            throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(limit))
+            throw SpecialFunctionError<Double>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(limit))
         }
         // Evaluate via Double-backed backend and cast to T.
         return T(bs_factorial_d(n))
@@ -142,7 +142,7 @@ public extension SpecialFunctions {
     @inlinable static func factorial (_ n: UInt32) throws -> Double {
         let limit = maxFactorialInputDouble
         guard n <= limit else {
-            throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(limit))
+            throw SpecialFunctionError<Double>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(limit))
         }
         return bs_factorial_d(n)
     }
@@ -160,7 +160,7 @@ public extension SpecialFunctions {
     @inlinable static func factorial_f (_ n: UInt32) throws -> Float {
         let limit = maxFactorialInputFloat
         guard n <= limit else {
-            throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(limit))
+            throw SpecialFunctionError<Float>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(limit))
         }
         return bs_factorial_f(n)
     }
@@ -179,7 +179,7 @@ public extension SpecialFunctions {
     @inlinable static func factorial_l (_ n: UInt32) throws -> Float80 {
         let limit = maxFactorialInputFloat80
         guard n <= limit else {
-            throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(limit))
+            throw SpecialFunctionError<Float80>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(limit))
         }
         return bs_factorial_l(n)
     }
@@ -192,7 +192,7 @@ public extension SpecialFunctions {
     /// Purpose:
     /// - Used to pre-check overflow for rising factorial and related computations by
     ///   comparing ln-magnitudes against ln(max finite).
-    @inline(__always)  static func logMaxFinite<T: Real & BinaryFloatingPoint>(for _: T.Type) -> Double {
+    @inline(__always)  static func logMaxFinite<T: Real & BinaryFloatingPoint & Sendable>(for _: T.Type) -> Double {
         if T.self == Float.self {
             return 88.72283905206835 // log(Float.greatestFiniteMagnitude)
         }
@@ -209,7 +209,7 @@ public extension SpecialFunctions {
     /// Purpose:
     /// - Used as an optional underflow-to-zero policy for rising factorial. If the
     ///   predicted ln-magnitude is below this value, the function returns 0.
-    @inline(__always)  static func logLeastPosNonzero<T: Real & BinaryFloatingPoint>(for _: T.Type) -> Double {
+    @inline(__always)  static func logLeastPosNonzero<T: Real & BinaryFloatingPoint & Sendable>(for _: T.Type) -> Double {
         if T.self == Float.self {
             return -103.27892990343185 // log(Float.leastNonzeroMagnitude)
         }
@@ -260,11 +260,11 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if x is NaN or ±∞.
-    /// - `SpecialFunctionError.invalidCombination(message: ...)` if the result would overflow `T`.
-    @inlinable static func rising_factorial<T: Real & BinaryFloatingPoint> (_ x: T, _ n: UInt32) throws -> T {
+    /// - ``SpecialFunctionError/invalidCombination(message:value:)`` if the result would overflow `T`; the `value` payload echoes the base `x`.
+    @inlinable static func rising_factorial<T: Real & BinaryFloatingPoint & Sendable> (_ x: T, _ n: UInt32) throws -> T {
         let dx = D(x)
         // Finiteness check
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         
         // Exact zero short-circuit
         if risingFactorialIsExactlyZero(dx, n: n) { return T(0) }
@@ -277,7 +277,7 @@ public extension SpecialFunctions {
         // Overflow check
         let lnMax = logMaxFinite(for: T.self)
         if S > lnMax {
-            throw SpecialFunctionError.invalidCombination(message: "rising_factorial overflows for given x and n in the target type")
+            throw SpecialFunctionError.invalidCombination(message: "rising_factorial overflows for given x and n in the target type", value: x)
         }
         
         // Optional underflow-to-zero
@@ -304,14 +304,14 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if x is NaN or ±∞.
-    /// - `SpecialFunctionError.invalidCombination(message: ...)` if the result would overflow Double.
+    /// - ``SpecialFunctionError/invalidCombination(message:value:)`` if the result would overflow Double; `value` echoes the base `x`.
     @inlinable static func rising_factorial (_ x: Double,_ n: UInt32) throws -> Double {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         if risingFactorialIsExactlyZero(x, n: n) { return 0 }
         
         let S = bs_lgamma_d(x + Double(n)) - bs_lgamma_d(x)
         if S > 709.782712893384 { // log(Double.greatestFiniteMagnitude)
-            throw SpecialFunctionError.invalidCombination(message: "rising_factorial overflows for given x and n in Double")
+            throw SpecialFunctionError.invalidCombination(message: "rising_factorial overflows for given x and n in Double", value: x)
         }
         if S < -744.4400719213812 { // log(Double.leastNonzeroMagnitude)
             return 0
@@ -335,9 +335,9 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if x is NaN or ±∞.
-    /// - `SpecialFunctionError.invalidCombination(message: ...)` if the result would overflow Float.
+    /// - ``SpecialFunctionError/invalidCombination(message:value:)`` if the result would overflow Float; `value` echoes the base `x`.
     @inlinable static func rising_factorial_f (_ x: Float, _ n: UInt32) throws -> Float {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         // Do exact-zero check in Float via Double for integer detection robustness
         let dx = Double(x)
         if risingFactorialIsExactlyZero(dx, n: n) { return 0 }
@@ -345,7 +345,7 @@ public extension SpecialFunctions {
         // Compute in Float precision for log-gamma
         let S = Double(bs_lgamma_f(x + Float(n)) - bs_lgamma_f(x))
         if S > 88.72283905206835 { // log(Float.greatestFiniteMagnitude)
-            throw SpecialFunctionError.invalidCombination(message: "rising_factorial overflows for given x and n in Float")
+            throw SpecialFunctionError.invalidCombination(message: "rising_factorial overflows for given x and n in Float", value: x)
         }
         if S < -103.27892990343185 { // log(Float.leastNonzeroMagnitude)
             return 0
@@ -371,16 +371,16 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if x is NaN or ±∞.
-    /// - `SpecialFunctionError.invalidCombination(message: ...)` if the result would overflow Float80.
+    /// - ``SpecialFunctionError/invalidCombination(message:value:)`` if the result would overflow Float80; `value` echoes the base `x`.
     @inlinable static func rising_factorial_l (_ x: Float80, _ n: UInt32) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         // Exact-zero check via Double
         if risingFactorialIsExactlyZero(Double(x), n: n) { return 0 }
         
         // Compute in extended precision for log-gamma
         let S = Double(bs_lgamma_l(x + Float80(n)) - bs_lgamma_l(x))
         if S > 11356.523406294143 { // log(max Float80)
-            throw SpecialFunctionError.invalidCombination(message: "rising_factorial overflows for given x and n in Float80")
+            throw SpecialFunctionError.invalidCombination(message: "rising_factorial overflows for given x and n in Float80", value: x)
         }
         // Underflow pre-check for Float80 is conservative; skip or set a very negative threshold.
         // if S < -11399 { return 0 }
@@ -397,7 +397,7 @@ public extension SpecialFunctions {
     ///
     /// Returns:
     /// - (x)_n as `T`, with the same checks and throwing behavior as rising_factorial(_:_:).
-    @inlinable static func pochhammer<T: Real & BinaryFloatingPoint> (_ x: T, _ n: UInt32) throws -> T {
+    @inlinable static func pochhammer<T: Real & BinaryFloatingPoint & Sendable> (_ x: T, _ n: UInt32) throws -> T {
         try rising_factorial(x, n)
     }
     
@@ -426,7 +426,7 @@ public extension SpecialFunctions {
     /// - Returns 0 if `k > n`.
     /// - Returns 1 if `k == 0` or `k == n`.
     /// - Pre-checks overflow using S = ln Γ(n+1) − ln Γ(k+1) − ln Γ(n−k+1) against the
-    ///   ln(max finite) for the target type `T`. Throws invalidCombination on overflow.
+    ///   ln(max finite) for the target type `T`. Throws ``SpecialFunctionError/invalidCombination(message:value:)`` on overflow.
     ///
     /// Parameters:
     /// - n: Non-negative integer.
@@ -436,8 +436,8 @@ public extension SpecialFunctions {
     /// - C(n, k) as `T`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.invalidCombination(message: ...)` if the result would overflow `T`.
-    @inlinable static func binomial_coeff<T: Real & BinaryFloatingPoint> (_ n: UInt32, _ k: UInt32) throws -> T {
+    /// - ``SpecialFunctionError/invalidCombination(message:value:)`` if the result would overflow `T`; the `value` payload echoes the argument `n`.
+    @inlinable static func binomial_coeff<T: Real & BinaryFloatingPoint & Sendable> (_ n: UInt32, _ k: UInt32) throws -> T {
         if k > n { return T(0) }
         if k == 0 || k == n { return T(1) }
         
@@ -447,7 +447,7 @@ public extension SpecialFunctions {
         
         let lnMax = logMaxFinite(for: T.self)
         if S > lnMax {
-            throw SpecialFunctionError.invalidCombination(message: "binomial_coeff overflows for given n and k in the target type")
+            throw SpecialFunctionError.invalidCombination(message: "binomial_coeff overflows for given n and k in the target type", value: T(n))
         }
         
         return T(bs_binomial_coefficient_d(n, k))
@@ -457,7 +457,7 @@ public extension SpecialFunctions {
     ///
     /// Behavior:
     /// - Returns 0 if `k > n`. Returns 1 if `k == 0` or `k == n`.
-    /// - Throws invalidCombination if the result would overflow Double.
+    /// - Throws ``SpecialFunctionError/invalidCombination(message:value:)`` if the result would overflow Double; `value` echoes the argument `n`.
     ///
     /// Parameters:
     /// - n: Non-negative integer.
@@ -472,7 +472,7 @@ public extension SpecialFunctions {
         let dn = Double(n), dk = Double(k), dnk = Double(n - k)
         let S = bs_lgamma_d(dn + 1) - bs_lgamma_d(dk + 1) - bs_lgamma_d(dnk + 1)
         if S > 709.782712893384 { // log(Double.greatestFiniteMagnitude)
-            throw SpecialFunctionError.invalidCombination(message: "binomial_coeff overflows for given n and k in Double")
+            throw SpecialFunctionError.invalidCombination(message: "binomial_coeff overflows for given n and k in Double", value: Double(n))
         }
         
         return bs_binomial_coefficient_d(n, k)
@@ -482,7 +482,7 @@ public extension SpecialFunctions {
     ///
     /// Behavior:
     /// - Returns 0 if `k > n`. Returns 1 if `k == 0` or `k == n`.
-    /// - Throws invalidCombination if the result would overflow Float.
+    /// - Throws ``SpecialFunctionError/invalidCombination(message:value:)`` if the result would overflow Float; `value` echoes the argument `n`.
     ///
     /// Parameters:
     /// - n: Non-negative integer.
@@ -498,7 +498,7 @@ public extension SpecialFunctions {
         let fn = Float(n), fk = Float(k), fnk = Float(n - k)
         let S = Double(bs_lgamma_f(fn + 1) - bs_lgamma_f(fk + 1) - bs_lgamma_f(fnk + 1))
         if S > 88.72283905206835 { // log(Float.greatestFiniteMagnitude)
-            throw SpecialFunctionError.invalidCombination(message: "binomial_coeff overflows for given n and k in Float")
+            throw SpecialFunctionError.invalidCombination(message: "binomial_coeff overflows for given n and k in Float", value: Float(n))
         }
         
         return bs_binomial_coefficient_f(n, k)
@@ -509,7 +509,7 @@ public extension SpecialFunctions {
     ///
     /// Behavior:
     /// - Returns 0 if `k > n`. Returns 1 if `k == 0` or `k == n`.
-    /// - Throws invalidCombination if the result would overflow Float80.
+    /// - Throws ``SpecialFunctionError/invalidCombination(message:value:)`` if the result would overflow Float80; `value` echoes the argument `n`.
     ///
     /// Parameters:
     /// - n: Non-negative integer.
@@ -524,7 +524,7 @@ public extension SpecialFunctions {
         let ln = Float80(n), lk = Float80(k), lnk = Float80(n - k)
         let S = Double(bs_lgamma_l(ln + 1) - bs_lgamma_l(lk + 1) - bs_lgamma_l(lnk + 1))
         if S > 11356.523406294143 { // log(max Float80)
-            throw SpecialFunctionError.invalidCombination(message: "binomial_coeff overflows for given n and k in Float80")
+            throw SpecialFunctionError.invalidCombination(message: "binomial_coeff overflows for given n and k in Float80", value: Float80(n))
         }
         
         return bs_binomial_coefficient_l(n, k)
@@ -564,7 +564,7 @@ public extension SpecialFunctions {
     ///
     /// Behavior:
     /// - Uses a logarithmic magnitude estimate via logDoubleFactorial(_:) to ensure
-    ///   the result fits in the target type `T`. Throws invalidCombination on overflow.
+    ///   the result fits in the target type `T`. Throws ``SpecialFunctionError/invalidCombination(message:value:)`` on overflow with `value` echoing the argument `n`.
     ///
     /// Parameters:
     /// - n: Non-negative integer.
@@ -573,13 +573,13 @@ public extension SpecialFunctions {
     /// - n!! as `T`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.invalidCombination(message: ...)` if the result would overflow `T`.
-    @inlinable static func double_factorial<T: Real & BinaryFloatingPoint>(_ n: UInt32) throws -> T {
+    /// - ``SpecialFunctionError/invalidCombination(message:value:)`` if the result would overflow `T`; the `value` payload echoes the argument `n`.
+    @inlinable static func double_factorial<T: Real & BinaryFloatingPoint & Sendable>(_ n: UInt32) throws -> T {
         // Magnitude check via log
         let S = logDoubleFactorial(n)
         let lnMax = logMaxFinite(for: T.self)
         if S > lnMax {
-            throw SpecialFunctionError.invalidCombination(message: "double_factorial overflows for given n in the target type")
+            throw SpecialFunctionError.invalidCombination(message: "double_factorial overflows for given n in the target type", value: T(n))
         }
         return T(bs_double_factorial_d(n))
     }
@@ -593,11 +593,11 @@ public extension SpecialFunctions {
     /// - n!! as `Double`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.invalidCombination(message: ...)` if the result would overflow Double.
+    /// - ``SpecialFunctionError/invalidCombination(message:value:)`` if the result would overflow Double; `value` echoes the argument `n`.
     @inlinable static func double_factorial(_ n: UInt32) throws -> Double {
         let S = logDoubleFactorial(n)
         if S > 709.782712893384 { // log(Double.greatestFiniteMagnitude)
-            throw SpecialFunctionError.invalidCombination(message: "double_factorial overflows for given n in Double")
+            throw SpecialFunctionError.invalidCombination(message: "double_factorial overflows for given n in Double", value: Double(n))
         }
         return bs_double_factorial_d(n)
     }
@@ -611,12 +611,12 @@ public extension SpecialFunctions {
     /// - n!! as `Float`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.invalidCombination(message: ...)` if the result would overflow Float.
+    /// - ``SpecialFunctionError/invalidCombination(message:value:)`` if the result would overflow Float; `value` echoes the argument `n`.
     @inlinable static func double_factorial_f(_ n: UInt32) throws -> Float {
         // For Float we can compute the log using Double (sufficient and safe).
         let S = logDoubleFactorial(n)
         if S > 88.72283905206835 { // log(Float.greatestFiniteMagnitude)
-            throw SpecialFunctionError.invalidCombination(message: "double_factorial overflows for given n in Float")
+            throw SpecialFunctionError.invalidCombination(message: "double_factorial overflows for given n in Float", value: Float(n))
         }
         return bs_double_factorial_f(n)
     }
@@ -631,11 +631,11 @@ public extension SpecialFunctions {
     /// - n!! as `Float80`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.invalidCombination(message: ...)` if the result would overflow Float80.
+    /// - ``SpecialFunctionError/invalidCombination(message:value:)`` if the result would overflow Float80; `value` echoes the argument `n`.
     @inlinable static func double_factorial_l(_ n: UInt32) throws -> Float80 {
         let S = logDoubleFactorial(n)
         if S > 11356.523406294143 { // log(max Float80)
-            throw SpecialFunctionError.invalidCombination(message: "double_factorial overflows for given n in Float80")
+            throw SpecialFunctionError.invalidCombination(message: "double_factorial overflows for given n in Float80", value: Float80(n))
         }
         return bs_double_factorial_l(n)
     }

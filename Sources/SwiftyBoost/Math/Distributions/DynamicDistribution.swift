@@ -75,7 +75,7 @@ extension Distribution {
                 defer { ptr.deallocate() }
                 let ok = bs_dist_make_d(name, cParams, cParams.count, ptr)
                 guard ok else {
-                    throw DistributionError.invalidCombination(message: "Unknown distribution or bad parameters: \(name)")
+                    throw DistributionError<Double>.invalidCombination(message: "Unknown distribution or bad parameters: \(name)", value: nil)
                 }
                 self.box = Box(d: ptr.pointee)
             } else if T.self == Float.self {
@@ -95,7 +95,7 @@ extension Distribution {
                 defer { ptr.deallocate() }
                 let ok = bs_dist_make_f(name, cParams, cParams.count, ptr)
                 guard ok else {
-                    throw DistributionError.invalidCombination(message: "Unknown distribution or bad parameters: \(name)")
+                    throw DistributionError<Double>.invalidCombination(message: "Unknown distribution or bad parameters: \(name)", value: nil)
                 }
                 self.box = Box(f: ptr.pointee)
             } else {
@@ -116,7 +116,7 @@ extension Distribution {
                 defer { ptr.deallocate() }
                 let ok = bs_dist_make_l(name, cParams, cParams.count, ptr)
                 guard ok else {
-                    throw DistributionError.invalidCombination(message: "Unknown distribution or bad parameters: \(name)")
+                    throw DistributionError<Double>.invalidCombination(message: "Unknown distribution or bad parameters: \(name)", value: nil)
                 }
                 self.box = Box(l: ptr.pointee)
                 #else
@@ -137,7 +137,7 @@ extension Distribution {
                 defer { ptr.deallocate() }
                 let ok = bs_dist_make_d(name, cParams, cParams.count, ptr)
                 guard ok else {
-                    throw DistributionError.invalidCombination(message: "Unknown distribution or bad parameters: \(name)")
+                    throw DistributionError<Double>.invalidCombination(message: "Unknown distribution or bad parameters: \(name)", value: nil)
                 }
                 self.box = Box(d: ptr.pointee)
                 #endif

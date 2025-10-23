@@ -66,14 +66,14 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - SpecialFunctionError.parameterNotFinite(name: "v") if v is NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotFinite(name: "x") if x is NaN or ±∞.
+    /// - SpecialFunctionError.parameterNotFinite(name: "x", value: x) if x is NaN or ±∞.
     ///
     /// See also:
     /// - NIST DLMF §10.2–10.4 for properties and series/recurrence relations.
-    @inlinable static func besselJ<T: Real & BinaryFloatingPoint>(v: T, x: T) throws -> T {
+    @inlinable static func besselJ<T: Real & BinaryFloatingPoint & Sendable>(v: T, x: T) throws -> T {
         let dv = D(v), dx = D(x)
-        guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_cyl_bessel_j_d(dv, dx))
     }
     
@@ -96,8 +96,8 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - SpecialFunctionError.parameterNotFinite(name: "v") if v is NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotFinite(name: "x") if x is NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotPositive(name: "x") if x ≤ 0.
+    /// - SpecialFunctionError.parameterNotFinite(name: "x", value: x) if x is NaN or ±∞.
+    /// - SpecialFunctionError.parameterNotPositive(name: "x", value: x) if x ≤ 0.
     ///
     /// Notes:
     /// - Also known as the Neumann function or Bessel function of the second kind.
@@ -105,11 +105,11 @@ public extension SpecialFunctions {
     ///
     /// See also:
     /// - NIST DLMF §10.2–10.4 and §10.7 for behavior and relations.
-    @inlinable static func besselY<T: Real & BinaryFloatingPoint>(v: T, x: T) throws -> T {
+    @inlinable static func besselY<T: Real & BinaryFloatingPoint & Sendable>(v: T, x: T) throws -> T {
         let dv = D(v), dx = D(x)
-        guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard dx > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
+        guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard dx > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
         return T(bs_cyl_neumann_d(dv, dx))
     }
     
@@ -132,14 +132,14 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - SpecialFunctionError.parameterNotFinite(name: "v") if v is NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotFinite(name: "x") if x is NaN or ±∞.
+    /// - SpecialFunctionError.parameterNotFinite(name: "x", value: x) if x is NaN or ±∞.
     ///
     /// See also:
     /// - NIST DLMF §10.25–10.27.
-    @inlinable static func modifiedBesselI<T: Real & BinaryFloatingPoint>(v: T, x: T) throws -> T {
+    @inlinable static func modifiedBesselI<T: Real & BinaryFloatingPoint & Sendable>(v: T, x: T) throws -> T {
         let dv = D(v), dx = D(x)
-        guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_cyl_bessel_i_d(dv, dx))
     }
     
@@ -161,8 +161,8 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - SpecialFunctionError.parameterNotFinite(name: "v") if v is NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotFinite(name: "x") if x is NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotPositive(name: "x") if x ≤ 0.
+    /// - SpecialFunctionError.parameterNotFinite(name: "x", value: x) if x is NaN or ±∞.
+    /// - SpecialFunctionError.parameterNotPositive(name: "x", value: x) if x ≤ 0.
     ///
     /// Notes:
     /// - Rapidly decays for large x and is often used in boundary-value problems.
@@ -170,11 +170,11 @@ public extension SpecialFunctions {
     ///
     /// See also:
     /// - NIST DLMF §10.25–10.31.
-    @inlinable static func modifiedBesselK<T: Real & BinaryFloatingPoint>(v: T, x: T) throws -> T {
+    @inlinable static func modifiedBesselK<T: Real & BinaryFloatingPoint & Sendable>(v: T, x: T) throws -> T {
         let dv = D(v), dx = D(x)
-        guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard dx > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
+        guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard dx > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
         return T(bs_cyl_bessel_k_d(dv, dx))
     }
 
@@ -268,7 +268,7 @@ public extension SpecialFunctions {
     @inlinable static func modifiedBesselKPrime<V: BinaryInteger>(v: V, x: Float80) throws -> Float80 { try modifiedBesselKPrime(v: Float80(v), x: x) }
     #endif
     
-    @inlinable static func besselJZero<T: Real & BinaryFloatingPoint>(v: T, m: Int32) -> T {
+    @inlinable static func besselJZero<T: Real & BinaryFloatingPoint & Sendable>(v: T, m: Int32) -> T {
         return T(bs_cyl_bessel_j_zero_d(Double(v), m))
     }
     
@@ -285,7 +285,7 @@ public extension SpecialFunctions {
     /// Notes:
     /// - This uses the plural bridge function to fill results in one call.
     /// - Domain specifics (e.g., invalid start for certain orders) are handled by the backend.
-    @inlinable static func besselJZeros<T: Real & BinaryFloatingPoint>(v: T, start: Int32, count: Int) -> [T] {
+    @inlinable static func besselJZeros<T: Real & BinaryFloatingPoint & Sendable>(v: T, start: Int32, count: Int) -> [T] {
         precondition(count >= 0, "count must be non-negative")
         if count == 0 { return [] }
         precondition(count <= Int(UInt32.max), "count exceeds UInt32 capacity")
@@ -316,11 +316,17 @@ public extension SpecialFunctions {
     ///   - x: Real argument (finite).
     ///
     /// - Returns: j_n(x) as T.
-    @inlinable static func sphericalBesselJ<T: Real & BinaryFloatingPoint>(n: Int, x: T) throws -> T {
+    @inlinable static func sphericalBesselJ<T: Real & BinaryFloatingPoint & Sendable>(n: Int, x: T) throws -> T {
         let dx = D(x)
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: T(n)) }
+        guard n <= Int(UInt32.max) else {
+            throw SpecialFunctionError<Double>
+                .parameterExceedsMaximumIntegerValue(
+                    name: "n",
+                    max: Int(UInt32.max)
+                )
+        }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_sph_bessel_d(UInt32(n), dx))
     }
     
@@ -338,12 +344,12 @@ public extension SpecialFunctions {
     ///   - x: Real argument (must satisfy x > 0).
     ///
     /// - Returns: y_n(x) as T.
-    @inlinable static func sphericalBesselY<T: Real & BinaryFloatingPoint>(n: Int, x: T) throws -> T {
+    @inlinable static func sphericalBesselY<T: Real & BinaryFloatingPoint & Sendable>(n: Int, x: T) throws -> T {
         let dx = D(x)
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard dx > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: T(n)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Double>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard dx > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
         return T(bs_sph_neumann_d(UInt32(n), dx))
     }
     
@@ -369,11 +375,11 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - SpecialFunctionError.parameterNotFinite(name: "v") if v is NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotFinite(name: "x") if x is NaN or ±∞.
-    @inlinable static func besselJPrime<T: Real & BinaryFloatingPoint>(v: T, x: T) throws -> T {
+    /// - SpecialFunctionError.parameterNotFinite(name: "x", value: x) if x is NaN or ±∞.
+    @inlinable static func besselJPrime<T: Real & BinaryFloatingPoint & Sendable>(v: T, x: T) throws -> T {
         let dv = D(v), dx = D(x)
-        guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_cyl_bessel_j_prime_d(dv, dx))
     }
     
@@ -395,11 +401,11 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - SpecialFunctionError.parameterNotFinite(name: "v") if v is NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotFinite(name: "x") if x is NaN or ±∞.
-    @inlinable static func modifiedBesselIPrime<T: Real & BinaryFloatingPoint>(v: T, x: T) throws -> T {
+    /// - SpecialFunctionError.parameterNotFinite(name: "x", value: x) if x is NaN or ±∞.
+    @inlinable static func modifiedBesselIPrime<T: Real & BinaryFloatingPoint & Sendable>(v: T, x: T) throws -> T {
         let dv = D(v), dx = D(x)
-        guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_cyl_bessel_i_prime_d(dv, dx))
     }
     
@@ -424,13 +430,13 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - SpecialFunctionError.parameterNotFinite(name: "v") if v is NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotFinite(name: "x") if x is NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotPositive(name: "x") if x ≤ 0.
-    @inlinable static func modifiedBesselKPrime<T: Real & BinaryFloatingPoint>(v: T, x: T) throws -> T {
+    /// - SpecialFunctionError.parameterNotFinite(name: "x", value: x) if x is NaN or ±∞.
+    /// - SpecialFunctionError.parameterNotPositive(name: "x", value: x) if x ≤ 0.
+    @inlinable static func modifiedBesselKPrime<T: Real & BinaryFloatingPoint & Sendable>(v: T, x: T) throws -> T {
         let dv = D(v), dx = D(x)
-        guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard dx > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
+        guard dv.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard dx > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
         return T(bs_cyl_bessel_k_prime_d(dv, dx))
     }
     
@@ -454,15 +460,15 @@ public extension SpecialFunctions {
     /// - j′_n(x) as T.
     ///
     /// Throws:
-    /// - SpecialFunctionError.parameterNotPositive(name: "n") if n < 0.
+    /// - SpecialFunctionError.parameterNotPositive(name: "n", value: n) if n < 0.
     /// - SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: ...) if n > UInt32.max.
-    /// - SpecialFunctionError.parameterNotFinite(name: "x") if x is NaN or ±∞.
+    /// - SpecialFunctionError.parameterNotFinite(name: "x", value: x) if x is NaN or ±∞.
     /// - SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: +∞) if x < 0.
-    @inlinable static func sphericalBesselJPrime<T: Real & BinaryFloatingPoint>(n: Int, x: T) throws -> T {
+    @inlinable static func sphericalBesselJPrime<T: Real & BinaryFloatingPoint & Sendable>(n: Int, x: T) throws -> T {
         let dx = D(x)
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: T(n)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Double>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         guard dx >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
         return T(bs_sph_bessel_prime_d(UInt32(n), dx))
     }
@@ -487,16 +493,16 @@ public extension SpecialFunctions {
     /// - y′_n(x) as T.
     ///
     /// Throws:
-    /// - SpecialFunctionError.parameterNotPositive(name: "n") if n < 0.
+    /// - SpecialFunctionError.parameterNotPositive(name: "n", value: n) if n < 0.
     /// - SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: ...) if n > UInt32.max.
-    /// - SpecialFunctionError.parameterNotFinite(name: "x") if x is NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotPositive(name: "x") if x ≤ 0.
-    @inlinable static func sphericalBesselYPrime<T: Real & BinaryFloatingPoint>(n: Int, x: T) throws -> T {
+    /// - SpecialFunctionError.parameterNotFinite(name: "x", value: x) if x is NaN or ±∞.
+    /// - SpecialFunctionError.parameterNotPositive(name: "x", value: x) if x ≤ 0.
+    @inlinable static func sphericalBesselYPrime<T: Real & BinaryFloatingPoint & Sendable>(n: Int, x: T) throws -> T {
         let dx = D(x)
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard dx > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: T(n)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Double>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard dx > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
         return T(bs_sph_neumann_prime_d(UInt32(n), dx))
     }
     
@@ -505,8 +511,8 @@ public extension SpecialFunctions {
     
     /// Cylindrical Bessel function of the first kind J_v(x) for Float.
     @inlinable static func besselJ_f(v: Float, x: Float) throws -> Float {
-        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_cyl_bessel_j_f(v, x)
     }
     
@@ -514,16 +520,16 @@ public extension SpecialFunctions {
     ///
     /// Domain: requires x > 0.
     @inlinable static func besselY_f(v: Float, x: Float) throws -> Float {
-        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
+        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
         return bs_cyl_neumann_f(v, x)
     }
     
     /// Modified Bessel function of the first kind I_v(x) for Float.
     @inlinable static func modifiedBesselI_f(v: Float, x: Float) throws -> Float {
-        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_cyl_bessel_i_f(v, x)
     }
     
@@ -531,9 +537,9 @@ public extension SpecialFunctions {
     ///
     /// Domain: requires x > 0.
     @inlinable static func modifiedBesselK_f(v: Float, x: Float) throws -> Float {
-        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
+        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
         return bs_cyl_bessel_k_f(v, x)
     }
     
@@ -555,18 +561,18 @@ public extension SpecialFunctions {
     
     /// Spherical Bessel j_n(x) for Float.
     @inlinable static func sphericalBesselJ(n: Int, x: Float) throws -> Float {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float(n)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Float>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_sph_bessel_f(UInt32(n), x)
     }
     
     /// Spherical Neumann y_n(x) for Float. Domain: x > 0.
     @inlinable static func sphericalBesselY(n: Int, x: Float) throws -> Float {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float(n)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Float>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
         return bs_sph_neumann_f(UInt32(n), x)
     }
     
@@ -576,8 +582,8 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/besselJPrime(v:x:)->T`` for definition, domain, and behavior.
     @inlinable static func besselJPrime(v: Float, x: Float) throws -> Float {
-        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_cyl_bessel_j_prime_f(v, x)
     }
     
@@ -585,8 +591,8 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/modifiedBesselIPrime(v:x:)->T`` for definition, domain, and behavior.
     @inlinable static func modifiedBesselIPrime(v: Float, x: Float) throws -> Float {
-        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_cyl_bessel_i_prime_f(v, x)
     }
     
@@ -597,9 +603,9 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/modifiedBesselKPrime(v:x:)->T`` for additional details.
     @inlinable static func modifiedBesselKPrime(v: Float, x: Float) throws -> Float {
-        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
+        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
         return bs_cyl_bessel_k_prime_f(v, x)
     }
     
@@ -610,9 +616,9 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/sphericalBesselJPrime(n:x:)->T`` for additional details.
     @inlinable static func sphericalBesselJPrime(n: Int, x: Float) throws -> Float {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float(n)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Float>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
         return bs_sph_bessel_prime_f(UInt32(n), x)
     }
@@ -624,10 +630,10 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/sphericalBesselYPrime(n:x:)->T`` for additional details.
     @inlinable static func sphericalBesselYPrime(n: Int, x: Float) throws -> Float {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float(n)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Float>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
         return bs_sph_neumann_prime_f(UInt32(n), x)
     }
 
@@ -681,8 +687,8 @@ public extension SpecialFunctions {
 
     /// Cylindrical Bessel function of the first kind J_v(x) for Float80 (x86_64 only).
     @inlinable static func besselJ_l(v: Float80, x: Float80) throws -> Float80 {
-        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_cyl_bessel_j_l(v, x)
     }
     
@@ -690,16 +696,16 @@ public extension SpecialFunctions {
     ///
     /// Domain: requires x > 0.
     @inlinable static func besselY_l(v: Float80, x: Float80) throws -> Float80 {
-        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
+        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
         return bs_cyl_neumann_l(v, x)
     }
     
     /// Modified Bessel function of the first kind I_v(x) for Float80 (x86_64 only).
     @inlinable static func modifiedBesselI_l(v: Float80, x: Float80) throws -> Float80 {
-        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_cyl_bessel_i_l(v, x)
     }
     
@@ -707,9 +713,9 @@ public extension SpecialFunctions {
     ///
     /// Domain: requires x > 0.
     @inlinable static func modifiedBesselK_l(v: Float80, x: Float80) throws -> Float80 {
-        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
+        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
         return bs_cyl_bessel_k_l(v, x)
     }
 
@@ -731,18 +737,18 @@ public extension SpecialFunctions {
     
     /// Spherical Bessel j_n(x) for Float80 (x86_64 only).
     @inlinable static func sphericalBesselJ(n: Int, x: Float80) throws -> Float80 {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float80(n)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Float80>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_sph_bessel_l(UInt32(n), x)
     }
     
     /// Spherical Neumann y_n(x) for Float80 (x86_64 only). Domain: x > 0.
     @inlinable static func sphericalBesselY(n: Int, x: Float80) throws -> Float80 {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float80(n)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Float80>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
         return bs_sph_neumann_l(UInt32(n), x)
     }
 
@@ -752,8 +758,8 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/besselJPrime(v:x:)->T`` for definition, domain, and behavior.
     @inlinable static func besselJPrime(v: Float80, x: Float80) throws -> Float80 {
-        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_cyl_bessel_j_prime_l(v, x)
     }
     
@@ -761,8 +767,8 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/modifiedBesselIPrime(v:x:)->T`` for definition, domain, and behavior.
     @inlinable static func modifiedBesselIPrime(v: Float80, x: Float80) throws -> Float80 {
-        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_cyl_bessel_i_prime_l(v, x)
     }
     
@@ -773,9 +779,9 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/modifiedBesselKPrime(v:x:)->T`` for additional details.
     @inlinable static func modifiedBesselKPrime(v: Float80, x: Float80) throws -> Float80 {
-        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
+        guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
         return bs_cyl_bessel_k_prime_l(v, x)
     }
     
@@ -786,9 +792,9 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/sphericalBesselJPrime(n:x:)->T`` for additional details.
     @inlinable static func sphericalBesselJPrime(n: Int, x: Float80) throws -> Float80 {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float80(n)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Float80>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
         return bs_sph_bessel_prime_l(UInt32(n), x)
     }
@@ -800,10 +806,10 @@ public extension SpecialFunctions {
     ///
     /// See ``SpecialFunctions/sphericalBesselYPrime(n:x:)->T`` for additional details.
     @inlinable static func sphericalBesselYPrime(n: Int, x: Float80) throws -> Float80 {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard n <= Int(UInt32.max) else { throw SpecialFunctionError.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float80(n)) }
+        guard n <= Int(UInt32.max) else { throw SpecialFunctionError<Float80>.parameterExceedsMaximumIntegerValue(name: "n", max: Int(UInt32.max)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
         return bs_sph_neumann_prime_l(UInt32(n), x)
     }
 

@@ -47,7 +47,7 @@ let entropy = bern.entropy              // −p log(p) − (1 − p) log(1 − p
 
 ## Error Handling
 
-- Initialization throws ``DistributionError/invalidCombination(message:)`` when `p` is outside `[0, 1]`.
+- Initialization throws ``DistributionError/invalidCombination(message:value:)`` when `p` is outside `[0, 1]`; the ``value`` payload echoes the invalid probability for diagnostics.
 - PMF/CDF helpers accept `x` values in `{0, 1}`; other inputs throw the underlying error from ``Distribution/Dynamic``.
 - Quantile helpers validate probability arguments in `[0, 1]`.
 

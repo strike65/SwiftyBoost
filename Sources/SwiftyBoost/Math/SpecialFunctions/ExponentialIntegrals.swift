@@ -35,22 +35,22 @@ public extension SpecialFunctions {
     /// References:
     /// - NIST DLMF §6.2 (Exponential Integral Ei)
     /// - Boost.Math expint(x)
-    @inlinable static func exponentialIntegralEi<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func exponentialIntegralEi<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) throws -> T {
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_expint_Ei_d(dx))
     }
     
     /// Exponential integral Ei(x) for `Float`.
     @inlinable static func exponentialIntegralEi(_ x: Float) throws -> Float {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_expint_Ei_f(x)
     }
     
 #if arch(x86_64)
     /// Exponential integral Ei(x) for `Float80` (x86_64 only).
     @inlinable static func exponentialIntegralEi(_ x: Float80) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_expint_Ei_l(x)
     }
 #endif
@@ -83,31 +83,31 @@ public extension SpecialFunctions {
     /// - E_n(x) as `T`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "n", value: n)` if `n < 0`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
     ///
     /// References:
     /// - NIST DLMF §8.20 (Exponential Integrals E_n)
     /// - Boost.Math expint(n, x)
-    @inlinable static func exponentialIntegralEn<T: Real & BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
+    @inlinable static func exponentialIntegralEn<T: Real & BinaryFloatingPoint & Sendable>(_ n: Int, _ x: T) throws -> T {
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: T(n)) }
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_expint_En_d(Int32(n), dx))
     }
     
     /// Generalized exponential integral E_n(x) for `Float`.
     @inlinable static func exponentialIntegralEn(_ n: Int, _ x: Float) throws -> Float {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float(n)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_expint_En_f(Int32(n), x)
     }
     
 #if arch(x86_64)
     /// Generalized exponential integral E_n(x) for `Float80` (x86_64 only).
     @inlinable static func exponentialIntegralEn(_ n: Int, _ x: Float80) throws -> Float80 {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float80(n)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_expint_En_l(Int32(n), x)
     }
 #endif

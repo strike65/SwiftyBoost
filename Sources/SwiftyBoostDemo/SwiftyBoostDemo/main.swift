@@ -121,6 +121,128 @@ do {
 } catch {
     print("StudentT error: \(error)")
 }
+do {
+    // ExtremeValue
+    let e = try Distribution.ExtremeValueGumpel(location: 0.0, scale: 1.0)
+    print("StudentT:")
+    print("  stored: location = \(e.location)")
+    print("  stored: scale = \(e.scale)")
+    print("  support: [\(e.supportLowerBound), \(e.supportUpperBound)]  range: \(e.range)")
+    print("  mean = \(String(describing: e.mean))")
+    print("  variance = \(String(describing: e.variance))")
+    print("  mode = \(String(describing: e.mode))")
+    print("  median = \(e.median)")
+    print("  skewness = \(String(describing: e.skewness))")
+    print("  kurtosis = \(String(describing: e.kurtosis))")
+    print("  kurtosisExcess = \(String(describing: e.kurtosisExcess))")
+    print("  entropy = \(String(describing: e.entropy))")
+    print("  latticeStep = \(String(describing: e.latticeStep))")
+    print("  latticeOrigin = \(String(describing: e.latticeOrigin))")
+    print("  pdf(0) = \(try e.pdf(0.0))  cdf(0) = \(try e.cdf(0.0))  sf(0) = \(try e.sf(0.0))")
+    print("  quantile(0.95) = \(try e.quantile(0.95))  q^c(0.05) = \(try e.quantileComplement(0.05))")
+    print("  hazard(0) = \(try e.hazard(0.0))  chf(0) = \(try e.chf(0.0))")
+} catch {
+    print("Gumpel error: \(error)")
+}
+
+do {
+    // Geometric
+    let t = try Distribution.Geometric(probabibilityOfSuccess: 0.4)
+    print("StudentT:")
+    print(
+        "  stored: probabilityOfSuccess = \(t.pSuccess)"
+    )
+    print("  support: [\(t.supportLowerBound), \(t.supportUpperBound)]  range: \(t.range)")
+    print("  mean = \(String(describing: t.mean))")
+    print("  variance = \(String(describing: t.variance))")
+    print("  mode = \(String(describing: t.mode))")
+    print("  median = \(t.median)")
+    print("  skewness = \(String(describing: t.skewness))")
+    print("  kurtosis = \(String(describing: t.kurtosis))")
+    print("  kurtosisExcess = \(String(describing: t.kurtosisExcess))")
+    print("  entropy = \(String(describing: t.entropy))")
+    print("  latticeStep = \(String(describing: t.latticeStep))")
+    print("  latticeOrigin = \(String(describing: t.latticeOrigin))")
+    print("  pdf(0) = \(try t.pdf(0.0))  cdf(0) = \(try t.cdf(0.0))  sf(0) = \(try t.sf(0.0))")
+    print("  quantile(0.95) = \(try t.quantile(0.95))  q^c(0.05) = \(try t.quantileComplement(0.05))")
+    print("  hazard(0) = \(try t.hazard(0.0))  chf(0) = \(try t.chf(0.0))")
+} catch {
+    print("ExtremeValue error: \(error)")
+}
+
+do {
+    // Binomial(n, p)
+    let bin = try Distribution.Binomial(numberOfTrials: 10.0, probabibilityOfSuccess: 0.3)
+    print("Binomial:")
+    print("  stored: nTrials = \(bin.nTrials), pSuccess = \(bin.pSuccess)")
+    print("  support: [\(bin.supportLowerBound), \(bin.supportUpperBound)]  range: \(bin.range)")
+    print("  mean = \(String(describing: bin.mean))")
+    print("  variance = \(String(describing: bin.variance))")
+    print("  mode = \(String(describing: bin.mode))")
+    print("  median = \(bin.median)")
+    print("  skewness = \(String(describing: bin.skewness))")
+    print("  kurtosis = \(String(describing: bin.kurtosis))")
+    print("  kurtosisExcess = \(String(describing: bin.kurtosisExcess))")
+    print("  entropy = \(String(describing: bin.entropy))")
+    print("  latticeStep = \(String(describing: bin.latticeStep))")
+    print("  latticeOrigin = \(String(describing: bin.latticeOrigin))")
+    print("  pdf(3) = \(try bin.pdf(3.0))  logpdf(3) = \(try bin.logPdf(3.0))")
+    print("  cdf(3) = \(try bin.cdf(3.0))  sf(3) = \(try bin.sf(3.0))")
+    print("  quantile(0.5) = \(try bin.quantile(0.5))  q^c(0.1) = \(try bin.quantileComplement(0.1))")
+    print("  hazard(3) = \(try bin.hazard(3.0))  chf(3) = \(try bin.chf(3.0))")
+} catch {
+    print("Binomial error: \(error)")
+}
+
+do {
+    // Cauchy)
+    let ca = try Distribution.Cauchy(location: 0.0, scale: 2)
+    print("Cauchy:")
+    print("  stored: location = \(ca.location)")
+    print("  stored: scale = \(ca.scale)")
+    print("  support: [\(ca.supportLowerBound), \(ca.supportUpperBound)]  range: \(ca.range)")
+    print("  mean = \(String(describing: ca.mean))")
+    print("  variance = \(String(describing: ca.variance))")
+    print("  mode = \(String(describing: ca.mode))")
+    print("  median = \(ca.median)")
+    print("  skewness = \(String(describing: ca.skewness))")
+    print("  kurtosis = \(String(describing: ca.kurtosis))")
+    print("  kurtosisExcess = \(String(describing: ca.kurtosisExcess))")
+    print("  entropy = \(String(describing: ca.entropy))")
+    print("  latticeStep = \(String(describing: ca.latticeStep))")
+    print("  latticeOrigin = \(String(describing: ca.latticeOrigin))")
+    print("  pdf(3) = \(try ca.pdf(3.0))  logpdf(3) = \(try ca.logPdf(3.0))")
+    print("  cdf(3) = \(try ca.cdf(3.0))  sf(3) = \(try ca.sf(3.0))")
+    print("  quantile(0.5) = \(try ca.quantile(0.5))  q^c(0.1) = \(try ca.quantileComplement(0.1))")
+    print("  hazard(3) = \(try ca.hazard(3.0))  chf(3) = \(try ca.chf(3.0))")
+} catch {
+    print("Cauchy error: \(error)")
+}
+do {
+    // Holtsmark
+    let ca = try Distribution.Holtsmark(location: 1.0, scale: 0.2)
+    print("Holtsmark:")
+    print("  stored: location = \(ca.location)")
+    print("  stored: scale = \(ca.scale)")
+    print("  support: [\(ca.supportLowerBound), \(ca.supportUpperBound)]  range: \(ca.range)")
+    print("  mean = \(String(describing: ca.mean))")
+    print("  variance = \(String(describing: ca.variance))")
+    print("  mode = \(String(describing: ca.mode))")
+    print("  median = \(ca.median)")
+    print("  skewness = \(String(describing: ca.skewness))")
+    print("  kurtosis = \(String(describing: ca.kurtosis))")
+    print("  kurtosisExcess = \(String(describing: ca.kurtosisExcess))")
+    print("  entropy = \(String(describing: ca.entropy))")
+    print("  latticeStep = \(String(describing: ca.latticeStep))")
+    print("  latticeOrigin = \(String(describing: ca.latticeOrigin))")
+    print("  pdf(3) = \(try ca.pdf(3.0))  logpdf(3) = \(try ca.logPdf(3.0))")
+    print("  cdf(3) = \(try ca.cdf(3.0))  sf(3) = \(try ca.sf(3.0))")
+    print("  quantile(0.5) = \(try ca.quantile(0.5))  q^c(0.1) = \(try ca.quantileComplement(0.1))")
+    print("  hazard(3) = \(try ca.hazard(3.0))  chf(3) = \(try ca.chf(3.0))")
+} catch {
+    print("Holtsmark error: \(error)")
+}
+
 
 // MARK: - Distribution static helpers
 
@@ -204,6 +326,57 @@ do {
             hint: 75.0
         )
         print("    Float80 -> ν = \(dfvL)")
+        #endif
+    }
+    
+    // Binomial planning helpers
+    do {
+        print("  Binomial planning helpers:")
+        // One-sided bounds on p (alpha in [0,1])
+        let n = 50, k = 20
+        let alphaD: Double = 0.05
+        let lbD = Distribution.Binomial<Double>.findLowerBoundOnP(nTrials: n, nSuccesses: k, proposedSuccessFraction: alphaD, useJeffreys: false)
+        let ubD = Distribution.Binomial<Double>.findUpperBoundOnP(nTrials: n, nSuccesses: k, proposedSuccessFraction: alphaD, useJeffreys: false)
+        print("    Double -> lowerBoundOnP = \(lbD), upperBoundOnP = \(ubD)")
+        
+        let alphaF: Float = 0.05
+        let lbF = Distribution.Binomial<Float>.findLowerBoundOnP(nTrials: n, nSuccesses: k, proposedSuccessFraction: alphaF, useJeffreys: true)
+        let ubF = Distribution.Binomial<Float>.findUpperBoundOnP(nTrials: n, nSuccesses: k, proposedSuccessFraction: alphaF, useJeffreys: true)
+        print("    Float -> lowerBoundOnP (Jeffreys) = \(lbF), upperBoundOnP (Jeffreys) = \(ubF)")
+        
+        // Trial count solvers (alpha in [0,1], p0 in [0,1])
+        do {
+            let s = 5
+            let p0D: Double = 0.3
+            let nMinD = try Distribution.Binomial<Double>.findMinimumNumberOfTrials(successes: s, proposedSuccessFraction: p0D, alpha: 0.05)
+            let nMaxD = try Distribution.Binomial<Double>.findMaximumNumberOfTrials(successes: s, proposedSuccessFraction: p0D, alpha: 0.05)
+            print("    Double -> nMin = \(nMinD), nMax = \(nMaxD)")
+        } catch {
+            print("    Double trial-count solvers error: \(error)")
+        }
+        do {
+            let s = 7
+            let p0F: Float = 0.4
+            let nMinF = try Distribution.Binomial<Float>.findMinimumNumberOfTrials(successes: s, proposedSuccessFraction: p0F, alpha: 0.1)
+            let nMaxF = try Distribution.Binomial<Float>.findMaximumNumberOfTrials(successes: s, proposedSuccessFraction: p0F, alpha: 0.1)
+            print("    Float -> nMin = \(nMinF), nMax = \(nMaxF)")
+        } catch {
+            print("    Float trial-count solvers error: \(error)")
+        }
+        #if arch(x86_64)
+        do {
+            let s = 6
+            let alphaL: Float80 = 0.05
+            let lbL = Distribution.Binomial<Float80>.findLowerBoundOnP(nTrials: n, nSuccesses: k, proposedSuccessFraction: alphaL, useJeffreys: false)
+            let ubL = Distribution.Binomial<Float80>.findUpperBoundOnP(nTrials: n, nSuccesses: k, proposedSuccessFraction: alphaL, useJeffreys: false)
+            print("    Float80 -> lowerBoundOnP = \(lbL), upperBoundOnP = \(ubL)")
+            let p0L: Float80 = 0.35
+            let nMinL = try Distribution.Binomial<Float80>.findMinimumNumberOfTrials(successes: s, proposedSuccessFraction: p0L, alpha: alphaL)
+            let nMaxL = try Distribution.Binomial<Float80>.findMaximumNumberOfTrials(successes: s, proposedSuccessFraction: p0L, alpha: alphaL)
+            print("    Float80 -> nMin = \(nMinL), nMax = \(nMaxL)")
+        } catch {
+            print("    Float80 trial-count solvers error: \(error)")
+        }
         #endif
     }
 }
@@ -395,6 +568,31 @@ do {
     print("SpecialFunctions digamma/trigamma/polygamma/zeta error: \(error)")
 }
 
+// Error functions: erf, erfc, inverse erf
+do {
+    print("SpecialFunctions: Error functions (erf/erfc/inverse)")
+    let xd: Double = 0.5
+    let zD: Double = 0.3
+    print("  erf(Double): \(try SpecialFunctions.errorFunction(xd))")
+    print("  erfc(Double): \(try SpecialFunctions.complementaryErrorFunction(xd))")
+    print("  erfInv(Double): \(try SpecialFunctions.inverseErrorFunction(zD))")
+    
+    let xf: Float = 0.5
+    let zF: Float = 0.3
+    print("  erf(Float): \(try SpecialFunctions.errorFunction(xf))")
+    print("  erfc(Float): \(try SpecialFunctions.complementaryErrorFunction(xf))")
+    print("  erfInv(Float): \(try SpecialFunctions.inverseErrorFunction(zF))")
+    #if arch(x86_64)
+    let xl: Float80 = 0.5
+    let zL: Float80 = 0.3
+    print("  erf(Float80): \(try SpecialFunctions.errorFunction(xl))")
+    print("  erfc(Float80): \(try SpecialFunctions.complementaryErrorFunction(xl))")
+    print("  erfInv(Float80): \(try SpecialFunctions.inverseErrorFunction(zL))")
+    #endif
+} catch {
+    print("SpecialFunctions error functions error: \(error)")
+}
+
 // Hypergeometric functions: 1F0, 0F1, 2F0, 1F1, and pFq
 do {
     print("SpecialFunctions: Hypergeometric 1F0 / 0F1 / 2F0 / 1F1 / pFq")
@@ -557,3 +755,4 @@ do {
 } catch {
     print("SpecialFunctions Chebyshev error: \(error)")
 }
+

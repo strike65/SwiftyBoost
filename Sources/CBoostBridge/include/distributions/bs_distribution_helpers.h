@@ -71,7 +71,6 @@ double bs_geometric_find_maximum_number_of_trials_d(double failures, double succ
 long double bs_geometric_find_maximum_number_of_trials_l(long double failures, long double success_fraction, long double alpha);
 
 
-
 #ifdef __cplusplus
 }
 #endif

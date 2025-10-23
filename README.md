@@ -7,10 +7,10 @@ SwiftyBoost gives Swift developers direct access to Boost.Math special functions
 ## Features
 - Gamma, Beta, error, Bessel, Legendre, elliptic (Legendre and Carlson), Lambert W, Owen's T, and other high-precision helpers.
 - Probability distributions with Boost-backed implementations:
-  - Gamma, Beta, Chi-squared, Student’s t, Fisher’s F, Bernoulli, and Arcsine (PDF/PMF, CDF/SF, quantiles, hazards, moments).
+  - Gamma, Beta, Chi-squared, Student’s t, Fisher’s F, Bernoulli, Geometric, Binomial, Cauchy, Exponential, Extreme Value (Gumbel), Holtsmark, and Arcsine (PDF/PMF, CDF/SF, quantiles, hazards, moments).
   - Typed wrappers delegate internally to a unified runtime vtable (`Distribution.Dynamic`) for consistent behavior across precisions.
   - Unified runtime factory to construct distributions by name at runtime (see "Dynamic Distribution Factory").
-- High-precision mathematical constants (`π`, `e`, `√2`, Euler–Mascheroni, Catalan, ζ(3), φ, …) exposed via the generic `Constants<T>` namespace with dedicated `Float`, `Double`, and (x86_64) `Float80` entry points.
+- High-precision mathematical constants (`π`, `e`, `√2`, Euler–Mascheroni, Catalan, ζ(3), φ, …) available through `Constants` helpers across `Float`, `Double`, and (x86_64) `Float80`.
 - `CBoostBridge` target that forwards Swift calls into the vendored Boost headers under `extern/boost`.
 - Architectural awareness with dedicated `Float`, `Double`, and (x86_64) `Float80` overloads plus generic `BinaryFloatingPoint` entry points.
 - Re-exported Swift Numerics `Complex<T>` type with SwiftyBoost convenience APIs: arithmetic, polar helpers, and Boost-backed elementary functions (`exp`, `log`, `sin`, `cos`, `tan`, `sinh`, `cosh`, `tanh`, `atan`). Double/Float/(x86_64) Float80 specializations call bridge functions (`bs_*`).
@@ -32,7 +32,7 @@ let package = Package(
     name: "YourApp",
     platforms: [ .iOS(.v16), .macOS(.v13) ],
     dependencies: [
-        .package(url: "https://github.com/strike65/SwiftyBoost.git", from: "0.5.0")
+        .package(url: "https://github.com/strike65/SwiftyBoost.git", from: "0.6.0")
     ],
     targets: [
         .target(
@@ -75,10 +75,10 @@ let sc   = SpecialFunctions.sincc_pi(z)                  // equals sinhc_pi(0.7)
 
 ```swift
 // Constants (choose your precision)
-let tau   = Constants<Double>.twoPi
-let phi   = Constants<Float>.phi
+let tau: Double = Constants.twoPi()
+let phi: Float = Constants.phi()
 #if arch(x86_64)
-let rootPi80 = Constants<Float80>.rootPi
+let rootPi80: Float80 = Constants.rootPi()
 #endif
 ```
 
@@ -104,12 +104,20 @@ let chi2_sf = try chi2.sf(12.0)
 let bern = try Distribution.Bernoulli<Double>(p: 0.3)
 let bern_entropy = bern.entropy
 
+// Geometric(p = 0.35) — failures before first success
+let geom = try Distribution.Geometric<Double>(probabibilityOfSuccess: 0.35)
+let geom_mean = geom.mean
+
+// Holtsmark(location = 0, scale = 1)
+let holtsmark = try Distribution.Holtsmark<Double>(location: 0, scale: 1)
+let holtsmark_pdf = try holtsmark.pdf(0.5)
+
 // Arcsine on [0, 1]
 let arcsine = try Distribution.Arcsine<Double>(minX: 0, maxX: 1)
 let arcsine_pdf = try arcsine.pdf(0.2)
 ```
 
-APIs throw `SpecialFunctionError` for invalid inputs or domain violations. See DocC symbol docs for function‑specific bounds mirrored from Boost.Math.
+APIs throw `SpecialFunctionError` for invalid inputs or domain violations; each case carries context such as the offending parameter name, and `invalidCombination` echoes the rejected value via its `value` payload. See DocC symbol docs for function‑specific bounds mirrored from Boost.Math.
 
 ### Dynamic Distribution Factory
 
@@ -152,6 +160,18 @@ let dynChi = try Distribution.Dynamic<Double>(
 let dynBern = try Distribution.Dynamic<Double>(
   distributionName: "bernoulli",
   parameters: ["p": 0.3]
+)
+
+// Geometric (aliases: geometric_distribution)
+let dynGeom = try Distribution.Dynamic<Double>(
+  distributionName: "geometric",
+  parameters: ["success": 0.35]
+)
+
+// Holtsmark (aliases: holtsmark_distribution)
+let dynHolts = try Distribution.Dynamic<Double>(
+  distributionName: "holtsmark",
+  parameters: ["loc": 0.0, "scale": 1.0]
 )
 
 // Arcsine (aliases: arcsine_distribution)

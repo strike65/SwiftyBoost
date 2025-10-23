@@ -22,7 +22,7 @@ struct CommonHelpersRsqrtTests {
 
     @Test("rsqrt negative domain throws (Double)")
     func rsqrtDoubleDomain() {
-        #expect(throws: SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity)) {
+        #expect(throws: SpecialFunctionError<Double>.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity)) {
             _ = try SpecialFunctions.rsqrt(-1.0)
         }
     }
@@ -44,7 +44,7 @@ struct CommonHelpersRsqrtTests {
 
     @Test("rsqrt negative domain throws (Float)")
     func rsqrtFloatDomain() {
-        #expect(throws: SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity)) {
+        #expect(throws: SpecialFunctionError<Float>.parameterOutOfRange(name: "x", min: 0.0, max: Float.infinity)) {
             _ = try SpecialFunctions.rsqrt(Float(-1.0))
         }
     }
@@ -67,10 +67,9 @@ struct CommonHelpersRsqrtTests {
 
     @Test("rsqrt negative domain throws (Float80)")
     func rsqrtFloat80Domain() {
-        #expect(throws: SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity)) {
+        #expect(throws: SpecialFunctionError<Float80>.parameterOutOfRange(name: "x", min: 0.0, max: Float80.infinity)) {
             _ = try SpecialFunctions.rsqrt(Float80(-1.0))
         }
     }
     #endif
 }
-

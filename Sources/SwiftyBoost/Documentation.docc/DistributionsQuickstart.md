@@ -25,9 +25,9 @@ _ = g.mode
 ```swift
 // Student's t with ν = 5
 let t = try Distribution.StudentT<Double>(degreesOfFreedom: 5)
-let p0  = t.pdf(0.0)
-let cdf = t.cdf(2.0)
-let q97 = t.quantile(0.975)
+let p0  = try t.pdf(0.0)
+let cdf = try t.cdf(2.0)
+let q97 = try t.quantile(0.975)
 
 // Planning helper (Boost):
 let nu = Distribution.StudentT<Double>.findDegreesOfFreedom(
@@ -52,6 +52,13 @@ let bernEntropy = bern.entropy
 ```
 
 ```swift
+// Geometric(p = 0.35) — failures before first success
+let geom = try Distribution.Geometric<Double>(probabibilityOfSuccess: 0.35)
+let geomPMF2 = try geom.pdf(2)
+let geomMean = geom.mean
+```
+
+```swift
 // Fisher’s F (df1 = 10, df2 = 20)
 let f = try Distribution.FisherF<Double>(degreesOfFreedom1: 10, degreesOfFreedom2: 20)
 let f_pdf = try f.pdf(2.0)
@@ -64,15 +71,42 @@ let f_q95 = try f.quantile(0.95)
 let a = try Distribution.Arcsine<Double>(minX: 0, maxX: 1)
 let a_pdf = try a.pdf(0.2)
 let a_cdf = try a.cdf(0.8)
+
+// Binomial(n = 12, p = 0.35)
+let bin = try Distribution.Binomial<Double>(
+  numberOfTrials: 12,
+  probabibilityOfSuccess: 0.35
+)
+let binPMF4 = try bin.pdf(4)
+let binVariance = bin.variance
+
+// Exponential(λ = 1.2)
+let exp = try Distribution.Exponential<Double>(lambda: 1.2)
+let expTail = try exp.sf(2.0)
+let expMean = exp.mean
+
+// Cauchy(location = 0.5, scale = 1.5)
+let cauchy = try Distribution.Cauchy<Double>(location: 0.5, scale: 1.5)
+let cauchyQuantile = try cauchy.quantile(0.95)
+
+// Holtsmark (location = 0, scale = 1)
+let holts = try Distribution.Holtsmark<Double>(location: 0, scale: 1)
+let holtsPdf = try holts.pdf(0.5)
+
+// Gumbel (extreme value) with loc = 0, scale = 0.75
+let gumbel = try Distribution.ExtremeValueGumpel<Double>(location: 0, scale: 0.75)
+let gumbelCdf = try gumbel.cdf(1.2)
+let gumbelMode = gumbel.mode
 ```
 
 ## Implementation model
 
-Typed distribution wrappers (Gamma, Student’s t, Fisher’s F, Arcsine) delegate to ``Distribution/Dynamic``, a unified runtime vtable backed by Boost.Math via the C bridge. Each instance constructs its Boost backend once through the dynamic factory and reuses it for all evaluations to ensure performance and consistent numerical policies.
+Typed distribution wrappers (Gamma, Student’s t, Fisher’s F, Arcsine, Geometric, Binomial, Cauchy, Holtsmark, Exponential, Extreme Value/Gumbel) delegate to ``Distribution/Dynamic``, a unified runtime vtable backed by Boost.Math via the C bridge. Each instance constructs its Boost backend once through the dynamic factory and reuses it for all evaluations to ensure performance and consistent numerical policies.
 
 ## Error handling
 
 - Constructors validate parameters and throw when they are not positive.
+- Bernoulli, Geometric, and Binomial enforce probabilities in `[0, 1]`; Cauchy, Exponential, and Extreme Value enforce strictly positive scale parameters.
 - Methods that accept probabilities (`quantile`, `quantileComplement`) validate inputs in `[0, 1]`.
 - Gamma methods throw for negative `x`.
 

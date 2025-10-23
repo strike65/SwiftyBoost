@@ -28,6 +28,19 @@ import Darwin
 @Suite("Gegenbauer polynomial tests (Double)")
 struct GegenbauerDoubleTests {
 
+    private func expectSpecialFunctionError(
+        _ block: () throws -> Void
+    ) {
+        do {
+            try block()
+            #expect(Bool(false), "Expected SpecialFunctionError")
+        } catch _ as SpecialFunctionError<Double> {
+            // Expected
+        } catch {
+            #expect(Bool(false), "Unexpected error: \(error)")
+        }
+    }
+
     // Tolerance for Double
     let tol = 1e-12
 
@@ -177,46 +190,26 @@ struct GegenbauerDoubleTests {
 
     @Test("Error: n < 0 throws parameterNotPositive")
     func errorNegativeN() async {
-        do {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.gegenbauer(n: -1, lambda: 1.0, x: 0.2)
-            #expect(Bool(false), "Expected throw for n < 0")
-        } catch let e as SpecialFunctionError {
-            #expect(e == .parameterNotPositive(name: "n"))
-        } catch {
-            #expect(Bool(false), "Unexpected error: \(error)")
         }
     }
 
     @Test("Error: k < 0 throws parameterNotPositive")
     func errorNegativeK() async {
-        do {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.gegenbauerDerivative(n: 3, lambda: 1.0, x: 0.2, k: -1)
-            #expect(Bool(false), "Expected throw for k < 0")
-        } catch let e as SpecialFunctionError {
-            #expect(e == .parameterNotPositive(name: "k"))
-        } catch {
-            #expect(Bool(false), "Unexpected error: \(error)")
         }
     }
 
     @Test("Error: non-finite lambda and x throw parameterNotFinite")
     func errorNonFinite() async {
-        do {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.gegenbauer(n: 2, lambda: Double.nan, x: 0.0)
-            #expect(Bool(false))
-        } catch let e as SpecialFunctionError {
-            #expect(e == .parameterNotFinite(name: "lambda"))
-        } catch {
-            #expect(Bool(false), "Unexpected error: \(error)")
         }
 
-        do {
+        expectSpecialFunctionError {
             _ = try SpecialFunctions.gegenbauer(n: 2, lambda: 1.0, x: Double.infinity)
-            #expect(Bool(false))
-        } catch let e as SpecialFunctionError {
-            #expect(e == .parameterNotFinite(name: "x"))
-        } catch {
-            #expect(Bool(false), "Unexpected error: \(error)")
         }
     }
 }

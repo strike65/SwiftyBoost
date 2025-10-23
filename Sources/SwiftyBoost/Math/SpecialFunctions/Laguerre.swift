@@ -68,12 +68,12 @@ public extension SpecialFunctions {
     /// - L_n(x) as `T`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "n", value: n)` if `n < 0`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    @inlinable static func laguerre<T: Real & BinaryFloatingPoint>(_ n: Int, _ x: T) throws -> T {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
+    @inlinable static func laguerre<T: Real & BinaryFloatingPoint & Sendable>(_ n: Int, _ x: T) throws -> T {
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: T(n)) }
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_laguerre_d(UInt32(n), dx))
     }
 
@@ -94,14 +94,14 @@ public extension SpecialFunctions {
     /// - L_n^m(x) as `T`.
     ///
     /// Throws:
-    /// - `SpecialFunctionError.parameterNotPositive(name: "n")` if `n < 0`.
-    /// - `SpecialFunctionError.parameterNotPositive(name: "m")` if `m < 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "n", value: n)` if `n < 0`.
+    /// - `SpecialFunctionError.parameterNotPositive(name: "m", value: m)` if `m < 0`.
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    @inlinable static func assocLaguerre<T: Real & BinaryFloatingPoint>(_ n: Int, _ m: Int, _ x: T) throws -> T {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard m >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "m") }
+    @inlinable static func assocLaguerre<T: Real & BinaryFloatingPoint & Sendable>(_ n: Int, _ m: Int, _ x: T) throws -> T {
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: T(n)) }
+        guard m >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "m", value: T(m)) }
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_assoc_laguerre_d(UInt32(n), UInt32(m), dx))
     }
 
@@ -111,8 +111,8 @@ public extension SpecialFunctions {
     ///
     /// Throws if `n < 0` or `x` is not finite.
     @inlinable static func laguerre(_ n: Int, _ x: Float) throws -> Float {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float(n)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_laguerre_f(UInt32(n), x)
     }
 
@@ -120,9 +120,9 @@ public extension SpecialFunctions {
     ///
     /// Throws if `n < 0`, `m < 0`, or `x` is not finite.
     @inlinable static func assocLaguerre(_ n: Int, _ m: Int, _ x: Float) throws -> Float {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard m >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "m") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float(n)) }
+        guard m >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "m", value: Float(m)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_assoc_laguerre_f(UInt32(n), UInt32(m), x)
     }
 
@@ -133,8 +133,8 @@ public extension SpecialFunctions {
     ///
     /// Throws if `n < 0` or `x` is not finite.
     @inlinable static func laguerre(_ n: Int, _ x: Float80) throws -> Float80 {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float80(n)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_laguerre_l(UInt32(n), x)
     }
 
@@ -142,9 +142,9 @@ public extension SpecialFunctions {
     ///
     /// Throws if `n < 0`, `m < 0`, or `x` is not finite.
     @inlinable static func assocLaguerre(_ n: Int, _ m: Int, _ x: Float80) throws -> Float80 {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n") }
-        guard m >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "m") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "n", value: Float80(n)) }
+        guard m >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "m", value: Float80(m)) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_assoc_laguerre_l(UInt32(n), UInt32(m), x)
     }
     #endif

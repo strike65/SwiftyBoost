@@ -33,9 +33,3 @@ public enum SpecialFunctions {}
 /// Concrete types such as ``Distribution/Gamma`` or ``Distribution/StudentT`` live
 /// under this enum and conform to ``DistributionProtocol`` for a uniform API surface.
 public enum Distribution {}
-
-/// Namespace for high-precision mathematical constants specialized by floating-point type.
-///
-/// Access constants via generic entry points like `Constants<Double>.pi`,
-/// `Constants<Float>.euler`, or (on x86_64) `Constants<Float80>.twoPi`.
-public enum Constants<T: Real & BinaryFloatingPoint> {}

@@ -43,7 +43,8 @@ extension Distribution {
         public init(degreesOfFreedom v: T) throws {
             guard v > 0 else {
                 throw DistributionError.parameterNotPositive(
-                    name: "degreesOfFreedom"
+                    name: "degreesOfFreedom",
+                    value: v
                 )
             }
             self.degreesOfFreedom = v

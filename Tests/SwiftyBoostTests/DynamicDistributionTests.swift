@@ -104,6 +104,122 @@ struct DynamicDistributionTests {
         }
     }
 
+    @Test("Geometric<Double> dynamic matches typed and closed forms")
+    func geometricDynamicMatchesTypedDouble() throws {
+        let p: Double = 0.37
+        let dyn = try Distribution.Dynamic<Double>(
+            distributionName: "geometric",
+            parameters: ["theta": p] // alias for probability
+        )
+        let typ = try Distribution.Geometric<Double>(probabibilityOfSuccess: p)
+
+        let ks: [Double] = [0, 1, 2, 5, 10]
+        for k in ks {
+            let pd = try dyn.pdf(k)
+            let pt = try typ.pdf(k)
+            #expect(abs(pd - pt) <= 1e-12)
+            let expectedPdf = pow(1 - p, k) * p
+            #expect(abs(pd - expectedPdf) <= 1e-12)
+
+            let cd = try dyn.cdf(k)
+            let ct = try typ.cdf(k)
+            #expect(abs(cd - ct) <= 1e-12)
+            let expectedCdf = 1 - pow(1 - p, k + 1)
+            #expect(abs(cd - expectedCdf) <= 1e-12)
+
+            let sd = try dyn.sf(k)
+            let st = try typ.sf(k)
+            #expect(abs(sd - st) <= 1e-12)
+        }
+
+        let probs: [Double] = [1e-9, 1e-6, 0.05, 0.5, 0.9, 1 - 1e-9]
+        for prob in probs {
+            let qd = try dyn.quantile(prob)
+            let qt = try typ.quantile(prob)
+            #expect(abs(qd - qt) <= 1e-10)
+            let cd = try dyn.cdf(qd)
+            #expect(cd >= prob - 1e-12)
+        }
+
+        let expectedMean = (1 - p) / p
+        let expectedVariance = (1 - p) / (p * p)
+        let expectedEntropy = -((1 - p) / p) * Foundation.log(1 - p) - Foundation.log(p)
+
+        if let md = dyn.mean {
+            #expect(abs(md - expectedMean) <= 1e-12)
+        }
+        if let vd = dyn.variance {
+            #expect(abs(vd - expectedVariance) <= 1e-12)
+        }
+        if let entropy = dyn.entropy {
+            #expect(abs(entropy - expectedEntropy) <= 1e-12)
+        }
+    }
+
+    @Test("Holtsmark<Double> dynamic matches typed for core metrics")
+    func holtsmarkDynamicMatchesTypedDouble() throws {
+        let loc: Double = 0.25
+        let scale: Double = 1.5
+        let dyn = try Distribution.Dynamic<Double>(
+            distributionName: "holtsmark",
+            parameters: ["mu": loc, "sigma": scale]
+        )
+        let typ = try Distribution.Holtsmark<Double>(location: loc, scale: scale)
+
+        let xs: [Double] = [-2.5, -0.75, 0.0, 0.75, 2.5]
+        for x in xs {
+            let pd = try dyn.pdf(x)
+            let pt = try typ.pdf(x)
+            #expect(abs(pd - pt) <= 1e-12)
+
+            let cd = try dyn.cdf(x)
+            let ct = try typ.cdf(x)
+            #expect(abs(cd - ct) <= 1e-12)
+
+            let sd = try dyn.sf(x)
+            let st = try typ.sf(x)
+            #expect(abs(sd - st) <= 1e-12)
+        }
+
+        let probs: [Double] = [1e-6, 1e-3, 0.1, 0.5, 0.9, 1 - 1e-6]
+        for p in probs {
+            let qd = try dyn.quantile(p)
+            let qt = try typ.quantile(p)
+            #expect(abs(qd - qt) <= 1e-10)
+        }
+
+        // Location-scale properties
+        if let mean = typ.mean {
+            #expect(abs(mean - loc) <= 1e-12)
+        }
+        #expect(typ.median == loc)
+        #expect((typ.mode ?? .nan) == loc)
+
+        // Variance and higher moments diverge for Holtsmark (α = 3/2)
+        #expect(typ.variance == nil)
+        #expect(typ.skewness == nil)
+        #expect(typ.kurtosis == nil)
+        #expect(typ.kurtosisExcess == nil)
+
+        // Differential entropy supplied in Swift using Constants.holtsmarkEntropy()
+        if let entropy = typ.entropy {
+            let expected = Foundation.log(scale) + Constants.holtsmarkEntropy()
+            #expect(abs(entropy - expected) <= 1e-12)
+        }
+
+        // Hazard and CHF parity (only where survival probability is well-behaved)
+        let interior: [Double] = [-0.5, 0.0, 0.5]
+        for x in interior {
+            let hd = try dyn.hazard(x)
+            let ht = try typ.hazard(x)
+            #expect(abs(hd - ht) <= 1e-12)
+
+            let Hd = try dyn.chf(x)
+            let Ht = try typ.chf(x)
+            #expect(abs(Hd - Ht) <= 1e-12)
+        }
+    }
+
     @Test("Gamma<Double> moments and hazards")
     func gammaDynamicMomentsAndHazard() throws {
         let shape: Double = 5.0, scale: Double = 2.0
@@ -188,16 +304,20 @@ struct DynamicDistributionTests {
     @Test("Factory errors for unknown name and missing parameters")
     func factoryErrors() throws {
         // Unknown distribution name
-        #expect(throws: DistributionError.self) {
+        #expect(throws: DistributionError<Double>.self) {
             _ = try Distribution.Dynamic<Double>(distributionName: "not_a_dist", parameters: [:])
         }
         // Missing required parameter (gamma.shape)
-        #expect(throws: DistributionError.self) {
+        #expect(throws: DistributionError<Double>.self) {
             _ = try Distribution.Dynamic<Double>(distributionName: "gamma", parameters: ["scale": 1.0])
         }
         // Invalid arcsine interval (min >= max)
-        #expect(throws: DistributionError.self) {
+        #expect(throws: DistributionError<Double>.self) {
             _ = try Distribution.Dynamic<Double>(distributionName: "arcsine", parameters: ["minX": 1.0, "maxX": 0.5])
+        }
+        // Geometric probability outside [0, 1]
+        #expect(throws: DistributionError<Double>.self) {
+            _ = try Distribution.Dynamic<Double>(distributionName: "geometric", parameters: ["p": 1.5])
         }
     }
 

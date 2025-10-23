@@ -59,11 +59,10 @@ extension Distribution {
         ///   ```
         public init(degreesOfFreedom df: T) throws {
             guard df > 0 else {
-                throw DistributionError.invalidCombination(message: "deegreesOfFreedom must be > 0")
+                throw DistributionError.invalidCombination(message: "deegreesOfFreedom must be > 0", value: df)
             }
             guard df.isFinite else {
-                throw DistributionError.parameterNotFinite(name: "alpha")
-            }
+                throw DistributionError.parameterNotFinite(name: "df", value: df) }
             self.degreesOfFreedom = df
             self.dyn = try Distribution.Dynamic<T>(
                 distributionName: "chisquared",

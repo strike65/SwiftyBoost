@@ -54,18 +54,15 @@ extension Distribution {
         ///           `DistributionError.parameterNotFinite` if either bound is not finite,
         ///           or `DistributionError.generalError` if the underlying distribution could not be initialized.
         public init(minX min_x: T = 0, maxX max_x: T = 0) throws {
-            guard min_x < max_x else {
-                throw DistributionError.invalidCombination(message: "minX must be less than maxX")
-            }
-            guard min_x.isFinite else {
-                throw DistributionError.parameterNotFinite(name: "minX")
-            }
-            guard max_x.isFinite else {
-                throw DistributionError.parameterNotFinite(name: "maxX")
-            }
-
             self.minX = min_x
             self.maxX = max_x
+            guard min_x < max_x else {
+                throw DistributionError<Double>.invalidCombination(message: "minX (\(self.minX)) must be less than maxX (\(self.minX))", value: nil)
+            }
+            guard min_x.isFinite else {
+                throw DistributionError.parameterNotFinite(name: "minX", value: minX) }
+            guard max_x.isFinite else {
+                throw DistributionError.parameterNotFinite(name: "maxX", value: maxX) }
             self.dyn = try Distribution.Dynamic<T>(
                 distributionName: "arcsine",
                 parameters: [

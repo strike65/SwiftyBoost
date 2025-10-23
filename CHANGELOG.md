@@ -5,6 +5,16 @@ All notable changes to this project are tracked here, following the principles o
 ## Unreleased
 - Nothing yet.
 
+## [0.6.0] - 2025-10-23
+- Features:
+  - Added ``Distribution.Holtsmark`` as a typed wrapper over Boost.Math’s heavy-tailed Holtsmark distribution (location/scale form) with full PDF/CDF/quantile coverage and entropy support.
+- Documentation:
+  - Linked all references to Swift Numerics’ ``Real`` protocol directly to the upstream project documentation for easier navigation.
+  - Added DocC coverage for ``Distribution/Geometric`` and refreshed README, Quickstart, and factory guides with geometric examples and alias tables.
+  - Renamed ``HighPrecisionConstants`` to ``Constants`` throughout the guides to reflect the streamlined API.
+- Tests:
+  - Added regression coverage for ``Distribution.Geometric`` (closed-form PMF/CDF, quantiles, moments) and ensured the dynamic factory’s geometric entry matches the typed wrapper and alias set.
+
 ## [0.5.0] - 2025-10-22
 - Dynamic distribution factory (runtime):
   - Added a unified vtable-based factory in `CBoostBridge` with non-null context pointer (`ctx`) and nullable function pointers for metrics.
@@ -23,9 +33,9 @@ All notable changes to this project are tracked here, following the principles o
   - Replaced the bespoke ``Complex`` struct with the Swift Numerics implementation, re-exported via `SwiftyBoostPrelude`.
   - Retained SwiftyBoost conveniences (`.i`, `fromPolar`, stable magnitude/square root) and Boost-backed elementary functions through extensions.
   - Updated README and DocC guidance to note the Numerics dependency.
-- Constants namespace:
-  - Introduced `Constants<T>` to expose Boost-backed mathematical constants (π, τ, √π, Euler–Mascheroni, Catalan, ζ(3), φ, logarithms, ratio variants) with dedicated bindings for `Float`, `Double`, and (x86_64) `Float80`.
-  - Added inline documentation for every constant accessor plus DocC coverage and README usage examples.
+- High-precision constants:
+  - Introduced `Constants` (named `HighPrecisionConstants` in the original 0.5.0 release) to expose Boost-backed mathematical constants (π, τ, √π, Euler–Mascheroni, Catalan, ζ(3), φ, logarithms, ratio variants) convertible to any `BinaryFloatingPoint` type at call-site.
+  - Added inline documentation for every helper plus DocC coverage and README usage examples.
 - Mixed-precision promotions:
   - Beta (complete/incomplete/regularized, inverses, derivative, parameter solvers)
   - Gamma (ratios, incomplete/regularized P/Q, inverses, derivative)
@@ -44,7 +54,7 @@ All notable changes to this project are tracked here, following the principles o
     - Complex `sincc_pi(z) = sin(πz)/(πz)` for `ComplexD/F/(x86_64) ComplexL`.
   - Bridge includes and mappings hardened for Boost 1.89.0 (sinc.hpp, sinhc.hpp); π-normalized forms used explicitly to avoid header ambiguities.
 - Documentation:
-  - Added DocC article “Constants Catalog” documenting the `Constants<T>` namespace, precision choices, and common values.
+  - Added DocC article “Constants Catalog” documenting the constant helpers, precision choices, and common values.
   - Added distribution references for “Distribution/Beta”, “Distribution/ChiSquared”, and “Distribution/Bernoulli”; refreshed the Quickstart and Dynamic Factory guides with matching examples and alias tables.
   - New DocC page “Result-Type Promotions” (policy, supported APIs, and guidance).
   - README quick reference and usage examples for promotions, `rsqrt`, and Sinus cardinalis.
@@ -90,6 +100,7 @@ All notable changes to this project are tracked here, following the principles o
 - Vendored Boost.Math headers under `extern/boost`.
 - Published core Gamma, Beta, error, Legendre, and Bessel function wrappers with Swift-friendly APIs and error handling.
 
+[0.6.0]: https://github.com/strike65/SwiftyBoost/releases/tag/0.6.0
 [0.5.0]: https://github.com/strike65/SwiftyBoost/releases/tag/0.5.0
 [0.1.0]: https://github.com/strike65/SwiftyBoost/releases/tag/0.1.0
 [0.0.1]: https://github.com/strike65/SwiftyBoost/releases/tag/0.0.1

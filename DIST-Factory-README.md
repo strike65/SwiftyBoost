@@ -28,10 +28,48 @@ The design introduces a single, generic C ABI for “a distribution of reals” 
 
 ## What’s Implemented Today
 
-- Supported distributions via the factory:
-  - Gamma: parameters `shape`/`k` (required), `scale`/`theta` (default 1).
-  - Student’s T: parameter `df`/`nu`/`degreesOfFreedom` (required).
-- Other distributions (e.g., FisherF, Arcsine) can be added in a few lines (see “Extending the Factory”).
+- Supported distributions via the factory (aliases in backticks):
+  - **Gamma** — `gamma`, `gamma_distribution`
+    - Params: `shape|k` (required), `scale|theta` (optional, defaults to 1).
+    - Typed wrapper: ``Distribution/Gamma``.
+  - **Beta** — `beta`, `beta_distribution`
+    - Params: `alpha|a|p|shape1` (required), `beta|b|q|shape2` (required).
+    - Typed wrapper: ``Distribution/Beta``.
+  - **Chi-squared** — `chisquared`, `chi_squared`, `chi2`, `chi-squared`, `chisquare`
+    - Params: `df|nu|degreesOfFreedom` (required).
+    - Typed wrapper: ``Distribution/ChiSquared``.
+  - **Student’s t** — `studentt`, `student_t`, `students_t`, `t`, `t_distribution`
+    - Params: `df|nu|degreesOfFreedom` (required).
+    - Typed wrapper: ``Distribution/StudentT``.
+  - **Fisher’s F** — `fisherf`, `f`, `f_distribution`
+    - Params: `df1|d1|m|degreesOfFreedom1` (required), `df2|d2|n|degreesOfFreedom2` (required).
+    - Typed wrapper: ``Distribution/FisherF``.
+  - **Bernoulli** — `bernoulli`, `bernoulli_distribution`
+    - Params: `p|prob|probability|success|theta` (required).
+    - Typed wrapper: ``Distribution/Bernoulli`` (entropy fallback computed in Swift).
+  - **Binomial** — `binomial`, `binomial_distribution`
+    - Params: `n|trials` (required, interpreted as trial count), `p|prob|probability|success` (required).
+    - Typed wrapper: ``Distribution/Binomial`` plus planning helpers in Swift.
+  - **Cauchy** — `cauchy`, `cauchy_distribution`
+    - Params: `location|loc|mu|median|x0` (optional, defaults to 0), `scale|gamma|sigma|b` (required, > 0).
+    - Typed wrapper: ``Distribution/Cauchy`` (entropy computed in Swift).
+  - **Exponential** — `exponential`, `exponential_distribution`, `exp`
+    - Params: `lambda|rate` (required, > 0). `scale` is accepted indirectly by typed wrapper.
+    - Typed wrapper: ``Distribution/Exponential``.
+  - **Extreme value / Gumbel** — `extremevalue`, `extreme_value`, `gumbel`, `extreme_value_distribution`
+    - Params: `location|loc|mu` (optional, defaults to 0), `scale|gamma|sigma|b` (required, > 0).
+    - Typed wrapper: ``Distribution/ExtremeValueGumpel`` (entropy fallback provided in Swift).
+  - **Arcsine** — `arcsine`, `arcsine_distribution`
+    - Params: `minX|min|a|lower` (required), `maxX|max|b|upper` (required).
+    - Typed wrapper: ``Distribution/Arcsine`` (entropy fallback provided in Swift).
+  - **Geometric** — `geometric`, `geometric_distribution`
+    - Params: `p|prob|probability|success|theta` (required).
+    - Typed wrapper: ``Distribution/Geometric`` (delegates to Dynamic; entropy currently unavailable in Boost).
+  - **Holtsmark** — `holtsmark`, `holtsmark_distribution`
+    - Params: `location|loc|mu|median|x0` (optional), `scale|gamma|sigma|b` (required).
+    - Typed wrapper: ``Distribution/Holtsmark``.
+
+- Swift typed wrappers delegate to the factory internally, so the dynamic and typed paths share the same Boost-backed semantics and alias handling.
 
 
 ## C ABI: Generic Distribution VTable
@@ -84,6 +122,7 @@ The design introduces a single, generic C ABI for “a distribution of reals” 
     - `Double` → `bs_dist_make_d`, `Float` → `bs_dist_make_f`; `Float80` on x86 → `bs_dist_make_l` (gated by `#if arch(x86_64) || arch(i386)`).
   - Stores the returned vtable struct in a small `Box` class and cleans up via `free(ctx)` in `deinit`.
   - All protocol methods forward to the corresponding vtable function pointer if present.
+  - Swift supplies fallbacks for metrics absent from the vtable (e.g. Bernoulli entropy, Cauchy entropy, Fisher F / Arcsine entropy) so the high-level API remains uniform.
   - For stats (`mean`, `variance`, …) non‑finite values are mapped to `nil`.
 
 
@@ -141,10 +180,19 @@ To support a new distribution everywhere (Double/Float/Long Double):
 ## Parameter Keys and Aliases
 
 - All parameter keys are matched case‑insensitively.
-- Aliases supported today:
-  - Gamma: `shape`/`k`, `scale`/`theta` (default scale = 1).
-  - Student T: `df`/`nu`/`degreesOfFreedom`.
-- Add aliases by extending the local key arrays in the factory implementation.
+- Alias sets for each distribution are listed in “What’s Implemented Today”; quick reference:
+  - Gamma: `shape|k`, `scale|theta`
+  - Beta: `alpha|a|p|shape1`, `beta|b|q|shape2`
+  - Chi-squared: `df|nu|degreesOfFreedom`
+  - Student’s t: `df|nu|degreesOfFreedom`
+  - Fisher’s F: `df1|d1|m|degreesOfFreedom1`, `df2|d2|n|degreesOfFreedom2`
+  - Bernoulli & Geometric: `p|prob|probability|success|theta`
+  - Binomial: `n|trials`, `p|prob|probability|success`
+  - Cauchy & Holtsmark: `location|loc|mu|median|x0`, `scale|gamma|sigma|b`
+  - Exponential: `lambda|rate` (scale handled by typed wrapper convenience API)
+  - Extreme value / Gumbel: `location|loc|mu`, `scale|gamma|sigma|b`
+  - Arcsine: `minX|min|a|lower`, `maxX|max|b|upper`
+- Add aliases by extending the key arrays in the factory implementation.
 
 
 ## Comparison: Dynamic vs Typed Swift Wrappers
@@ -182,6 +230,17 @@ let t = try Distribution.Dynamic<Float>(
   parameters: ["df": 12]
 )
 let tail = try t.sf(1.96)
+```
+
+Swift (Binomial counts):
+
+```swift
+let bin = try Distribution.Dynamic<Double>(
+  distributionName: "binomial",
+  parameters: ["n": 12, "p": 0.35]
+)
+let pmf4 = try bin.pdf(4)
+let cdf4 = try bin.cdf(4)
 ```
 
 Error handling:

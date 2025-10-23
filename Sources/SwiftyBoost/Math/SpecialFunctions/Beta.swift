@@ -55,13 +55,13 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - SpecialFunctionError.parameterNotFinite(name: ...) if inputs are NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotPositive(name: "a") if a ≤ 0.
-    /// - SpecialFunctionError.parameterNotPositive(name: "b") if b ≤ 0.
-    @inlinable static func beta<T: Real & BinaryFloatingPoint>(_ a: T, _ b: T) throws -> T {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+    /// - SpecialFunctionError.parameterNotPositive(name: "a", value: a) if a ≤ 0.
+    /// - SpecialFunctionError.parameterNotPositive(name: "b", value: b) if b ≤ 0.
+    @inlinable static func beta<T: Real & BinaryFloatingPoint & Sendable>(_ a: T, _ b: T) throws -> T {
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         return T(bs_beta_d(D(a), D(b)))
     }
 
@@ -76,15 +76,15 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - SpecialFunctionError.parameterNotFinite(name: ...) if inputs are NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotPositive(name: "a") if a ≤ 0.
-    /// - SpecialFunctionError.parameterNotPositive(name: "b") if b ≤ 0.
+    /// - SpecialFunctionError.parameterNotPositive(name: "a", value: a) if a ≤ 0.
+    /// - SpecialFunctionError.parameterNotPositive(name: "b", value: b) if b ≤ 0.
     /// - SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: 1) if x ∉ [0, 1].
-    @inlinable static func incompleteBetaUnnormalized<T: Real & BinaryFloatingPoint>(_ a: T, _ b: T, x: T) throws -> T {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+    @inlinable static func incompleteBetaUnnormalized<T: Real & BinaryFloatingPoint & Sendable>(_ a: T, _ b: T, x: T) throws -> T {
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
         return T(bs_fullBeta_d(D(a), D(b), D(x)))
     }
@@ -100,15 +100,15 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - SpecialFunctionError.parameterNotFinite(name: ...) if inputs are NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotPositive(name: "a") if a ≤ 0.
-    /// - SpecialFunctionError.parameterNotPositive(name: "b") if b ≤ 0.
+    /// - SpecialFunctionError.parameterNotPositive(name: "a", value: a) if a ≤ 0.
+    /// - SpecialFunctionError.parameterNotPositive(name: "b", value: b) if b ≤ 0.
     /// - SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: 1) if x ∉ [0, 1].
-    @inlinable static func regularizedIncompleteBeta<T: Real & BinaryFloatingPoint>(_ a: T, _ b: T, x: T) throws -> T {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+    @inlinable static func regularizedIncompleteBeta<T: Real & BinaryFloatingPoint & Sendable>(_ a: T, _ b: T, x: T) throws -> T {
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
         return T(bs_ibeta_d(D(a), D(b), D(x)))
     }
@@ -124,15 +124,15 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - SpecialFunctionError.parameterNotFinite(name: ...) if inputs are NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotPositive(name: "a") if a ≤ 0.
-    /// - SpecialFunctionError.parameterNotPositive(name: "b") if b ≤ 0.
+    /// - SpecialFunctionError.parameterNotPositive(name: "a", value: a) if a ≤ 0.
+    /// - SpecialFunctionError.parameterNotPositive(name: "b", value: b) if b ≤ 0.
     /// - SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: 1) if x ∉ [0, 1].
-    @inlinable static func complementaryRegularizedIncompleteBeta<T: Real & BinaryFloatingPoint>(_ a: T, _ b: T, x: T) throws -> T {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+    @inlinable static func complementaryRegularizedIncompleteBeta<T: Real & BinaryFloatingPoint & Sendable>(_ a: T, _ b: T, x: T) throws -> T {
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
         return T(bs_ibetac_d(D(a), D(b), D(x)))
     }
@@ -148,15 +148,15 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - SpecialFunctionError.parameterNotFinite(name: ...) if inputs are NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotPositive(name: "a") if a ≤ 0.
-    /// - SpecialFunctionError.parameterNotPositive(name: "b") if b ≤ 0.
+    /// - SpecialFunctionError.parameterNotPositive(name: "a", value: a) if a ≤ 0.
+    /// - SpecialFunctionError.parameterNotPositive(name: "b", value: b) if b ≤ 0.
     /// - SpecialFunctionError.parameterOutOfRange(name: "p", min: 0, max: 1) if p ∉ [0, 1].
-    @inlinable static func inverseRegularizedIncompleteBeta<T: Real & BinaryFloatingPoint>(_ a: T, _ b: T, p: T) throws -> T {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+    @inlinable static func inverseRegularizedIncompleteBeta<T: Real & BinaryFloatingPoint & Sendable>(_ a: T, _ b: T, p: T) throws -> T {
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p", value: p) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard p >= 0 && p <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
         return T(bs_ibeta_inv_d(D(a), D(b), D(p)))
     }
@@ -172,15 +172,15 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - SpecialFunctionError.parameterNotFinite(name: ...) if inputs are NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotPositive(name: "a") if a ≤ 0.
-    /// - SpecialFunctionError.parameterNotPositive(name: "b") if b ≤ 0.
+    /// - SpecialFunctionError.parameterNotPositive(name: "a", value: a) if a ≤ 0.
+    /// - SpecialFunctionError.parameterNotPositive(name: "b", value: b) if b ≤ 0.
     /// - SpecialFunctionError.parameterOutOfRange(name: "p", min: 0, max: 1) if p ∉ [0, 1].
-    @inlinable static func inverseComplementaryRegularizedIncompleteBeta<T: Real & BinaryFloatingPoint>(_ a: T, _ b: T, p: T) throws -> T {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+    @inlinable static func inverseComplementaryRegularizedIncompleteBeta<T: Real & BinaryFloatingPoint & Sendable>(_ a: T, _ b: T, p: T) throws -> T {
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p", value: p) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard p >= 0 && p <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
         return T(bs_ibetac_inv_d(D(a), D(b), D(p)))
     }
@@ -193,7 +193,7 @@ public extension SpecialFunctions {
     @inlinable static func inverseComplementaryRegularizedIncompleteBeta(_ a: Double, _ b: Double, p: Float) throws -> Double { try inverseComplementaryRegularizedIncompleteBeta(a, b, p: Double(p)) }
     
     /// Solve for a in I_x(a, b) = p, given b, x, p. No throws; see notes.
-    @inlinable static func solveAForRegularizedIncompleteBeta<T: Real & BinaryFloatingPoint>(b: T, x: T, p: T) -> T {
+    @inlinable static func solveAForRegularizedIncompleteBeta<T: Real & BinaryFloatingPoint & Sendable>(b: T, x: T, p: T) -> T {
         T(bs_ibeta_inva_d(D(b), D(x), D(p)))
     }
 
@@ -205,7 +205,7 @@ public extension SpecialFunctions {
     @inlinable static func solveAForRegularizedIncompleteBeta(b: Double, x: Double, p: Float) -> Double { solveAForRegularizedIncompleteBeta(b: b, x: x, p: Double(p)) }
     
     /// Solve for b in I_x(a, b) = p, given a, x, p. No throws; see notes.
-    @inlinable static func solveBForRegularizedIncompleteBeta<T: Real & BinaryFloatingPoint>(a: T, x: T, p: T) -> T {
+    @inlinable static func solveBForRegularizedIncompleteBeta<T: Real & BinaryFloatingPoint & Sendable>(a: T, x: T, p: T) -> T {
         T(bs_ibeta_invb_d(D(a), D(x), D(p)))
     }
 
@@ -222,15 +222,15 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - SpecialFunctionError.parameterNotFinite(name: ...) if inputs are NaN or ±∞.
-    /// - SpecialFunctionError.parameterNotPositive(name: "a") if a ≤ 0.
-    /// - SpecialFunctionError.parameterNotPositive(name: "b") if b ≤ 0.
+    /// - SpecialFunctionError.parameterNotPositive(name: "a", value: a) if a ≤ 0.
+    /// - SpecialFunctionError.parameterNotPositive(name: "b", value: b) if b ≤ 0.
     /// - SpecialFunctionError.parameterOutOfRange(name: "x", min: 0, max: 1) if x ∉ [0, 1].
-    @inlinable static func regularizedIncompleteBetaDerivative<T: Real & BinaryFloatingPoint>(_ a: T, _ b: T, x: T) throws -> T {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+    @inlinable static func regularizedIncompleteBetaDerivative<T: Real & BinaryFloatingPoint & Sendable>(_ a: T, _ b: T, x: T) throws -> T {
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
         return T(bs_ibeta_derivative_d(D(a), D(b), D(x)))
     }
@@ -238,59 +238,59 @@ public extension SpecialFunctions {
     // MARK: - Float overloads (Beta)
     
     @inlinable static func beta(_ a: Float, _ b: Float) throws -> Float {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         return bs_beta_f(a, b)
     }
     
     @inlinable static func incompleteBetaUnnormalized(_ a: Float, _ b: Float, x: Float) throws -> Float {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
         return bs_fullBeta_f(a, b, x)
     }
     
     @inlinable static func regularizedIncompleteBeta(_ a: Float, _ b: Float, x: Float) throws -> Float {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
         return bs_ibeta_f(a, b, x)
     }
     
     @inlinable static func complementaryRegularizedIncompleteBeta(_ a: Float, _ b: Float, x: Float) throws -> Float {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
         return bs_ibetac_f(a, b, x)
     }
     
     @inlinable static func inverseRegularizedIncompleteBeta(_ a: Float, _ b: Float, p: Float) throws -> Float {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p", value: p) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard p >= 0 && p <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
         return bs_ibeta_inv_f(a, b, p)
     }
     
     @inlinable static func inverseComplementaryRegularizedIncompleteBeta(_ a: Float, _ b: Float, p: Float) throws -> Float {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p", value: p) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard p >= 0 && p <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
         return bs_ibetac_inv_f(a, b, p)
     }
@@ -304,11 +304,11 @@ public extension SpecialFunctions {
     }
     
     @inlinable static func regularizedIncompleteBetaDerivative(_ a: Float, _ b: Float, x: Float) throws -> Float {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
         return bs_ibeta_derivative_f(a, b, x)
     }
@@ -317,10 +317,10 @@ public extension SpecialFunctions {
     
 #if arch(x86_64)
     @inlinable static func beta(_ a: Float80, _ b: Float80) throws -> Float80 {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         return bs_beta_l(a, b)
     }
 
@@ -331,11 +331,11 @@ public extension SpecialFunctions {
     @inlinable static func beta(_ a: Float, _ b: Float80) throws -> Float80 { try beta(Float80(a), b) }
     
     @inlinable static func incompleteBetaUnnormalized(_ a: Float80, _ b: Float80, x: Float80) throws -> Float80 {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
         return bs_fullBeta_l(a, b, x)
     }
@@ -348,11 +348,11 @@ public extension SpecialFunctions {
     @inlinable static func incompleteBetaUnnormalized(_ a: Double, _ b: Float80, x: Float) throws -> Float80 { try incompleteBetaUnnormalized(Float80(a), b, x: Float80(x)) }
     
     @inlinable static func regularizedIncompleteBeta(_ a: Float80, _ b: Float80, x: Float80) throws -> Float80 {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
         return bs_ibeta_l(a, b, x)
     }
@@ -365,11 +365,11 @@ public extension SpecialFunctions {
     @inlinable static func regularizedIncompleteBeta(_ a: Double, _ b: Float80, x: Float) throws -> Float80 { try regularizedIncompleteBeta(Float80(a), b, x: Float80(x)) }
     
     @inlinable static func complementaryRegularizedIncompleteBeta(_ a: Float80, _ b: Float80, x: Float80) throws -> Float80 {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
         return bs_ibetac_l(a, b, x)
     }
@@ -382,11 +382,11 @@ public extension SpecialFunctions {
     @inlinable static func complementaryRegularizedIncompleteBeta(_ a: Double, _ b: Float80, x: Float) throws -> Float80 { try complementaryRegularizedIncompleteBeta(Float80(a), b, x: Float80(x)) }
     
     @inlinable static func inverseRegularizedIncompleteBeta(_ a: Float80, _ b: Float80, p: Float80) throws -> Float80 {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p", value: p) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard p >= 0 && p <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
         return bs_ibeta_inv_l(a, b, p)
     }
@@ -399,11 +399,11 @@ public extension SpecialFunctions {
     @inlinable static func inverseRegularizedIncompleteBeta(_ a: Double, _ b: Float80, p: Float) throws -> Float80 { try inverseRegularizedIncompleteBeta(Float80(a), b, p: Float80(p)) }
     
     @inlinable static func inverseComplementaryRegularizedIncompleteBeta(_ a: Float80, _ b: Float80, p: Float80) throws -> Float80 {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard p.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "p", value: p) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard p >= 0 && p <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "p", min: 0.0, max: 1.0) }
         return bs_ibetac_inv_l(a, b, p)
     }
@@ -436,11 +436,11 @@ public extension SpecialFunctions {
     @inlinable static func solveBForRegularizedIncompleteBeta(a: Float, x: Float80, p: Float) -> Float80 { solveBForRegularizedIncompleteBeta(a: Float80(a), x: x, p: Float80(p)) }
     
     @inlinable static func regularizedIncompleteBetaDerivative(_ a: Float80, _ b: Float80, x: Float80) throws -> Float80 {
-        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a") }
-        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b") }
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
-        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a") }
-        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b") }
+        guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
+        guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        guard a > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "a", value: a) }
+        guard b > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "b", value: b) }
         guard x >= 0 && x <= 1 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: 1.0) }
         return bs_ibeta_derivative_l(a, b, x)
     }

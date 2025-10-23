@@ -55,7 +55,7 @@ public extension SpecialFunctions {
     ///   - Propagates IEEE-754 `NaN` and `±∞` according to the underlying implementation.
     /// - SeeAlso: ``SpecialFunctions/sinc_pi(_:)->T`` (generic), ``SpecialFunctions/sinc_pi(_:)->Double`` (Double), ``SpecialFunctions/sinc_pi(_:)->Float`` (Float)
     @inlinable
-    static func sinc_pi<T: Real & BinaryFloatingPoint>(_ x: T) -> T {
+    static func sinc_pi<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) -> T {
             return T(bs_sinc_pi_d(Double(x)))
     }
 
@@ -92,7 +92,7 @@ public extension SpecialFunctions {
     ///   - Propagates IEEE-754 `NaN` and `±∞` according to the underlying implementation.
     /// - SeeAlso: ``SpecialFunctions/sinhc_pi(_:)->T`` (generic), ``SpecialFunctions/sinhc_pi(_:)->Double`` (Double), ``SpecialFunctions/sinhc_pi(_:)->Float`` (Float)
     @inlinable
-    static func sinhc_pi<T: Real & BinaryFloatingPoint>(_ x: T) -> T {
+    static func sinhc_pi<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) -> T {
             return T(bs_sinhc_pi_d(Double(x)))
     }
 

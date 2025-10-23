@@ -51,7 +51,7 @@ public extension SpecialFunctions {
     /// - Returns: The inverse hyperbolic tangent of `x`.
     /// - Note: For |x| > 1 the result is NaN. As x approaches +/-1, the result tends to +/-infinity.
     @inlinable
-    static func atanh<T: Real & BinaryFloatingPoint>(_ x: T) -> T {
+    static func atanh<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) -> T {
         return T(bs_atanh_d(Double(x)))
     }
 
@@ -81,7 +81,7 @@ public extension SpecialFunctions {
     /// - Parameter x: The input value (all real numbers are allowed).
     /// - Returns: The inverse hyperbolic sine of `x`.
     @inlinable
-    static func asinh<T: Real & BinaryFloatingPoint>(_ x: T) -> T {
+    static func asinh<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) -> T {
         return T(bs_asinh_d(Double(x)))
     }
 
@@ -112,7 +112,7 @@ public extension SpecialFunctions {
     /// - Returns: The inverse hyperbolic cosine of `x`.
     /// - Note: For x < 1 the result is NaN.
     @inlinable
-    static func acosh<T: Real & BinaryFloatingPoint>(_ x: T) -> T {
+    static func acosh<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) -> T {
         return T(bs_acosh_d(Double(x)))
     }
 

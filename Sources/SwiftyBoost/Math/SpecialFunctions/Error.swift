@@ -51,9 +51,9 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    @inlinable static func errorFunction<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func errorFunction<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) throws -> T {
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_erf_d(dx))
     }
     
@@ -70,9 +70,9 @@ public extension SpecialFunctions {
     ///
     /// Throws:
     /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
-    @inlinable static func complementaryErrorFunction<T: Real & BinaryFloatingPoint>(_ x: T) throws -> T {
+    @inlinable static func complementaryErrorFunction<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) throws -> T {
         let dx = D(x)
-        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return T(bs_erfc_d(dx))
     }
     
@@ -96,9 +96,9 @@ public extension SpecialFunctions {
     ///
     /// Notes:
     /// - This generic overload funnels through a Double-backed backend and converts the result back to `T`.
-    @inlinable static func inverseErrorFunction<T: Real & BinaryFloatingPoint>(_ z: T) throws -> T {
+    @inlinable static func inverseErrorFunction<T: Real & BinaryFloatingPoint & Sendable>(_ z: T) throws -> T {
         let dp = D(z)
-        guard dp.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
+        guard dp.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z", value: z) }
         guard abs(dp) < 1 else {
             throw SpecialFunctionError.parameterOutOfRange(
                 name: "z",
@@ -116,7 +116,7 @@ public extension SpecialFunctions {
     ///
     /// Throws if `x` is not finite.
     @inlinable static func errorFunction(_ x: Float) throws -> Float {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_erf_f(x)
     }
     
@@ -124,7 +124,7 @@ public extension SpecialFunctions {
     ///
     /// Throws if `x` is not finite.
     @inlinable static func complementaryErrorFunction(_ x: Float) throws -> Float {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_erfc_f(x)
     }
     
@@ -143,7 +143,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterNotFinite(name: "z")` if `z` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "z", min: -1.nextUp, max: 1.nextDown)` if `|z| ≥ 1`.
     @inlinable static func inverseErrorFunction(_ z: Float) throws -> Float {
-        guard z.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
+        guard z.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z", value: z) }
         guard abs(z) < 1 else {
             throw SpecialFunctionError.parameterOutOfRange(
                 name: "z",
@@ -160,7 +160,7 @@ public extension SpecialFunctions {
     ///
     /// Throws if `x` is not finite.
     @inlinable static func errorFunction(_ x: Float80) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_erf_l(x)
     }
     
@@ -168,7 +168,7 @@ public extension SpecialFunctions {
     ///
     /// Throws if `x` is not finite.
     @inlinable static func complementaryErrorFunction(_ x: Float80) throws -> Float80 {
-        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x") }
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_erfc_l(x)
     }
     
@@ -187,7 +187,7 @@ public extension SpecialFunctions {
     /// - `SpecialFunctionError.parameterNotFinite(name: "z")` if `z` is NaN or ±∞.
     /// - `SpecialFunctionError.parameterOutOfRange(name: "z", min: -1.nextUp, max: 1.nextDown)` if `|z| ≥ 1`.
     @inlinable static func inverseErrorFunction(_ z: Float80) throws -> Float80 {
-        guard z.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z") }
+        guard z.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z", value: z) }
         guard abs(z) < 1 else {
             throw SpecialFunctionError.parameterOutOfRange(
                 name: "z",
