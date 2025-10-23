@@ -9,11 +9,13 @@
 #include <boost/math/distributions/beta.hpp>
 #include <boost/math/distributions/chi_squared.hpp>
 #include <boost/math/distributions/complement.hpp>
+#include <boost/math/distributions/binomial.hpp>
 
 using boost::math::students_t_distribution;
 using boost::math::beta_distribution;
 using boost::math::complement;
 using boost::math::chi_squared_distribution;
+using boost::math::binomial_distribution;
 
 extern "C" {
 
@@ -77,6 +79,87 @@ double bs_chisquare_find_degreesOfFreedom_d(double difference_from_variance, dou
    
 long double bs_chisquare_find_degreesOfFreedom_l(long double difference_from_variance, long double alpha, long double beta, long double variance, long double hint) {
     return bs_wrap<long double>([&]{ return chi_squared_distribution<long double>::find_degrees_of_freedom(difference_from_variance, alpha, beta, variance, hint); });
+}
+
+float bs_binomial_find_lower_bound_on_p_f(float trials,
+                                          float successes,
+                                          float alpha,
+                                          bool jeffreys) {
+    if (jeffreys) {
+        return bs_wrap<float>([&]{ return binomial_distribution<float>::find_lower_bound_on_p(trials, successes, alpha, binomial_distribution<float>::jeffreys_prior_interval);});
+    }
+    else {
+        return bs_wrap<float>([&]{ return binomial_distribution<float>::find_lower_bound_on_p(trials, successes, alpha, binomial_distribution<float>::clopper_pearson_exact_interval); });
+    }
+}
+
+double bs_binomial_find_lower_bound_on_p_d(double trials, double successes, double alpha, bool jeffreys) {
+    if (jeffreys) {
+        return bs_wrap<double>([&]{ return binomial_distribution<double>::find_lower_bound_on_p(trials, successes, alpha, binomial_distribution<double>::jeffreys_prior_interval); });
+    }
+    else {
+        return bs_wrap<double>([&]{ return binomial_distribution<double>::find_lower_bound_on_p(trials, successes, alpha, binomial_distribution<double>::clopper_pearson_exact_interval); });
+    }
+}
+
+long double bs_binomial_find_lower_bound_on_p_l(long double trials, long double successes, long double alpha, bool jeffreys) {
+    if (jeffreys) {
+        return bs_wrap<long double>([&]{ return binomial_distribution<long double>::find_lower_bound_on_p(trials, successes, alpha, binomial_distribution<long double>::jeffreys_prior_interval); });
+    }
+    else {
+        return bs_wrap<long double>([&]{ return binomial_distribution<long double>::find_lower_bound_on_p(trials, successes, alpha, binomial_distribution<long double>::clopper_pearson_exact_interval); });
+    }
+}
+
+float bs_binomial_find_upper_bound_on_p_f(float trials,
+                                          float successes,
+                                          float alpha,
+                                          bool jeffreys) {
+    if (jeffreys) {
+        return bs_wrap<float>([&]{ return binomial_distribution<float>::find_upper_bound_on_p(trials, successes, alpha, binomial_distribution<float>::jeffreys_prior_interval); });
+    }
+    else {
+        return bs_wrap<float>([&]{ return binomial_distribution<float>::find_upper_bound_on_p(trials, successes, alpha, binomial_distribution<float>::clopper_pearson_exact_interval); });
+    }
+}
+
+double bs_binomial_find_upper_bound_on_p_d(double trials, double successes, double alpha, bool jeffreys) {
+    if (jeffreys) {
+        return bs_wrap<double>([&]{ return binomial_distribution<double>::find_upper_bound_on_p(trials, successes, alpha, binomial_distribution<double>::jeffreys_prior_interval); });
+    }
+    else {
+        return bs_wrap<double>([&]{ return binomial_distribution<double>::find_upper_bound_on_p(trials, successes, alpha, binomial_distribution<double>::clopper_pearson_exact_interval); });
+    }
+}
+
+long double bs_binomial_find_upper_bound_on_p_l(long double trials, long double successes, long double alpha, bool jeffreys) {
+    if (jeffreys) {
+        return bs_wrap<long double>([&]{ return binomial_distribution<long double>::find_upper_bound_on_p(trials, successes, alpha, binomial_distribution<long double>::jeffreys_prior_interval); });
+    }
+    else {
+        return bs_wrap<long double>([&]{ return binomial_distribution<long double>::find_upper_bound_on_p(trials, successes, alpha, binomial_distribution<long double>::clopper_pearson_exact_interval); });
+    }
+}
+
+float bs_binomial_find_minimum_number_of_trials_f(float events, float success_fraction, float alpha) {
+    return bs_wrap<float>([&]{ return binomial_distribution<float>::find_minimum_number_of_trials(events, success_fraction, alpha); });
+}
+
+double bs_binomial_find_minimum_number_of_trials_d(double events, double success_fraction, double alpha){
+    return bs_wrap<double>([&]{ return binomial_distribution<double>::find_minimum_number_of_trials(events, success_fraction, alpha); });
+}
+long double bs_binomial_find_minimum_number_of_trials_l(long double events, long double success_fraction, long double alpha){
+    return bs_wrap<long double>([&]{ return binomial_distribution<long double>::find_minimum_number_of_trials(events, success_fraction, alpha); });
+}
+float bs_binomial_find_maximum_number_of_trials_f(float events, float success_fraction, float alpha) {
+    return bs_wrap<float>([&]{ return binomial_distribution<float>::find_maximum_number_of_trials(events, success_fraction, alpha); });
+}
+double bs_binomial_find_maximum_number_of_trials_d(double events, double success_fraction, double alpha) {
+    return bs_wrap<double>([&]{ return binomial_distribution<double>::find_maximum_number_of_trials(events, success_fraction, alpha); });
+}
+
+long double bs_binomial_find_maximum_number_of_trials_l(long double events, long double success_fraction, long double alpha) {
+    return bs_wrap<long double>([&]{ return binomial_distribution<long double>::find_maximum_number_of_trials(events, success_fraction, alpha); });
 }
 
 

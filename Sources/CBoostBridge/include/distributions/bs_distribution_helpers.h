@@ -36,6 +36,26 @@ long double bs_beta_find_beta_from_alpha_l(long double alpha, long double x, lon
 float bs_chisquare_find_degreesOfFreedom_f(float difference_from_variance, float alpha, float beta, float variance, float hint);
 double bs_chisquare_find_degreesOfFreedom_d(double difference_from_variance, double alpha, double beta, double variance, double hint);
 long double bs_chisquare_find_degreesOfFreedom_l(long double difference_from_variance, long double alpha, long double beta, long double variance, long double hint);
+
+
+float bs_binomial_find_lower_bound_on_p_f(float trials, float successes, float alpha, bool jeffreys) ;
+double bs_binomial_find_lower_bound_on_p_d(double trials, double successes, double alpha, bool jeffreys);
+long double bs_binomial_find_lower_bound_on_p_l(long double trials, long double successes, long double alpha, bool jeffreys);
+
+float bs_binomial_find_upper_bound_on_p_f(float trials, float successes, float alpha, bool jeffreys);
+double bs_binomial_find_upper_bound_on_p_d(double trials, double successes, double alpha, bool jeffreys);
+long double bs_binomial_find_upper_bound_on_p_l(long double trials, long double successes, long double alpha, bool jeffreys);
+
+float bs_binomial_find_minimum_number_of_trials_f(float events, float success_fraction, float alpha);
+double bs_binomial_find_minimum_number_of_trials_d(double events, double success_fraction, double alpha);
+long double bs_binomial_find_minimum_number_of_trials_l(long double events, long double success_fraction, long double alpha);
+
+float bs_binomial_find_maximum_number_of_trials_f(float events, float success_fraction, float alpha);
+double bs_binomial_find_maximum_number_of_trials_d(double events, double success_fraction, double alpha);
+long double bs_binomial_find_maximum_number_of_trials_l(long double events, long double success_fraction, long double alpha);
+
+
+
 #ifdef __cplusplus
 }
 #endif

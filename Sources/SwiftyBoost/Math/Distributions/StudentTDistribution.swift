@@ -38,7 +38,7 @@ extension Distribution {
         typealias RealType = T
         public let degreesOfFreedom: T
         private let dyn: Distribution.Dynamic<T>
-
+        
         /// Initialize with ν degrees of freedom (> 0).
         public init(degreesOfFreedom v: T) throws {
             guard v > 0 else {
@@ -54,12 +54,12 @@ extension Distribution {
                 ]
             )
         }
-
+        
         // MARK: DistributionProtocol — Support
         public var supportLowerBound: T { dyn.supportLowerBound }
         public var supportUpperBound: T { dyn.supportUpperBound }
         public var range: (lower: T, upper: T) { dyn.range }
-
+        
         // MARK: PDF/CDF/SF/Quantile
         public func pdf(_ x: T) throws -> T { try dyn.pdf(x) }
         public func logPdf(_ x: T) throws -> T { try dyn.logPdf(x) }
@@ -69,7 +69,7 @@ extension Distribution {
         public func quantileComplement(_ q: T) throws -> T {
             try dyn.quantileComplement(q)
         }
-
+        
         // MARK: Moments
         public var mean: T? { degreesOfFreedom > 1 ? T(0) : nil }
         public var variance: T? { dyn.variance }
@@ -78,16 +78,16 @@ extension Distribution {
         public var skewness: T? { dyn.skewness }
         public var kurtosis: T? { dyn.kurtosis }
         public var kurtosisExcess: T? { dyn.kurtosisExcess }
-
+        
         // MARK: Hazards
         public func hazard(_ x: T) throws -> T { try dyn.hazard(x) }
         public func chf(_ x: T) throws -> T { try dyn.chf(x) }
-
+        
         // Lattice/discrete-only properties (continuous ⇒ nil)
         public var latticeStep: T? { nil }
         public var latticeOrigin: T? { nil }
         public var entropy: T? { dyn.entropy }
-
+        
         // MARK: Planning helper
         /// Find degrees of freedom ν given effect size, α, β, and σ.
         public static func findDegreesOfFreedom(
@@ -97,49 +97,50 @@ extension Distribution {
             sd: T,
             hint: T = 1
         ) -> T {
+            let res: T
             if T.self == Double.self {
-                return T(
-                    bs_student_t_find_degrees_of_freedom_d(
+                res = T(
+                    ceil(bs_student_t_find_degrees_of_freedom_d(
                         Double(differenceFromMean),
                         Double(alpha),
                         Double(beta),
                         Double(sd),
                         Double(hint)
-                    )
+                    ))
                 )
             }
-            if T.self == Float.self {
-                return T(
-                    bs_student_t_find_degrees_of_freedom_f(
+            else if T.self == Float.self {
+                res = T(
+                    ceil(bs_student_t_find_degrees_of_freedom_f(
                         Float(differenceFromMean),
                         Float(alpha),
                         Float(beta),
                         Float(sd),
                         Float(hint)
-                    )
-                )
+                    )))
             }
-            #if arch(x86_64) || arch(i386)
-                return T(
-                    bs_student_t_find_degrees_of_freedom_l(
+            else {
+#if arch(x86_64) || arch(i386)
+                res = T(
+                    ceil(bs_student_t_find_degrees_of_freedom_l(
                         Float80(differenceFromMean),
                         Float80(alpha),
                         Float80(beta),
                         Float80(sd),
                         Float80(hint)
-                    )
-                )
-            #else
-                return T(
-                    bs_student_t_find_degrees_of_freedom_d(
+                    )))
+#else
+                res = T(
+                    ceil(bs_student_t_find_degrees_of_freedom_d(
                         Double(differenceFromMean),
                         Double(alpha),
                         Double(beta),
                         Double(sd),
                         Double(hint)
-                    )
-                )
-            #endif
+                    )))
+#endif
+            }
+            return res + 1
         }
     }
 }
