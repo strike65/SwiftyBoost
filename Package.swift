@@ -12,6 +12,10 @@ let package = Package(
             name: "SwiftyBoost",
             targets: ["SwiftyBoost"]
         ),
+        .executable(
+            name: "swiftyboost-demo",
+            targets: ["SwiftyBoostDemo"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0"),
@@ -49,6 +53,16 @@ let package = Package(
                 .product(name: "ComplexModule", package: "swift-numerics")
             ],
             path: "Sources/SwiftyBoost"
+        ),
+        .executableTarget(
+            name: "SwiftyBoostDemo",
+            dependencies: [
+                "SwiftyBoost",
+                "SwiftyBoostPrelude",
+                "CBoostBridge",
+                .product(name: "ComplexModule", package: "swift-numerics")
+            ],
+            path: "Sources/SwiftyBoostDemo"
         ),
         .testTarget(
             name: "SwiftyBoostTests",
