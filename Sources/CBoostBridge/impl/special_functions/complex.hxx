@@ -22,8 +22,8 @@
 //
 // Complex number helpers and elementary functions
 #include <complex>
-#include "../internal/bs_internal.hpp"
-#include "../include/complex.h"
+#include "../../internal/bs_internal.hpp"
+#include "../include/special/complex.h"
 
 // Converters for C POD <-> std::complex
 static inline std::complex<double> to_std(complex_d z) noexcept { return { z.re, z.im }; }
