@@ -60,6 +60,7 @@
 #include "special/bs_a_hyper.h"
 #include "special/bs_jacobi_elliptic.h"
 #include "special/bs_jacobi_theta.h"
+#include "Quadrature/bs_quadrature.h"
 // Generic vtable-based distribution factory
 #include "distributions/bs_generic_distribution.h"
 #include "distributions/bs_distribution_helpers.h"

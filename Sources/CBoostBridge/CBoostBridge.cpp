@@ -60,6 +60,7 @@
 #include "impl/special_functions/bs_sin_cardinal.hxx"
 #include "impl/special_functions/bs_jacobi_elliptic.hxx"
 #include "impl/special_functions/bs_jacobi_theta.hxx"
+#include "impl/Quadrature/bs_quadrature.hxx"
 // Unified generic distribution vtable (runtime factory)
 #include "impl/distributions/bs_generic_distribution.hxx"
 #include "impl/distributions/bs_distribution_helpers.hxx"
