@@ -25,6 +25,15 @@ Discover common entry points and best practices when calling into ``SwiftyBoost`
 - Gegenbauer (ultraspherical) polynomials and derivatives are available via ``SpecialFunctions/gegenbauer(n:lambda:x:)`` and related helpers.
 - All APIs share validation conventions: integer indices must be non-negative and fit in `UInt32`, while parameters and evaluation points must be finite. Each overload is mirrored for `Float`, `Double`, generic `BinaryFloatingPoint`, and (on x86) `Float80`.
 
+## Quadrature
+
+- ``SpecialFunctions/Quadrature`` provides Gaussian and double-exponential integration across `Float`, `Double`, and (x86) `Float80`.
+- ``SpecialFunctions/Quadrature/Integrator`` reuses a single handle for repeated work; call ``SpecialFunctions/Quadrature/integrate(using:over:integrand:)`` for one-shot evaluations.
+- ``SpecialFunctions/Quadrature/Interval/automatic`` selects the rule’s native domain; ``SpecialFunctions/Quadrature/Interval/finite(lower:upper:)`` requires finite bounds with `lower < upper`.
+- Adaptive rules accept optional overrides for `maxRefinements` and `tolerance` (defaults: 10 refinements, `1e-9` tolerance).
+- Fixed rules expose nodes and weights when buffers match ``SpecialFunctions/Quadrature/Metadata/points``; use ``SpecialFunctions/Quadrature/Integrator/copyAbscissaWeights(into:weights:)``.
+- Review <doc:Quadrature> for a full tour plus metadata fields and error semantics.
+
 ## Elliptic Integrals
 
 - ``SpecialFunctions/bernoulli_b2n_f(_:)`` and companions provide Legendre-form integrals; Carlson symmetric variants such as ``SpecialFunctions/carlsonRF(_:_:_:)->T`` offer improved convergence for certain domains.

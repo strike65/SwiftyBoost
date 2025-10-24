@@ -27,6 +27,7 @@ Use this documentation catalog with DocC to explore how to configure Boost-backe
 
 - <doc:SinusCardinalis>
 - <doc:CommonHelpers>
+- <doc:Quadrature>
 
 ### Distribution APIs
 

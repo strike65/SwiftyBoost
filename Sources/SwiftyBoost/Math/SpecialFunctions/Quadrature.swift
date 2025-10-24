@@ -10,24 +10,78 @@
 
 import SwiftyBoostPrelude
 
+// The C enums are bridged via CBoostBridge and used for metadata reporting only.
+// We mark them retroactively Sendable because they are plain C enums.
 extension QuadratureType: @retroactive @unchecked Sendable {}
 extension QuadraturePrecision: @retroactive @unchecked Sendable {}
 
 public extension SpecialFunctions {
+    /// Numerical integration (quadrature) helpers backed by Boost.Math.
+    ///
+    /// This namespace provides:
+    /// - A type-safe description of available quadrature rules.
+    /// - A reusable `Integrator` that owns a single C handle and can evaluate multiple integrals.
+    /// - A one-shot `integrate` convenience that creates and disposes an integrator for a single call.
+    /// - Rich result metadata (estimated error, L1 norm, iterations, function calls, convergence flag).
+    ///
+    /// Precision
+    /// - Generic over `Scalar: Real & BinaryFloatingPoint` with concrete support for:
+    ///   - `Double`
+    ///   - `Float`
+    ///   - `Float80` on x86 (where available)
+    ///
+    /// Thread-safety
+    /// - `Integrator` instances are Sendable; the underlying handle is confined to the
+    ///   `Storage` reference and used synchronously during each `integrate` call.
+    /// - You can create multiple integrators and use them concurrently from different tasks/threads.
+    ///
+    /// Intervals
+    /// - `.automatic` chooses the natural interval of the rule (e.g. Gauss–Legendre: [-1, 1]).
+    /// - `.finite(lower:upper:)` integrates over a user-specified finite interval.
     enum Quadrature {
         /// Describes the quadrature rule to employ.
+        ///
+        /// Notes per rule:
+        /// - `.gaussLegendre(points:)`
+        ///   - Fixed, non-adaptive rule on [-1, 1] with positive weights.
+        ///   - Use `.finite` with an affine change of variables if you need [a, b].
+        /// - `.gaussKronrod(points:)`
+        ///   - Fixed Gauss–Kronrod extension (e.g. 15, 21, 31 points depending on availability).
+        /// - `.tanhSinh(maxRefinements:tolerance:)`
+        ///   - Adaptive double-exponential rule over (-∞, ∞). Natural interval is infinite.
+        ///   - Provide parameters to override defaults; otherwise use the backend defaults.
+        /// - `.sinhSinh(maxRefinements:tolerance:)`
+        ///   - Adaptive double-exponential rule suited for even integrands on (-∞, ∞).
+        /// - `.expSinh(maxRefinements:tolerance:)`
+        ///   - Adaptive double-exponential rule suited for semi-infinite domains [0, ∞).
+        ///
+        /// Point count constraints:
+        /// - Must be > 0 and fit in Int32; otherwise an error is thrown at construction time.
         public enum Rule: Sendable, Equatable {
+            /// Gauss–Legendre rule with a given number of points on [-1, 1].
             case gaussLegendre(points: Int)
-            case gaussHermite(points: Int)
-            case gaussLaguerre(points: Int, alpha: Double? = nil)
-            case gaussJacobi(points: Int, alpha: Double, beta: Double)
+            /// Gauss–Kronrod fixed rule on [-1, 1].
             case gaussKronrod(points: Int)
+            /// Tanh–Sinh (double-exponential) adaptive rule over (-∞, ∞).
+            /// - Parameters override backend defaults if provided.
             case tanhSinh(maxRefinements: Int? = nil, tolerance: Double? = nil)
+            /// Sinh–Sinh adaptive rule (often used for even integrands) over (-∞, ∞).
             case sinhSinh(maxRefinements: Int? = nil, tolerance: Double? = nil)
+            /// Exp–Sinh adaptive rule over [0, ∞).
             case expSinh(maxRefinements: Int? = nil, tolerance: Double? = nil)
         }
 
         /// Specifies how to interpret integration bounds.
+        ///
+        /// - `.automatic`: Use the rule’s natural interval:
+        ///   - Gauss–Legendre, Gauss–Jacobi, Gauss–Kronrod: [-1, 1]
+        ///   - Gauss–Hermite: (-∞, ∞)
+        ///   - Gauss–Laguerre: [0, ∞)
+        ///   - Tanh–Sinh, Sinh–Sinh: (-∞, ∞)
+        ///   - Exp–Sinh: [0, ∞)
+        /// - `.finite(lower:upper:)`: Integrate over a finite, ordered interval [lower, upper].
+        ///   - Both bounds must be finite and `lower < upper`. For `Float` integrators the bounds
+        ///     must also be representable as finite `Float` values.
         public enum Interval: Sendable, Equatable {
             /// Use the rule’s natural interval (e.g., [-1, 1] for Gauss–Legendre).
             case automatic
@@ -35,28 +89,59 @@ public extension SpecialFunctions {
             case finite(lower: Double, upper: Double)
         }
 
-        /// Describes the instantiated quadrature backend.
+        /// Describes the instantiated quadrature backend and its capabilities.
+        ///
+        /// Values are queried from the C bridge after creating the handle:
+        /// - `type`: The backend rule family (e.g., Gauss–Legendre, Tanh–Sinh).
+        /// - `precision`: Underlying scalar precision of the handle.
+        /// - `points`: Number of nodes for fixed rules (0 for adaptive rules).
+        /// - `isAdaptive`: Whether the backend is adaptive (double-exponential families).
+        /// - `supportsInfiniteBounds`: Whether the backend can integrate on infinite domains.
         public struct Metadata: Sendable, Equatable {
+            /// The Swift rule used to construct the handle.
             public let rule: Rule
+            /// C-side rule family identifier.
             public let type: QuadratureType
+            /// C-side precision of the handle (float/double/long double).
             public let precision: QuadraturePrecision
+            /// Number of nodes for fixed rules; 0 for adaptive rules.
             public let points: Int
+            /// True for adaptive (double-exponential) backends.
             public let isAdaptive: Bool
+            /// True if the backend accepts infinite bounds on the C side.
             public let supportsInfiniteBounds: Bool
         }
 
         /// Encapsulates the result of an integral evaluation.
+        ///
+        /// Fields mirror the bridge’s `QuadratureResult*` structures with Swift-friendly types.
+        /// - value: The estimated integral.
+        /// - estimatedError: Backend’s error estimate (absolute).
+        /// - l1Norm: Estimated L1 norm of the integrand (if provided by the backend).
+        /// - iterations: Iteration count reported by the backend (0 for fixed rules).
+        /// - functionEvaluations: Number of integrand calls performed.
+        /// - converged: Backend-reported convergence flag (true/false).
+        /// - metadata: The `Metadata` describing the instantiated backend.
         public struct Result<Scalar: Real & BinaryFloatingPoint & Sendable>: Sendable, Equatable {
+            /// The estimated integral value.
             public let value: Scalar
+            /// The backend’s absolute error estimate.
             public let estimatedError: Scalar
+            /// Estimated L1 norm of the integrand over the integration domain.
             public let l1Norm: Scalar
+            /// Iteration count (adaptive rules) or 0 for fixed rules.
             public let iterations: Int
+            /// Number of integrand evaluations performed.
             public let functionEvaluations: Int
+            /// Whether the backend reported convergence.
             public let converged: Bool
+            /// Metadata describing the backend used for this evaluation.
             public let metadata: Metadata
 
+            /// Convenience alias for `converged`.
             @inlinable public var didConverge: Bool { converged }
 
+            /// Convert the result value to another binary floating-point type.
             @inlinable public func value<T: BinaryFloatingPoint>(as _: T.Type = T.self) -> T {
                 T(value)
             }
@@ -72,18 +157,36 @@ public extension SpecialFunctions {
             }
         }
 
+        /// Errors thrown by quadrature setup or evaluation.
         public enum Error: Swift.Error, Equatable {
+            /// Rule-specific validation failed (e.g., non-positive points, α/β ≤ -1).
             case invalidConfiguration(String)
+            /// The requested interval was invalid (non-finite or unordered).
             case invalidInterval(lower: Double, upper: Double)
+            /// The backend for the requested rule/precision combination is not available.
             case backendUnavailable(String)
         }
 
         /// Reusable integrator that owns a single quadrature handle.
+        ///
+        /// Use this type if you plan to evaluate multiple integrals with the same rule
+        /// (potentially over different intervals or with different integrands). The
+        /// underlying C handle is created once in `init(rule:)` and destroyed when the
+        /// integrator is deinitialized.
+        ///
+        /// Example
+        /// - Create a 61-point Gauss–Kronrod integrator and integrate on [0, 1]:
+        ///   let gk = try SpecialFunctions.Quadrature.Integrator<Double>(rule: .gaussKronrod(points: 61))
+        ///   let result = try gk.integrate(over: .finite(lower: 0, upper: 1)) { x in 1.0 / (1.0 + x*x) }
+        ///   print(result.value, result.estimatedError, result.didConverge)
         public struct Integrator<Scalar: Real & BinaryFloatingPoint & Sendable>: Sendable {
+            /// Internal reference type that owns the opaque C handle.
             private final class Storage: @unchecked Sendable {
                 let handle: QuadratureHandle
                 let metadata: Metadata
 
+                /// Create and configure the C handle for the given rule.
+                /// - Throws: `Error.invalidConfiguration` or `Error.backendUnavailable`.
                 init(rule: Rule) throws {
                     let handle = try QuadratureBridge.createHandle(for: rule, scalar: Scalar.self)
                     let type = quad_get_type(handle)
@@ -103,6 +206,8 @@ public extension SpecialFunctions {
                     quad_destroy(handle)
                 }
 
+                /// Evaluate the integral for the supplied integrand over the given interval.
+                /// - Throws: `Error.invalidInterval` for non-finite or unordered bounds.
                 func integrate(over interval: Interval,
                                integrand: @escaping @Sendable (Scalar) -> Scalar) throws -> Result<Scalar> {
                     let raw = try QuadratureBridge.integrate(handle: handle,
@@ -112,6 +217,9 @@ public extension SpecialFunctions {
                     return Result(raw: raw, metadata: metadata)
                 }
 
+                /// Copy abscissa and weights for fixed rules into caller-provided buffers.
+                /// - Returns: `true` if the backend provided nodes/weights and buffers were large enough.
+                /// - Note: Adaptive rules do not expose fixed abscissa/weights and will return `false`.
                 func copyAbscissa(into abscissa: UnsafeMutablePointer<Scalar>,
                                   weights: UnsafeMutablePointer<Scalar>,
                                   capacity: Int) -> Bool {
@@ -125,18 +233,42 @@ public extension SpecialFunctions {
 
             private let storage: Storage
 
+            /// Metadata describing the underlying backend.
             public var metadata: Metadata { storage.metadata }
 
+            /// Create an integrator for the specified rule.
+            /// - Throws:
+            ///   - `Error.invalidConfiguration` for invalid parameters (e.g., non-positive points).
+            ///   - `Error.backendUnavailable` if the backend is not present for the target precision.
             public init(rule: Rule) throws {
                 self.storage = try Storage(rule: rule)
             }
 
+            /// Evaluate the integral for the supplied integrand over the given interval.
+            ///
+            /// - Parameters:
+            ///   - interval: `.automatic` uses the rule’s natural domain; `.finite` integrates over [lower, upper].
+            ///   - integrand: A `Sendable` closure from `Scalar` to `Scalar`.
+            /// - Returns: A `Result` containing the integral estimate and metadata.
+            /// - Throws: `Error.invalidInterval` if bounds are not finite or ordered.
             public func integrate(over interval: Interval = .automatic,
                                   integrand: @escaping @Sendable (Scalar) -> Scalar) throws -> Result<Scalar> {
                 try storage.integrate(over: interval, integrand: integrand)
             }
 
             /// Copy abscissa and weights into caller-provided buffers. Returns false if unavailable.
+            ///
+            /// - Parameters:
+            ///   - abscissa: Mutable buffer to receive nodes (x_i).
+            ///   - weights: Mutable buffer to receive weights (w_i).
+            /// - Returns:
+            ///   - `true` if the backend supplied nodes and weights and both buffers had sufficient capacity.
+            ///   - `false` if the backend is adaptive (no fixed nodes), the capacity was insufficient,
+            ///     or the underlying C call rejected the request.
+            ///
+            /// Notes
+            /// - For fixed rules (e.g., Gauss–Legendre), the required capacity equals `metadata.points`.
+            /// - For adaptive rules, this always returns `false`.
             public func copyAbscissaWeights(into abscissa: UnsafeMutableBufferPointer<Scalar>,
                                             weights: UnsafeMutableBufferPointer<Scalar>) -> Bool {
                 guard abscissa.count > 0,
@@ -151,6 +283,16 @@ public extension SpecialFunctions {
 
         /// Convenience one-shot entry point that constructs an integrator,
         /// evaluates the integral, and disposes the handle afterwards.
+        ///
+        /// Prefer this overload for simple, single-use integrations. For repeated
+        /// evaluations, construct an `Integrator` to amortize handle creation.
+        ///
+        /// - Parameters:
+        ///   - rule: The quadrature rule to use.
+        ///   - interval: Integration interval; defaults to the rule’s natural interval.
+        ///   - integrand: A `Sendable` closure mapping `Scalar` to `Scalar`.
+        /// - Returns: A `Result` with the integral estimate and metadata.
+        /// - Throws: `Error.invalidConfiguration`, `Error.backendUnavailable`, or `Error.invalidInterval`.
         public static func integrate<Scalar: Real & BinaryFloatingPoint & Sendable>(
             using rule: Rule,
             over interval: Interval = .automatic,
@@ -164,6 +306,7 @@ public extension SpecialFunctions {
 // MARK: - Rule helpers
 
 private extension SpecialFunctions.Quadrature.Rule {
+    /// Validate and downcast a positive point count to Int32 for the C bridge.
     static func checkedCount(_ value: Int, label: String) throws -> Int32 {
         guard value > 0 else {
             throw SpecialFunctions.Quadrature.Error.invalidConfiguration("\(label) requires a positive point count (received \(value)).")
@@ -174,6 +317,10 @@ private extension SpecialFunctions.Quadrature.Rule {
         return Int32(value)
     }
 
+    /// Normalize adaptive parameters (max refinements and tolerance) and validate them.
+    ///
+    /// - maxRef: Defaults to 10 if nil; must be positive and fit in Int32.
+    /// - tolerance: Defaults to 1e-9 if nil; must be positive.
     static func normalizedAdaptiveParameters<Scalar: BinaryFloatingPoint>(
         _ maxRef: Int?,
         _ tolerance: Scalar?,
@@ -195,8 +342,12 @@ private extension SpecialFunctions.Quadrature.Rule {
 }
 
 // MARK: - Bridging helpers
+//
+// Internal adapter that dispatches to precision-specific bridge implementations,
+// converts Swift closures to C callbacks, and maps raw results into generic form.
 
 private enum QuadratureBridge {
+    /// Precision-agnostic result used to populate `Quadrature.Result`.
     struct RawResult<Scalar: Real & BinaryFloatingPoint & Sendable> {
         let value: Scalar
         let estimatedError: Scalar
@@ -206,6 +357,7 @@ private enum QuadratureBridge {
         let converged: Bool
     }
 
+    /// Create a C-side handle for the given rule and scalar precision.
     static func createHandle<Scalar: Real & BinaryFloatingPoint & Sendable>(
         for rule: SpecialFunctions.Quadrature.Rule,
         scalar _: Scalar.Type
@@ -224,6 +376,7 @@ private enum QuadratureBridge {
         }
     }
 
+    /// Evaluate the integral by forwarding to the precision-specific bridge.
     static func integrate<Scalar: Real & BinaryFloatingPoint & Sendable>(
         handle: QuadratureHandle,
         over interval: SpecialFunctions.Quadrature.Interval,
@@ -231,9 +384,8 @@ private enum QuadratureBridge {
         scalar _: Scalar.Type
     ) throws -> RawResult<Scalar> {
         if Scalar.self == Double.self {
-            let raw = try QuadratureBridgeDouble.integrate(handle: handle,
-                                                           over: interval,
-                                                           integrand: integrand as! @Sendable (Double) -> Double)
+            let typed = unsafeBitCast(integrand, to: (@Sendable (Double) -> Double).self)
+            let raw = try QuadratureBridgeDouble.integrate(handle: handle, over: interval, integrand: typed)
             return QuadratureBridge.RawResult(
                 value: Scalar(raw.value),
                 estimatedError: Scalar(raw.estimatedError),
@@ -243,9 +395,8 @@ private enum QuadratureBridge {
                 converged: raw.converged
             )
         } else if Scalar.self == Float.self {
-            let raw = try QuadratureBridgeFloat.integrate(handle: handle,
-                                                          over: interval,
-                                                          integrand: integrand as! @Sendable (Float) -> Float)
+            let typed = unsafeBitCast(integrand, to: (@Sendable (Float) -> Float).self)
+            let raw = try QuadratureBridgeFloat.integrate(handle: handle, over: interval, integrand: typed)
             return QuadratureBridge.RawResult(
                 value: Scalar(raw.value),
                 estimatedError: Scalar(raw.estimatedError),
@@ -257,9 +408,8 @@ private enum QuadratureBridge {
         } else {
             #if arch(x86_64) || arch(i386)
             if Scalar.self == Float80.self {
-                let raw = try QuadratureBridgeFloat80.integrate(handle: handle,
-                                                                over: interval,
-                                                                integrand: integrand as! @Sendable (Float80) -> Float80)
+                let typed = unsafeBitCast(integrand, to: (@Sendable (Float80) -> Float80).self)
+                let raw = try QuadratureBridgeFloat80.integrate(handle: handle, over: interval, integrand: typed)
                 return QuadratureBridge.RawResult(
                     value: Scalar(raw.value),
                     estimatedError: Scalar(raw.estimatedError),
@@ -274,6 +424,7 @@ private enum QuadratureBridge {
         }
     }
 
+    /// Copy fixed abscissa/weights for the given precision (if available).
     static func copyAbscissa<Scalar: Real & BinaryFloatingPoint & Sendable>(
         handle: QuadratureHandle,
         abscissa: UnsafeMutablePointer<Scalar>,
@@ -318,6 +469,8 @@ private enum QuadratureBridge {
 }
 
 // MARK: - Double precision bridge
+//
+// Precision-specific construction, evaluation, and abscissa copying for Double.
 
 private enum QuadratureBridgeDouble {
     static func createHandle(for rule: SpecialFunctions.Quadrature.Rule) throws -> QuadratureHandle {
@@ -326,40 +479,6 @@ private enum QuadratureBridgeDouble {
             let n = try SpecialFunctions.Quadrature.Rule.checkedCount(points, label: "Gauss-Legendre")
             guard let handle = quad_gauss_create_d(n) else {
                 throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Legendre does not support \(points) points.")
-            }
-            return handle
-        case let .gaussHermite(points):
-            let n = try SpecialFunctions.Quadrature.Rule.checkedCount(points, label: "Gauss-Hermite")
-            guard let handle = quad_gauss_hermite_create_d(n) else {
-                throw SpecialFunctions.Quadrature.Error.backendUnavailable("Gauss-Hermite is unavailable for \(points) points (requires Boost ≥ 1.78).")
-            }
-            return handle
-        case let .gaussLaguerre(points, alpha):
-            let n = try SpecialFunctions.Quadrature.Rule.checkedCount(points, label: "Gauss-Laguerre")
-            if let alpha {
-                guard alpha > -1 else {
-                    throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Laguerre alpha must be greater than -1 (received \(alpha)).")
-                }
-                guard let handle = quad_gauss_laguerre_create_alpha_d(n, alpha) else {
-                    throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Laguerre does not support \(points) points with alpha=\(alpha).")
-                }
-                return handle
-            } else {
-                guard let handle = quad_gauss_laguerre_create_d(n) else {
-                    throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Laguerre does not support \(points) points.")
-                }
-                return handle
-            }
-        case let .gaussJacobi(points, alpha, beta):
-            let n = try SpecialFunctions.Quadrature.Rule.checkedCount(points, label: "Gauss-Jacobi")
-            guard alpha > -1 else {
-                throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Jacobi alpha must be greater than -1 (received \(alpha)).")
-            }
-            guard beta > -1 else {
-                throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Jacobi beta must be greater than -1 (received \(beta)).")
-            }
-            guard let handle = quad_gauss_jacobi_create_d(n, alpha, beta) else {
-                throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Jacobi does not support \(points) points for α=\(alpha), β=\(beta).")
             }
             return handle
         case let .gaussKronrod(points):
@@ -448,6 +567,8 @@ private enum QuadratureBridgeDouble {
 }
 
 // MARK: - Float precision bridge
+//
+// Precision-specific construction, evaluation, and abscissa copying for Float.
 
 private enum QuadratureBridgeFloat {
     static func createHandle(for rule: SpecialFunctions.Quadrature.Rule) throws -> QuadratureHandle {
@@ -456,40 +577,6 @@ private enum QuadratureBridgeFloat {
             let n = try SpecialFunctions.Quadrature.Rule.checkedCount(points, label: "Gauss-Legendre")
             guard let handle = quad_gauss_create_f(n) else {
                 throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Legendre does not support \(points) points.")
-            }
-            return handle
-        case let .gaussHermite(points):
-            let n = try SpecialFunctions.Quadrature.Rule.checkedCount(points, label: "Gauss-Hermite")
-            guard let handle = quad_gauss_hermite_create_f(n) else {
-                throw SpecialFunctions.Quadrature.Error.backendUnavailable("Gauss-Hermite is unavailable for \(points) points (requires Boost ≥ 1.78).")
-            }
-            return handle
-        case let .gaussLaguerre(points, alpha):
-            let n = try SpecialFunctions.Quadrature.Rule.checkedCount(points, label: "Gauss-Laguerre")
-            if let alpha {
-                guard alpha > -1 else {
-                    throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Laguerre alpha must be greater than -1 (received \(alpha)).")
-                }
-                guard let handle = quad_gauss_laguerre_create_alpha_f(n, Float(alpha)) else {
-                    throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Laguerre does not support \(points) points with alpha=\(alpha).")
-                }
-                return handle
-            } else {
-                guard let handle = quad_gauss_laguerre_create_f(n) else {
-                    throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Laguerre does not support \(points) points.")
-                }
-                return handle
-            }
-        case let .gaussJacobi(points, alpha, beta):
-            let n = try SpecialFunctions.Quadrature.Rule.checkedCount(points, label: "Gauss-Jacobi")
-            guard alpha > -1 else {
-                throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Jacobi alpha must be greater than -1 (received \(alpha)).")
-            }
-            guard beta > -1 else {
-                throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Jacobi beta must be greater than -1 (received \(beta)).")
-            }
-            guard let handle = quad_gauss_jacobi_create_f(n, Float(alpha), Float(beta)) else {
-                throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Jacobi does not support \(points) points for α=\(alpha), β=\(beta).")
             }
             return handle
         case let .gaussKronrod(points):
@@ -583,6 +670,8 @@ private enum QuadratureBridgeFloat {
 }
 
 // MARK: - Float80 bridge (x86 only)
+//
+// Precision-specific construction, evaluation, and abscissa copying for Float80.
 
 #if arch(x86_64) || arch(i386)
 private enum QuadratureBridgeFloat80 {
@@ -592,40 +681,6 @@ private enum QuadratureBridgeFloat80 {
             let n = try SpecialFunctions.Quadrature.Rule.checkedCount(points, label: "Gauss-Legendre")
             guard let handle = quad_gauss_create_l(n) else {
                 throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Legendre does not support \(points) points.")
-            }
-            return handle
-        case let .gaussHermite(points):
-            let n = try SpecialFunctions.Quadrature.Rule.checkedCount(points, label: "Gauss-Hermite")
-            guard let handle = quad_gauss_hermite_create_l(n) else {
-                throw SpecialFunctions.Quadrature.Error.backendUnavailable("Gauss-Hermite is unavailable for \(points) points (requires Boost ≥ 1.78).")
-            }
-            return handle
-        case let .gaussLaguerre(points, alpha):
-            let n = try SpecialFunctions.Quadrature.Rule.checkedCount(points, label: "Gauss-Laguerre")
-            if let alpha {
-                guard alpha > -1 else {
-                    throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Laguerre alpha must be greater than -1 (received \(alpha)).")
-                }
-                guard let handle = quad_gauss_laguerre_create_alpha_l(n, Float80(alpha)) else {
-                    throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Laguerre does not support \(points) points with alpha=\(alpha).")
-                }
-                return handle
-            } else {
-                guard let handle = quad_gauss_laguerre_create_l(n) else {
-                    throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Laguerre does not support \(points) points.")
-                }
-                return handle
-            }
-        case let .gaussJacobi(points, alpha, beta):
-            let n = try SpecialFunctions.Quadrature.Rule.checkedCount(points, label: "Gauss-Jacobi")
-            guard alpha > -1 else {
-                throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Jacobi alpha must be greater than -1 (received \(alpha)).")
-            }
-            guard beta > -1 else {
-                throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Jacobi beta must be greater than -1 (received \(beta)).")
-            }
-            guard let handle = quad_gauss_jacobi_create_l(n, Float80(alpha), Float80(beta)) else {
-                throw SpecialFunctions.Quadrature.Error.invalidConfiguration("Gauss-Jacobi does not support \(points) points for α=\(alpha), β=\(beta).")
             }
             return handle
         case let .gaussKronrod(points):
@@ -715,6 +770,10 @@ private enum QuadratureBridgeFloat80 {
 #endif
 
 // MARK: - Callback plumbing
+//
+// Convert `@Sendable (Scalar) -> Scalar` closures into C function pointers with an
+// opaque context pointer. We retain the callback box for the duration of the C call
+// via `withExtendedLifetime` to ensure the closure remains valid.
 
 private typealias CIntegrandDouble = @convention(c) (Double, UnsafeMutableRawPointer?) -> Double
 private typealias CIntegrandFloat = @convention(c) (Float, UnsafeMutableRawPointer?) -> Float

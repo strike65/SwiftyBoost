@@ -14,6 +14,7 @@ SwiftyBoost gives Swift developers direct access to Boost.Math special functions
 - `CBoostBridge` target that forwards Swift calls into the vendored Boost headers under `extern/boost`.
 - Architectural awareness with dedicated `Float`, `Double`, and (x86_64) `Float80` overloads plus generic `BinaryFloatingPoint` entry points.
 - Re-exported Swift Numerics `Complex<T>` type with SwiftyBoost convenience APIs: arithmetic, polar helpers, and Boost-backed elementary functions (`exp`, `log`, `sin`, `cos`, `tan`, `sinh`, `cosh`, `tanh`, `atan`). Double/Float/(x86_64) Float80 specializations call bridge functions (`bs_*`).
+- Fixed and adaptive quadrature helpers (`SpecialFunctions.Quadrature`) covering Gauss–Legendre, Gauss–Kronrod, tanh–sinh, sinh–sinh, and exp–sinh rules with reusable integrators, metadata, and abscissa/weight export.
 
 ## Requirements
 - Swift 6.2 or later.
@@ -132,6 +133,20 @@ let holtsmark_pdf = try holtsmark.pdf(0.5)
 // Arcsine on [0, 1]
 let arcsine = try Distribution.Arcsine<Double>(minX: 0, maxX: 1)
 let arcsine_pdf = try arcsine.pdf(0.2)
+```
+
+```swift
+// Quadrature
+let kronrod = try SpecialFunctions.Quadrature.Integrator<Double>(rule: .gaussKronrod(points: 61))
+let partial = try kronrod.integrate(over: .finite(lower: 0, upper: 1)) { x in 1.0 / (1.0 + x * x) }
+
+let gaussian = try SpecialFunctions.Quadrature.integrate(
+    using: .tanhSinh(maxRefinements: 12, tolerance: 1e-12),
+    over: .finite(lower: -1, upper: 1)
+) { (x: Double) in
+    1.0 / (1.0 + x * x)
+}
+let evaluations = gaussian.functionEvaluations
 ```
 
 APIs throw `SpecialFunctionError` for invalid inputs or domain violations; each case carries context such as the offending parameter name, and `invalidCombination` echoes the rejected value via its `value` payload. See DocC symbol docs for function‑specific bounds mirrored from Boost.Math.

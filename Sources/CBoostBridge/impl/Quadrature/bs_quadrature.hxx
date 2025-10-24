@@ -21,6 +21,79 @@
 //  THE SOFTWARE.
 //
 
+/*
+    Overview
+    --------
+    This translation unit implements a C-compatible facade over several
+    quadrature rules provided by Boost.Math. It exposes an opaque handle
+    (QuadratureHandle) and a family of C functions declared in
+    "../include/Quadrature/bs_quadrature.h" to:
+
+      - Construct quadrature objects for different rules and precisions.
+      - Integrate functions either over the rule’s natural domain or a
+        user-specified finite interval (where applicable).
+      - Obtain metadata (type, precision, number of points).
+      - Retrieve abscissa and weights for fixed (non-adaptive) rules.
+
+    Internally, we use a small type-erased hierarchy:
+
+      - QuadratureAny: non-templated base for lifetime and metadata.
+      - QuadratureBase<Real>: templated base that defines a uniform
+        interface across Real = float/double/long double.
+      - Concrete implementations per Boost rule and point count.
+
+    Ownership and lifetime
+    ----------------------
+    - All factory functions return a raw QuadratureHandle that is in fact
+      a pointer to a QuadratureAny-derived instance. The caller becomes
+      the owner and must call quad_destroy(handle) to release it.
+    - No shared ownership is used; creation succeeds or returns nullptr.
+
+    Error semantics
+    ---------------
+    - For fixed rules (Gauss-Legendre/Jacobi/Hermite/Laguerre/Kronrod),
+      Boost’s compile-time constructs do not provide a runtime error estimate.
+      We therefore set Result.error and Result.l1_norm to zero, mark
+      converged=1, iterations=1, and function_calls to the rule’s point count.
+    - For adaptive rules (tanh_sinh, sinh_sinh, exp_sinh), we wrap Boost’s
+      adaptive integrators. We count function evaluations in the callback
+      and return iterations as 0 (Boost doesn’t expose a step count via this
+      interface). Error and L1 norm are currently zero-filled; extend here
+      if you plumb Boost’s optional error/L1 outputs in the future.
+
+    Bounds handling
+    ---------------
+    - Some rules have natural infinite domains (Hermite: (-∞,∞), Laguerre: [0,∞)).
+      Their integrate_interval implementations ignore user bounds and integrate
+      over the natural domain. For Exp-Sinh, we support a left-bound shift so
+      [a, ∞) can be handled by a change of variables when a != 0.
+
+    Boost version feature gates
+    ---------------------------
+    - Since Boost 1.78, additional fixed rules are available:
+      Gauss-Hermite, Gauss-Laguerre, and Gauss-Jacobi. This file conditionally
+      compiles those implementations and factories behind BOOST_VERSION >= 107800.
+
+    Thread-safety
+    -------------
+    - Each handle is independent. There is no shared mutable state between
+      handles. The function-call counter inside adaptive integrators is local
+      to the integration call and guarded by capture-by-reference into the
+      lambda, so concurrent calls on the same handle are not supported.
+
+    Precision bridging
+    ------------------
+    - The Traits<> mapping associates C ABI function-pointer and result
+      structs per precision. This allows a single implementation to bridge
+      to the C header’s typedefs: IntegrandFunctionF/D/L and QuadratureResultF/D/L.
+
+    Abscissa and weights
+    --------------------
+    - Only fixed rules with compile-time point counts expose static abscissa
+      and weight arrays in Boost. We expose them via quad_get_abscissa_weights_*.
+      Adaptive rules return false (0) from this query.
+*/
+
 #include "../include/Quadrature/bs_quadrature.h"
 
 #include <boost/math/quadrature/exp_sinh.hpp>
@@ -34,23 +107,31 @@
 #include <memory>
 #include <type_traits>
 
-// Since Boost 1.78 additional quadrature rules are available.
-#if BOOST_VERSION >= 107800
-#include <boost/math/quadrature/gauss_hermite.hpp>
-#include <boost/math/quadrature/gauss_jacobi.hpp>
-#include <boost/math/quadrature/gauss_laguerre.hpp>
-#endif
-
 using namespace boost::math::quadrature;
 
 namespace bs::quadrature::detail {
 
+/*
+    PrecisionTag
+    ------------
+    Internal discriminator that records the Real type used by a concrete
+    quadrature instance. This is translated to the public C enum
+    QuadraturePrecision via to_c_precision().
+*/
 enum class PrecisionTag {
     Float,
     Double,
     LongDouble
 };
 
+/*
+    Traits<Real>
+    ------------
+    Associates a Real type with:
+      - The corresponding C function pointer type for integrands.
+      - The corresponding C result structure type.
+      - The internal PrecisionTag.
+*/
 template <typename Real>
 struct Traits;
 
@@ -75,43 +156,79 @@ struct Traits<long double> {
     using CResult = QuadratureResultL;
 };
 
+/*
+    QuadratureAny
+    -------------
+    Non-templated base class used for:
+      - Type erasure across different Real types.
+      - Exposing metadata common to all rules (type, points, precision).
+    Derived classes must implement get_type() and get_points().
+*/
 class QuadratureAny {
 public:
     explicit QuadratureAny(PrecisionTag p) : precision_(p) {}
     virtual ~QuadratureAny() = default;
 
+    // Returns the concrete quadrature rule (C ABI enum).
     virtual QuadratureType get_type() const = 0;
+
+    // Returns the number of points for fixed rules; -1 for adaptive rules.
     virtual int get_points() const = 0;
 
+    // Returns the internal precision tag.
     PrecisionTag precision() const { return precision_; }
 
 private:
     PrecisionTag precision_;
 };
 
+/*
+    QuadratureBase<Real>
+    --------------------
+    Templated base class that defines:
+      - The C ABI-compatible Integrand function signature for the given Real.
+      - A Result structure used internally that mirrors the C result types.
+      - Virtual methods: integrate(...) and integrate_interval(...).
+      - Optional abscissa/weights retrieval for fixed rules.
+
+    Implementors only need to provide the two integrate methods and, if
+    applicable, get_abscissa_weights.
+*/
 template <typename Real>
 class QuadratureBase : public QuadratureAny {
 public:
     using Integrand = Real (*)(Real, void*);
 
     struct Result {
-        Real result;
-        Real error;
-        Real l1_norm;
-        int iterations;
-        int function_calls;
-        int converged;
+        Real result;          // Integral estimate.
+        Real error;           // Estimated absolute error (0 for fixed rules).
+        Real l1_norm;         // L1 norm estimate (0 for fixed rules).
+        int iterations;       // Iteration count (0 for adaptive here).
+        int function_calls;   // Number of integrand evaluations (best effort).
+        int converged;        // 1 if converged/OK; 0 if error/unavailable.
     };
 
     QuadratureBase() : QuadratureAny(Traits<Real>::precision) {}
     ~QuadratureBase() override = default;
 
+    // Integrate over the rule’s natural domain or default interval.
     virtual Result integrate(Integrand f, void* context) = 0;
+
+    // Integrate over [a, b] when supported. Implementations may ignore bounds
+    // for rules defined on infinite domains.
     virtual Result integrate_interval(Integrand f, void* context, Real a, Real b) = 0;
 
+    // Retrieve abscissa and weights for fixed rules. Default returns false.
     virtual bool get_abscissa_weights(Real*, Real*, int) { return false; }
 };
 
+/*
+    make_error_result<Real>()
+    ------------------------
+    Utility to construct a sentinel Result indicating failure/unavailable.
+    Used when a handle cannot be cast to the expected Real-specialized
+    implementation.
+*/
 template <typename Real>
 [[nodiscard]] inline typename QuadratureBase<Real>::Result make_error_result() {
     using Result = typename QuadratureBase<Real>::Result;
@@ -125,11 +242,21 @@ template <typename Real>
     return r;
 }
 
+/*
+    precision_of<Real>()
+    -------------------
+    Returns the internal PrecisionTag corresponding to Real.
+*/
 template <typename Real>
 [[nodiscard]] inline PrecisionTag precision_of() {
     return Traits<Real>::precision;
 }
 
+/*
+    to_c_result<Real>(Result)
+    -------------------------
+    Converts an internal Result to the corresponding C ABI result struct.
+*/
 template <typename Real>
 [[nodiscard]] inline typename Traits<Real>::CResult to_c_result(const typename QuadratureBase<Real>::Result& src) {
     using CResult = typename Traits<Real>::CResult;
@@ -143,6 +270,14 @@ template <typename Real>
     };
 }
 
+/*
+    GaussLegendreImpl<Real, Points>
+    -------------------------------
+    Fixed Gauss-Legendre quadrature of compile-time order Points.
+    - integrate(): integrates over [-1, 1].
+    - integrate_interval(a, b): integrates over [a, b].
+    - get_abscissa_weights(): copies Boost’s static abscissa/weights.
+*/
 template <typename Real, unsigned Points>
 class GaussLegendreImpl final : public QuadratureBase<Real> {
     using Base = QuadratureBase<Real>;
@@ -196,133 +331,12 @@ public:
     }
 };
 
-#if BOOST_VERSION >= 107800
-template <typename Real, unsigned Points>
-class GaussHermiteImpl final : public QuadratureBase<Real> {
-    using Base = QuadratureBase<Real>;
-    using Result = typename Base::Result;
-    using Integrand = typename Base::Integrand;
-    using GaussType = gauss_hermite<Real, Points>;
-
-public:
-    Result integrate(Integrand f, void* context) override {
-        Result result{};
-        result.converged = 1;
-        result.iterations = 1;
-        result.function_calls = static_cast<int>(Points);
-        auto lambda = [f, context](Real x) -> Real {
-            return f ? f(x, context) : Real(0);
-        };
-        result.result = GaussType::integrate(lambda);
-        result.error = Real(0);
-        result.l1_norm = Real(0);
-        return result;
-    }
-
-    Result integrate_interval(Integrand f, void* context, Real, Real) override {
-        // Hermite integrates over (-∞, ∞); ignore bounds.
-        return integrate(f, context);
-    }
-
-    QuadratureType get_type() const override { return QUAD_GAUSS_HERMITE; }
-    int get_points() const override { return static_cast<int>(Points); }
-
-    bool get_abscissa_weights(Real* abscissa, Real* weights, int buffer_size) override {
-        if (buffer_size < static_cast<int>(Points)) {
-            return false;
-        }
-        const auto& abs = GaussType::abscissa();
-        const auto& wgt = GaussType::weights();
-        for (unsigned i = 0; i < Points; ++i) {
-            abscissa[i] = abs[i];
-            weights[i] = wgt[i];
-        }
-        return true;
-    }
-};
-#endif // BOOST_VERSION >= 107800
-
-#if BOOST_VERSION >= 107800
-template <typename Real, unsigned Points>
-class GaussLaguerreImpl final : public QuadratureBase<Real> {
-    using Base = QuadratureBase<Real>;
-    using Result = typename Base::Result;
-    using Integrand = typename Base::Integrand;
-    using GaussType = gauss_laguerre<Real, Points>;
-
-public:
-    explicit GaussLaguerreImpl(Real alpha = Real(0))
-        : alpha_(alpha) {}
-
-    Result integrate(Integrand f, void* context) override {
-        Result result{};
-        result.converged = 1;
-        result.iterations = 1;
-        result.function_calls = static_cast<int>(Points);
-        auto lambda = [f, context](Real x) -> Real {
-            return f ? f(x, context) : Real(0);
-        };
-        if (alpha_ == Real(0)) {
-            result.result = GaussType::integrate(lambda);
-        } else {
-            gauss_laguerre<Real, Points> quad(alpha_);
-            result.result = quad.integrate(lambda);
-        }
-        result.error = Real(0);
-        result.l1_norm = Real(0);
-        return result;
-    }
-
-    Result integrate_interval(Integrand f, void* context, Real, Real) override {
-        // Laguerre integrates over [0, ∞); ignore bounds.
-        return integrate(f, context);
-    }
-
-    QuadratureType get_type() const override { return QUAD_GAUSS_LAGUERRE; }
-    int get_points() const override { return static_cast<int>(Points); }
-
-private:
-    Real alpha_;
-};
-
-template <typename Real, unsigned Points>
-class GaussJacobiImpl final : public QuadratureBase<Real> {
-    using Base = QuadratureBase<Real>;
-    using Result = typename Base::Result;
-    using Integrand = typename Base::Integrand;
-
-public:
-    GaussJacobiImpl(Real alpha, Real beta)
-        : alpha_(alpha), beta_(beta) {}
-
-    Result integrate(Integrand f, void* context) override {
-        return integrate_interval(f, context, Real(-1), Real(1));
-    }
-
-    Result integrate_interval(Integrand f, void* context, Real a, Real b) override {
-        Result result{};
-        result.converged = 1;
-        result.iterations = 1;
-        result.function_calls = static_cast<int>(Points);
-        gauss_jacobi<Real, Points> quad(alpha_, beta_);
-        auto lambda = [f, context](Real x) -> Real {
-            return f ? f(x, context) : Real(0);
-        };
-        result.result = quad.integrate(lambda, a, b);
-        result.error = Real(0);
-        result.l1_norm = Real(0);
-        return result;
-    }
-
-    QuadratureType get_type() const override { return QUAD_GAUSS_JACOBI; }
-    int get_points() const override { return static_cast<int>(Points); }
-
-private:
-    Real alpha_;
-    Real beta_;
-};
-#endif // BOOST_VERSION >= 107800
-
+/*
+    GaussKronrodImpl<Real, Points>
+    ------------------------------
+    Fixed Gauss-Kronrod quadrature of compile-time order Points.
+    Natural interval: [-1, 1]. Also supports [a, b].
+*/
 template <typename Real, unsigned Points>
 class GaussKronrodImpl final : public QuadratureBase<Real> {
     using Base = QuadratureBase<Real>;
@@ -353,6 +367,15 @@ public:
     int get_points() const override { return static_cast<int>(Points); }
 };
 
+/*
+    TanhSinhImpl<Real>
+    ------------------
+    Adaptive double-exponential tanh-sinh integrator.
+    - Default constructor uses Boost defaults; an alternate constructor
+      allows specifying max refinements and convergence tolerance.
+    - Integrates over [-1, 1] by default; integrate_interval supports [a, b].
+    - function_calls is counted by intercepting the callback.
+*/
 template <typename Real>
 class TanhSinhImpl final : public QuadratureBase<Real> {
     using Base = QuadratureBase<Real>;
@@ -393,6 +416,13 @@ private:
     Real tolerance_;
 };
 
+/*
+    SinhSinhImpl<Real>
+    ------------------
+    Adaptive sinh-sinh integrator.
+    - Natural domain: (-∞, ∞).
+    - integrate_interval ignores bounds and integrates over the natural domain.
+*/
 template <typename Real>
 class SinhSinhImpl final : public QuadratureBase<Real> {
     using Base = QuadratureBase<Real>;
@@ -434,6 +464,14 @@ private:
     Real tolerance_;
 };
 
+/*
+    ExpSinhImpl<Real>
+    -----------------
+    Adaptive exp-sinh integrator.
+    - Natural domain: [0, ∞).
+    - integrate_interval supports shifting the lower bound: if a != 0,
+      we integrate f(x + a) over [0, ∞) which corresponds to [a, ∞).
+*/
 template <typename Real>
 class ExpSinhImpl final : public QuadratureBase<Real> {
     using Base = QuadratureBase<Real>;
@@ -463,6 +501,7 @@ public:
 
     Result integrate_interval(Integrand f, void* context, Real a, Real) override {
         if (a != Real(0)) {
+            // Change of variables: integrate g(x) = f(x + a) over [0, ∞).
             auto shifted = [f, context, a](Real x) -> Real {
                 return f ? f(x + a, context) : Real(0);
             };
@@ -479,6 +518,7 @@ public:
             result.l1_norm = Real(0);
             return result;
         }
+        // Natural domain [0, ∞).
         return integrate(f, context);
     }
 
@@ -491,6 +531,13 @@ private:
     Real tolerance_;
 };
 
+/*
+    Factory helpers per rule and precision
+    --------------------------------------
+    The following functions create concrete QuadratureBase<Real> instances
+    for the requested point count or parameters. Unsupported configurations
+    return nullptr.
+*/
 template <typename Real>
 QuadratureBase<Real>* create_gauss(int points) {
     switch (points) {
@@ -511,48 +558,6 @@ QuadratureBase<Real>* create_gauss(int points) {
     }
 }
 
-#if BOOST_VERSION >= 107800
-template <typename Real>
-QuadratureBase<Real>* create_gauss_hermite(int points) {
-    switch (points) {
-        case 10: return new GaussHermiteImpl<Real, 10>();
-        case 15: return new GaussHermiteImpl<Real, 15>();
-        case 20: return new GaussHermiteImpl<Real, 20>();
-        case 25: return new GaussHermiteImpl<Real, 25>();
-        case 30: return new GaussHermiteImpl<Real, 30>();
-        case 40: return new GaussHermiteImpl<Real, 40>();
-        case 50: return new GaussHermiteImpl<Real, 50>();
-        default: return nullptr;
-    }
-}
-
-template <typename Real>
-QuadratureBase<Real>* create_gauss_laguerre(int points, Real alpha, bool use_alpha) {
-    switch (points) {
-        case 10: return use_alpha ? static_cast<QuadratureBase<Real>*>(new GaussLaguerreImpl<Real, 10>(alpha)) : new GaussLaguerreImpl<Real, 10>();
-        case 15: return use_alpha ? static_cast<QuadratureBase<Real>*>(new GaussLaguerreImpl<Real, 15>(alpha)) : new GaussLaguerreImpl<Real, 15>();
-        case 20: return use_alpha ? static_cast<QuadratureBase<Real>*>(new GaussLaguerreImpl<Real, 20>(alpha)) : new GaussLaguerreImpl<Real, 20>();
-        case 25: return use_alpha ? static_cast<QuadratureBase<Real>*>(new GaussLaguerreImpl<Real, 25>(alpha)) : new GaussLaguerreImpl<Real, 25>();
-        case 30: return use_alpha ? static_cast<QuadratureBase<Real>*>(new GaussLaguerreImpl<Real, 30>(alpha)) : new GaussLaguerreImpl<Real, 30>();
-        case 40: return use_alpha ? static_cast<QuadratureBase<Real>*>(new GaussLaguerreImpl<Real, 40>(alpha)) : new GaussLaguerreImpl<Real, 40>();
-        case 50: return use_alpha ? static_cast<QuadratureBase<Real>*>(new GaussLaguerreImpl<Real, 50>(alpha)) : new GaussLaguerreImpl<Real, 50>();
-        default: return nullptr;
-    }
-}
-
-template <typename Real>
-QuadratureBase<Real>* create_gauss_jacobi(int points, Real alpha, Real beta) {
-    switch (points) {
-        case 10: return new GaussJacobiImpl<Real, 10>(alpha, beta);
-        case 15: return new GaussJacobiImpl<Real, 15>(alpha, beta);
-        case 20: return new GaussJacobiImpl<Real, 20>(alpha, beta);
-        case 30: return new GaussJacobiImpl<Real, 30>(alpha, beta);
-        case 50: return new GaussJacobiImpl<Real, 50>(alpha, beta);
-        default: return nullptr;
-    }
-}
-#endif // BOOST_VERSION >= 107800
-
 template <typename Real>
 QuadratureBase<Real>* create_gauss_kronrod(int points) {
     switch (points) {
@@ -566,6 +571,11 @@ QuadratureBase<Real>* create_gauss_kronrod(int points) {
     }
 }
 
+/*
+    create_tanh_sinh / create_sinh_sinh / create_exp_sinh
+    ------------------------------------------------------
+    Create adaptive integrators with defaults or custom parameters.
+*/
 template <typename Real>
 QuadratureBase<Real>* create_tanh_sinh(int max_refinements, Real tolerance, bool custom) {
     if (custom) {
@@ -590,6 +600,13 @@ QuadratureBase<Real>* create_exp_sinh(int max_refinements, Real tolerance, bool 
     return new ExpSinhImpl<Real>();
 }
 
+/*
+    Downcasting helpers
+    -------------------
+    - as_impl<Real>: cast an opaque handle back to QuadratureBase<Real>*.
+      Returns nullptr if the underlying object uses a different Real.
+    - as_any: cast to the non-templated base for metadata access.
+*/
 template <typename Real>
 QuadratureBase<Real>* as_impl(QuadratureHandle handle) {
     return dynamic_cast<QuadratureBase<Real>*>(static_cast<QuadratureAny*>(handle));
@@ -599,6 +616,13 @@ inline QuadratureAny* as_any(QuadratureHandle handle) {
     return static_cast<QuadratureAny*>(handle);
 }
 
+/*
+    integrate_impl / integrate_interval_impl
+    ----------------------------------------
+    Invoke the underlying implementation with the provided C ABI integrand
+    function pointer and context. If the handle cannot be cast to the Real
+    specialization, returns a sentinel error result.
+*/
 template <typename Real>
 typename QuadratureBase<Real>::Result integrate_impl(QuadratureHandle handle,
                                                      typename QuadratureBase<Real>::Integrand f,
@@ -623,6 +647,12 @@ typename QuadratureBase<Real>::Result integrate_interval_impl(QuadratureHandle h
     return impl->integrate_interval(f, context, a, b);
 }
 
+/*
+    get_abscissa_impl
+    -----------------
+    Copy abscissa and weights for fixed rules into caller-provided buffers.
+    Returns 1 on success, 0 otherwise (including adaptive rules).
+*/
 template <typename Real>
 int get_abscissa_impl(QuadratureHandle handle, Real* abscissa, Real* weights, int buffer_size) {
     auto* impl = as_impl<Real>(handle);
@@ -632,6 +662,11 @@ int get_abscissa_impl(QuadratureHandle handle, Real* abscissa, Real* weights, in
     return impl->get_abscissa_weights(abscissa, weights, buffer_size) ? 1 : 0;
 }
 
+/*
+    to_c_precision
+    --------------
+    Translate internal PrecisionTag to the public C QuadraturePrecision enum.
+*/
 inline QuadraturePrecision to_c_precision(PrecisionTag tag) {
     switch (tag) {
         case PrecisionTag::Float: return QUAD_PRECISION_FLOAT;
@@ -641,6 +676,13 @@ inline QuadraturePrecision to_c_precision(PrecisionTag tag) {
     return QUAD_PRECISION_DOUBLE;
 }
 
+/*
+    create_handle<Real>(Factory)
+    ----------------------------
+    Small RAII helper that constructs a QuadratureBase<Real> via a factory
+    functor and returns ownership to the caller as a raw QuadratureHandle.
+    Returns nullptr if the factory yields a null pointer.
+*/
 template <typename Real, typename Factory>
 QuadratureHandle create_handle(Factory&& factory) {
     std::unique_ptr<QuadratureBase<Real>> ptr(factory());
@@ -656,6 +698,12 @@ using namespace bs::quadrature::detail;
 
 // === Factory implementations =================================================
 
+/*
+    Gauss-Legendre factories (C ABI)
+    --------------------------------
+    Create fixed Gauss-Legendre integrators for the requested point count
+    and precision. Return nullptr for unsupported counts.
+*/
 QuadratureHandle quad_gauss_create_f(int points) {
     return create_handle<float>([&]() { return create_gauss<float>(points); });
 }
@@ -668,75 +716,9 @@ QuadratureHandle quad_gauss_create_l(int points) {
     return create_handle<long double>([&]() { return create_gauss<long double>(points); });
 }
 
-#if BOOST_VERSION >= 107800
-QuadratureHandle quad_gauss_hermite_create_f(int points) {
-    return create_handle<float>([&]() { return create_gauss_hermite<float>(points); });
-}
-
-QuadratureHandle quad_gauss_hermite_create_d(int points) {
-    return create_handle<double>([&]() { return create_gauss_hermite<double>(points); });
-}
-
-QuadratureHandle quad_gauss_hermite_create_l(int points) {
-    return create_handle<long double>([&]() { return create_gauss_hermite<long double>(points); });
-}
-#else
-QuadratureHandle quad_gauss_hermite_create_f(int) { return nullptr; }
-QuadratureHandle quad_gauss_hermite_create_d(int) { return nullptr; }
-QuadratureHandle quad_gauss_hermite_create_l(int) { return nullptr; }
-#endif
-
-#if BOOST_VERSION >= 107800
-QuadratureHandle quad_gauss_laguerre_create_f(int points) {
-    return create_handle<float>([&]() { return create_gauss_laguerre<float>(points, float(0), false); });
-}
-
-QuadratureHandle quad_gauss_laguerre_create_d(int points) {
-    return create_handle<double>([&]() { return create_gauss_laguerre<double>(points, 0.0, false); });
-}
-
-QuadratureHandle quad_gauss_laguerre_create_l(int points) {
-    return create_handle<long double>([&]() { return create_gauss_laguerre<long double>(points, 0.0L, false); });
-}
-
-QuadratureHandle quad_gauss_laguerre_create_alpha_f(int points, float alpha) {
-    return create_handle<float>([&]() { return create_gauss_laguerre<float>(points, alpha, true); });
-}
-
-QuadratureHandle quad_gauss_laguerre_create_alpha_d(int points, double alpha) {
-    return create_handle<double>([&]() { return create_gauss_laguerre<double>(points, alpha, true); });
-}
-
-QuadratureHandle quad_gauss_laguerre_create_alpha_l(int points, long double alpha) {
-    return create_handle<long double>([&]() { return create_gauss_laguerre<long double>(points, alpha, true); });
-}
-#else
-QuadratureHandle quad_gauss_laguerre_create_f(int) { return nullptr; }
-QuadratureHandle quad_gauss_laguerre_create_d(int) { return nullptr; }
-QuadratureHandle quad_gauss_laguerre_create_l(int) { return nullptr; }
-QuadratureHandle quad_gauss_laguerre_create_alpha_f(int, float) { return nullptr; }
-QuadratureHandle quad_gauss_laguerre_create_alpha_d(int, double) { return nullptr; }
-QuadratureHandle quad_gauss_laguerre_create_alpha_l(int, long double) { return nullptr; }
-#endif
-
-#if BOOST_VERSION >= 107800
-QuadratureHandle quad_gauss_jacobi_create_f(int points, float alpha, float beta) {
-    return create_handle<float>([&]() { return create_gauss_jacobi<float>(points, alpha, beta); });
-}
-
-QuadratureHandle quad_gauss_jacobi_create_d(int points, double alpha, double beta) {
-    return create_handle<double>([&]() { return create_gauss_jacobi<double>(points, alpha, beta); });
-}
-
-QuadratureHandle quad_gauss_jacobi_create_l(int points, long double alpha, long double beta) {
-    return create_handle<long double>([&]() { return create_gauss_jacobi<long double>(points, alpha, beta); });
-}
-#else
-QuadratureHandle quad_gauss_jacobi_create_f(int, float, float) { return nullptr; }
-QuadratureHandle quad_gauss_jacobi_create_d(int, double, double) { return nullptr; }
-QuadratureHandle quad_gauss_jacobi_create_l(int, long double, long double) { return nullptr; }
-#endif
-
+/*
+    Gauss-Kronrod factories (C ABI)
+*/
 QuadratureHandle quad_gauss_kronrod_create_f(int points) {
     return create_handle<float>([&]() { return create_gauss_kronrod<float>(points); });
 }
@@ -749,6 +731,10 @@ QuadratureHandle quad_gauss_kronrod_create_l(int points) {
     return create_handle<long double>([&]() { return create_gauss_kronrod<long double>(points); });
 }
 
+/*
+    Tanh-Sinh factories (C ABI)
+    - Default and parameterized variants.
+*/
 QuadratureHandle quad_tanh_sinh_create_f(void) {
     return create_handle<float>([&]() { return create_tanh_sinh<float>(10, float(1e-9), false); });
 }
@@ -773,6 +759,9 @@ QuadratureHandle quad_tanh_sinh_create_with_params_l(int max_ref, long double to
     return create_handle<long double>([&]() { return create_tanh_sinh<long double>(max_ref, tol, true); });
 }
 
+/*
+    Sinh-Sinh factories (C ABI)
+*/
 QuadratureHandle quad_sinh_sinh_create_f(void) {
     return create_handle<float>([&]() { return create_sinh_sinh<float>(10, float(1e-9), false); });
 }
@@ -797,6 +786,9 @@ QuadratureHandle quad_sinh_sinh_create_with_params_l(int max_ref, long double to
     return create_handle<long double>([&]() { return create_sinh_sinh<long double>(max_ref, tol, true); });
 }
 
+/*
+    Exp-Sinh factories (C ABI)
+*/
 QuadratureHandle quad_exp_sinh_create_f(void) {
     return create_handle<float>([&]() { return create_exp_sinh<float>(10, float(1e-9), false); });
 }
@@ -823,12 +815,25 @@ QuadratureHandle quad_exp_sinh_create_with_params_l(int max_ref, long double tol
 
 // === Lifetime ================================================================
 
+/*
+    quad_destroy
+    ------------
+    Releases the quadrature handle created by any factory above. Safe to call
+    with nullptr. After destruction, the handle must not be used again.
+*/
 void quad_destroy(QuadratureHandle handle) {
     delete as_any(handle);
 }
 
 // === Integration =============================================================
 
+/*
+    quad_integrate_* (C ABI)
+    ------------------------
+    Integrate over the rule’s natural domain or default interval.
+    - The integrand is a C function pointer of the appropriate precision.
+    - The context pointer is passed through to the integrand.
+*/
 QuadratureResultF quad_integrate_f(QuadratureHandle handle, IntegrandFunctionF f, void* context) {
     auto raw = integrate_impl<float>(handle, f, context);
     return to_c_result<float>(raw);
@@ -844,6 +849,12 @@ QuadratureResultL quad_integrate_l(QuadratureHandle handle, IntegrandFunctionL f
     return to_c_result<long double>(raw);
 }
 
+/*
+    quad_integrate_interval_* (C ABI)
+    ---------------------------------
+    Integrate over [a, b] when supported. Implementations may ignore bounds
+    for rules with natural infinite domains (see per-rule comments).
+*/
 QuadratureResultF quad_integrate_interval_f(QuadratureHandle handle,
                                             IntegrandFunctionF f,
                                             void* context,
@@ -873,6 +884,15 @@ QuadratureResultL quad_integrate_interval_l(QuadratureHandle handle,
 
 // === Metadata ================================================================
 
+/*
+    quad_get_type / quad_get_precision / quad_get_points
+    ----------------------------------------------------
+    Accessors for metadata of the underlying implementation. If the handle
+    is null, sensible defaults are returned:
+      - type: QUAD_GAUSS_LEGENDRE
+      - precision: QUAD_PRECISION_DOUBLE
+      - points: 0
+*/
 QuadratureType quad_get_type(QuadratureHandle handle) {
     auto* any = as_any(handle);
     return any ? any->get_type() : QUAD_GAUSS_LEGENDRE;
@@ -888,6 +908,14 @@ int quad_get_points(QuadratureHandle handle) {
     return any ? any->get_points() : 0;
 }
 
+/*
+    quad_get_abscissa_weights_* (C ABI)
+    -----------------------------------
+    Copies abscissa and weights for fixed rules into caller-provided buffers.
+    Returns 1 on success, 0 otherwise (including adaptive rules or insufficient
+    buffer capacity). The caller must ensure the buffers have capacity equal
+    to or greater than the rule’s point count.
+*/
 int quad_get_abscissa_weights_f(QuadratureHandle handle, float* abscissa, float* weights, int buffer_size) {
     return get_abscissa_impl<float>(handle, abscissa, weights, buffer_size);
 }
@@ -902,6 +930,13 @@ int quad_get_abscissa_weights_l(QuadratureHandle handle, long double* abscissa, 
 
 // === Helper utilities ========================================================
 
+/*
+    quad_type_to_string
+    -------------------
+    Returns a stable string name for the QuadratureType enum. Useful for
+    diagnostics and logging; the returned pointer is to a static string
+    literal, so it remains valid for the lifetime of the program.
+*/
 const char* quad_type_to_string(QuadratureType type) {
     switch (type) {
         case QUAD_GAUSS_LEGENDRE: return "gauss_legendre";
@@ -916,6 +951,12 @@ const char* quad_type_to_string(QuadratureType type) {
     return "unknown";
 }
 
+/*
+    quad_is_adaptive
+    ----------------
+    Returns 1 if the rule is adaptive (double-exponential family), 0 otherwise.
+    Adaptive rules do not expose fixed abscissa/weights and have get_points()=-1.
+*/
 int quad_is_adaptive(QuadratureType type) {
     switch (type) {
         case QUAD_TANH_SINH:
@@ -927,6 +968,14 @@ int quad_is_adaptive(QuadratureType type) {
     }
 }
 
+/*
+    quad_supports_infinite_bounds
+    -----------------------------
+    Returns 1 if the rule naturally supports infinite bounds, 0 otherwise.
+    - Gauss-Hermite: (-∞, ∞)
+    - Sinh-Sinh: (-∞, ∞)
+    - Exp-Sinh: [0, ∞)
+*/
 int quad_supports_infinite_bounds(QuadratureType type) {
     switch (type) {
         case QUAD_GAUSS_HERMITE:

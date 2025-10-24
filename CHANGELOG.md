@@ -4,6 +4,7 @@ All notable changes to this project are tracked here, following the principles o
 
 ## Unreleased
 - Features:
+  - Added Boost-backed quadrature helpers ``SpecialFunctions.Quadrature`` with Gauss–Legendre, Gauss–Kronrod, tanh–sinh, sinh–sinh, and exp–sinh rules plus reusable integrators, metadata, and abscissa extraction.
   - Added Boost-backed Legendre–Stieltjes polynomials to the bridge plus Swift wrappers for evaluation, derivatives, zeros, and norm-squared helpers.
   - Added Hermite polynomial wrappers, including the three-term recurrence helper `hermiteNext` for efficient sequence stepping.
   - Added Jacobi polynomials with first/second/k-th derivative access across precisions.
@@ -13,6 +14,7 @@ All notable changes to this project are tracked here, following the principles o
   - Added Jacobi elliptic functions (`sn`, `cn`, `dn`, quotient variants) through ``SpecialFunctions.jacobiElliptic(_:theta:)`` (returns the triple) plus individual helpers with Float/Float80 support.
   - Added falling factorial ``SpecialFunctions.falling_factorial(_:_:)->T`` with Float/Double/(x86) Float80 overloads, mirroring Boost’s implementation with finiteness checks, zero detection, and overflow/underflow guards.
 - Documentation:
+  - Documented quadrature helpers across DocC (`<doc:Quadrature>`), README usage, and the new `QUADRATURE-README.md` workflow guide.
   - Extended DocC guidance with an “Orthogonal Polynomials” overview and refreshed README examples to highlight the new wrappers plus Jacobi Zeta.
   - Added documentation references to the Airy helpers.
   - Documented Jacobi theta helpers (q and τ parameterizations) across README and DocC usage guides.
