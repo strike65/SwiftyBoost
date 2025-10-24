@@ -5,7 +5,7 @@
 SwiftyBoost gives Swift developers direct access to Boost.Math special functions through a thin, type-safe wrapper. The package keeps Swift ergonomics—generics, errors, and platform availability—while reusing Boost’s battle-tested numerical algorithms via a small C++ bridge target.
 
 ## Features
-- Gamma, Beta, error, Bessel, Legendre, elliptic (Legendre and Carlson), Lambert W, Owen's T, and other high-precision helpers.
+- Gamma, Beta, error, Bessel, Airy, Legendre (including Legendre–Stieltjes quadrature polynomials), Gegenbauer, Jacobi, Jacobi elliptic functions, Jacobi theta functions, Hermite, elliptic (Legendre/Carlson forms, Jacobi Zeta, Heuman’s lambda), Lambert W, Owen's T, and other high-precision helpers.
 - Probability distributions with Boost-backed implementations:
   - Gamma, Beta, Chi-squared, Student’s t, Fisher’s F, Bernoulli, Geometric, Binomial, Cauchy, Exponential, Extreme Value (Gumbel), Holtsmark, and Arcsine (PDF/PMF, CDF/SF, quantiles, hazards, moments).
   - Typed wrappers delegate internally to a unified runtime vtable (`Distribution.Dynamic`) for consistent behavior across precisions.
@@ -69,8 +69,25 @@ let invS = try SpecialFunctions.rsqrt(9.0)               // 1/3
 let s0   = try SpecialFunctions.sinc_pi(0.0)             // 1 (limit)
 let s12  = try SpecialFunctions.sinc_pi(0.5)             // 2/π
 let sh12 = try SpecialFunctions.sinhc_pi(0.5)            // sinh(π/2)/(π/2)
+let fall = try SpecialFunctions.falling_factorial(6.0, 3) // 6 · 5 · 4 = 120
 let z    = ComplexD(0, 0.7)
 let sc   = SpecialFunctions.sincc_pi(z)                  // equals sinhc_pi(0.7)
+
+// Orthogonal polynomials
+let ls = try SpecialFunctions.legendreStieltjes(5, 0.3)  // Legendre–Stieltjes E₅(0.3)
+let h2 = try SpecialFunctions.hermite(2, 1.0)            // H₂(1) = 4x² - 2 → 2
+let j13 = try SpecialFunctions.jacobi(n: 3, alpha: 0.5, beta: -0.25, x: 0.2)
+let jPrime = try SpecialFunctions.jacobiPrime(n: 3, alpha: 0.5, beta: -0.25, x: 0.2)
+let zeta = try SpecialFunctions.jacobiZeta(0.5, modulus: 0.8)
+let lambda = try SpecialFunctions.heumanLambda(0.8, phi: 0.3)
+let theta1 = try SpecialFunctions.jacobiTheta1(0.4, q: 0.2)
+let theta3Tau = try SpecialFunctions.jacobiTheta3Tau(0.4, tau: 1.5)
+let sn = try SpecialFunctions.jacobiEllipticSn(0.75, theta: 1.1)
+let trio = try SpecialFunctions.jacobiElliptic(0.75, theta: 1.1)  // (sn, cn, dn)
+let ai = try SpecialFunctions.airyAi(-1.0)
+let biPrime = try SpecialFunctions.airyBiPrime(0.75)
+let firstAiZero = try SpecialFunctions.airyAiZero(0)    // ≈ −2.3381
+let aiZeros = try SpecialFunctions.airyAiZeros(startIndex: 0, count: 3)
 ```
 
 ```swift

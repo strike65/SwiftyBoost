@@ -14,6 +14,8 @@
 //  - Rising factorial / Pochhammer (x)_n = x (x+1) … (x+n−1):
 //    • rising_factorial(_:_:), rising_factorial_f(_:_:), rising_factorial_l(_:_:)
 //    • pochhammer aliases for the same
+//  - Falling factorial x^{\underline{n}} = x (x−1) … (x−n+1):
+//    • falling_factorial(_:_:), falling_factorial_f(_:_:), falling_factorial_l(_:_:)
 //  - Binomial coefficient C(n, k):
 //    • binomial_coeff(_:_:), binomial_coeff_f(_:_:), binomial_coeff_l(_:_:)
 //  - Double factorial n!!:
@@ -241,6 +243,21 @@ public extension SpecialFunctions {
         return false
     }
     
+    /// Exact-zero check for falling factorial: if x is a non-negative integer and n > x, then x^{\underline{n}} == 0.
+    ///
+    /// Notes:
+    /// - Implemented in Double to share logic across Float/Float80 overloads.
+    @inline(__always) static func fallingFactorialIsExactlyZero(_ x: Double, n: UInt32) -> Bool {
+        guard n > 0 else { return false }
+        if x >= 0 {
+            let ix = x.rounded(.towardZero)
+            if ix == x {
+                return ix < Double(n)
+            }
+        }
+        return false
+    }
+    
     // MARK: - Rising factorial / Pochhammer (x)_{n} with overflow/underflow checks
     
     /// Compute the rising factorial (x)_n = x (x+1) … (x+n−1) returned as `T`, with magnitude checks.
@@ -415,6 +432,144 @@ public extension SpecialFunctions {
     /// Alias for the Pochhammer symbol (x)_{n} for `Float80` (x86 only).
     @inlinable static func pochhammer_l (_ x: Float80, _ n: UInt32) throws -> Float80 {
         try rising_factorial_l(x, n)
+    }
+#endif
+    
+    // MARK: - Falling factorial x^{\u{23C5}n} with overflow/underflow checks
+    
+    /// Compute the falling factorial x^{\underline{n}} = x (x−1) … (x−n+1) returned as `T`, with magnitude checks.
+    ///
+    /// Behavior:
+    /// - Validates finiteness of `x` and throws if not finite.
+    /// - Detects exact zeros when `x` is a non-negative integer and `n > x`.
+    /// - Uses `S = ln Γ(x+1) − ln Γ(x−n+1)` to pre-check overflow/underflow for the target type.
+    ///   Throws `invalidCombination` on overflow; returns 0 on underflow.
+    ///
+    /// Parameters:
+    /// - x: The base value (finite).
+    /// - n: The non-negative integer order.
+    ///
+    /// Returns:
+    /// - x^{\underline{n}} as `T`. If `n == 0`, returns 1 for all finite `x`.
+    ///
+    /// Throws:
+    /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
+    /// - ``SpecialFunctionError/invalidCombination(message:value:)`` if the result would overflow `T`; the `value` payload echoes the base `x`.
+    @inlinable static func falling_factorial<T: Real & BinaryFloatingPoint & Sendable>(_ x: T, _ n: UInt32) throws -> T {
+        let dx = D(x)
+        guard dx.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        if fallingFactorialIsExactlyZero(dx, n: n) { return T(0) }
+        
+        let lnGammaXP1 = bs_lgamma_d(dx + 1)
+        let lnGammaXMinusNPlus1 = bs_lgamma_d(dx - Double(n) + 1)
+        let S = lnGammaXP1 - lnGammaXMinusNPlus1
+        
+        let lnMax = logMaxFinite(for: T.self)
+        if S.isFinite && S > lnMax {
+            throw SpecialFunctionError.invalidCombination(message: "falling_factorial overflows for given x and n in the target type", value: x)
+        }
+        
+        let lnMin = logLeastPosNonzero(for: T.self)
+        if S.isFinite && S < lnMin {
+            return T(0)
+        }
+        
+        return T(bs_falling_factorial_d(dx, n))
+    }
+    
+    /// Falling factorial x^{\underline{n}} for `Double` with magnitude checks.
+    ///
+    /// Behavior:
+    /// - Throws on overflow based on ln-magnitude check.
+    /// - Returns 0 on exact zero (factor equals zero in the product) or underflow.
+    ///
+    /// Parameters:
+    /// - x: Finite base value.
+    /// - n: Non-negative integer order.
+    ///
+    /// Returns:
+    /// - x^{\underline{n}} as `Double`.
+    ///
+    /// Throws:
+    /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
+    /// - ``SpecialFunctionError/invalidCombination(message:value:)`` if the result would overflow Double; the `value` payload echoes the base `x`.
+    @inlinable static func falling_factorial(_ x: Double,_ n: UInt32) throws -> Double {
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        if fallingFactorialIsExactlyZero(x, n: n) { return 0 }
+        
+        let S = bs_lgamma_d(x + 1) - bs_lgamma_d(x - Double(n) + 1)
+        if S.isFinite && S > 709.782712893384 {
+            throw SpecialFunctionError.invalidCombination(message: "falling_factorial overflows for given x and n in Double", value: x)
+        }
+        if S.isFinite && S < -744.4400719213812 {
+            return 0
+        }
+        
+        return bs_falling_factorial_d(x, n)
+    }
+    
+    /// Falling factorial x^{\underline{n}} for `Float` with magnitude checks.
+    ///
+    /// Behavior:
+    /// - Throws on overflow based on ln-magnitude check.
+    /// - Returns 0 on exact zero (factor equals zero in the product) or underflow.
+    ///
+    /// Parameters:
+    /// - x: Finite base value.
+    /// - n: Non-negative integer order.
+    ///
+    /// Returns:
+    /// - x^{\underline{n}} as `Float`.
+    ///
+    /// Throws:
+    /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
+    /// - ``SpecialFunctionError/invalidCombination(message:value:)`` if the result would overflow Float; the `value` payload echoes the base `x`.
+    @inlinable static func falling_factorial_f(_ x: Float,_ n: UInt32) throws -> Float {
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        if fallingFactorialIsExactlyZero(Double(x), n: n) { return 0 }
+        
+        let S = Double(bs_lgamma_f(x + 1) - bs_lgamma_f(x - Float(n) + 1))
+        if S.isFinite && S > 88.72283905206835 {
+            throw SpecialFunctionError.invalidCombination(message: "falling_factorial overflows for given x and n in Float", value: x)
+        }
+        if S.isFinite && S < -103.27892990343185 {
+            return 0
+        }
+        
+        return bs_falling_factorial_f(x, n)
+    }
+    
+#if arch(i386) || arch(x86_64)
+    /// Falling factorial x^{\underline{n}} for `Float80` (x86 only) with magnitude checks.
+    ///
+    /// Behavior:
+    /// - Throws on overflow based on ln-magnitude check.
+    /// - Returns 0 on exact zero (factor equals zero in the product) or underflow (conservative check).
+    ///
+    /// Parameters:
+    /// - x: Finite base value.
+    /// - n: Non-negative integer order.
+    ///
+    /// Returns:
+    /// - x^{\underline{n}} as `Float80`.
+    ///
+    /// Throws:
+    /// - `SpecialFunctionError.parameterNotFinite(name: "x")` if `x` is NaN or ±∞.
+    /// - ``SpecialFunctionError/invalidCombination(message:value:)`` if the result would overflow Float80; the `value` payload echoes the base `x`.
+    @inlinable static func falling_factorial_l(_ x: Float80,_ n: UInt32) throws -> Float80 {
+        guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
+        if fallingFactorialIsExactlyZero(Double(x), n: n) { return 0 }
+        
+        let S = Double(bs_lgamma_l(x + 1) - bs_lgamma_l(x - Float80(n) + 1))
+        if S.isFinite && S > 11356.523406294143 {
+            throw SpecialFunctionError.invalidCombination(message: "falling_factorial overflows for given x and n in Float80", value: x)
+        }
+        // Underflow threshold is conservative; returning 0 when the magnitude is below Float80's least nonzero.
+        if S.isFinite && S < -11399.0 {
+            return 0
+        }
+        
+        return bs_falling_factorial_l(x, n)
     }
 #endif
     

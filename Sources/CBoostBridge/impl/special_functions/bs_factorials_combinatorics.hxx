@@ -24,5 +24,11 @@ double bs_double_factorial_d(unsigned int i) { return bs_wrap<double>([&] { retu
 float bs_double_factorial_f(unsigned int i) { return bs_wrap<float>([&] { return boost::math::double_factorial<float>(i); }); }
 long double bs_double_factorial_l(unsigned int i) { return bs_wrap<long double>([&] { return boost::math::double_factorial<long double>(i); }); }
 
+// falling factorial
+double bs_falling_factorial_d(double x, unsigned int i) { return bs_wrap<double>([&] { return boost::math::falling_factorial<double>(x, i); }); }
+float bs_falling_factorial_f(float x, unsigned int i) { return bs_wrap<float>([&] { return boost::math::falling_factorial<float>(x, i); }); }
+long double bs_falling_factorial_l(long double x, unsigned int i) { return bs_wrap<long double>([&] { return boost::math::falling_factorial<long double>(x, i); }); }
+
+
 } // extern "C"
 

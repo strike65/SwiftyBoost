@@ -246,6 +246,21 @@ public extension SpecialFunctions {
     // Mixed-precision promotions for Π(n | k) (Float ↔ Double) → Double
     @inlinable static func completeEllipticIntegralPi(_ k: Float, _ nu: Double) -> Double { completeEllipticIntegralPi(Double(k), nu) }
     @inlinable static func completeEllipticIntegralPi(_ k: Double, _ nu: Float) -> Double { completeEllipticIntegralPi(k, Double(nu)) }
+
+    /// Heuman’s lambda function Λ(φ, k).
+    ///
+    /// Parameters:
+    /// - k: Modulus (finite real; |k| ≤ 1 for classical real-valued use).
+    /// - phi: Amplitude φ (radians, finite real).
+    ///
+    /// Returns:
+    /// - Λ(φ, k) as `T`.
+    @inlinable static func heumanLambda<T: Real & BinaryFloatingPoint & Sendable>(_ k: T, phi: T) throws -> T {
+        let dk = D(k), dphi = D(phi)
+        guard dk.isFinite else { throw SpecialFunctionError<T>.parameterNotFinite(name: "k", value: k) }
+        guard dphi.isFinite else { throw SpecialFunctionError<T>.parameterNotFinite(name: "phi", value: phi) }
+        return T(bs_heuman_lambda_d(dk, dphi))
+    }
     
     // MARK: - Float overloads
     // Direct Float-precision entry points that avoid generic conversions and call
@@ -309,6 +324,13 @@ public extension SpecialFunctions {
     /// - Π(n | k) as `Float`.
     @inlinable static func completeEllipticIntegralPi(_ k: Float, _ nu: Float) -> Float {
         return bs_ellint_3_complete_f(k, nu)
+    }
+
+    /// Λ(φ, k) for `Float`.
+    @inlinable static func heumanLambda(_ k: Float, phi: Float) throws -> Float {
+        guard k.isFinite else { throw SpecialFunctionError<Float>.parameterNotFinite(name: "k", value: k) }
+        guard phi.isFinite else { throw SpecialFunctionError<Float>.parameterNotFinite(name: "phi", value: phi) }
+        return bs_heuman_lambda_f(k, phi)
     }
 
    
@@ -394,6 +416,13 @@ public extension SpecialFunctions {
     /// - Π(n | k) as `Float80`.
     @inlinable static func completeEllipticIntegralPi(_ k: Float80, _ nu: Float80) -> Float80 {
         return bs_ellint_3_complete_l(k, nu)
+    }
+
+    /// Λ(φ, k) for `Float80` (x86_64 only).
+    @inlinable static func heumanLambda(_ k: Float80, phi: Float80) throws -> Float80 {
+        guard k.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "k", value: k) }
+        guard phi.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "phi", value: phi) }
+        return bs_heuman_lambda_l(k, phi)
     }
 
     // Mixed promotions with Float80 for Π(n | k) → Float80

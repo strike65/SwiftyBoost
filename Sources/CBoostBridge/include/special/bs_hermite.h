@@ -26,33 +26,16 @@
 extern "C" {
 #endif
 
-// Factorials
-double bs_factorial_d(unsigned int i);
-float bs_factorial_f(unsigned int i);
-long double bs_factorial_l(unsigned int i);
+// Hermite polynomials (Physicists' convention).
+double bs_hermite_d(unsigned int n, double x);
+double bs_hermite_next_d(unsigned int n, double x, double hn, double hnm1);
 
-// Pochhammer (rising factorial)
-double bs_rising_factorial_d(double x, unsigned int i);
-float bs_rising_factorial_f(float x, unsigned int i);
-long double bs_rising_factorial_l(long double x, unsigned int i);
+float bs_hermite_f(unsigned int n, float x);
+float bs_hermite_next_f(unsigned int n, float x, float hn, float hnm1);
 
-// Binomial coefficients
-double bs_binomial_coefficient_d(unsigned int n, unsigned int k);
-float bs_binomial_coefficient_f(unsigned int n, unsigned int k);
-long double bs_binomial_coefficient_l(unsigned int n, unsigned int k);
-
-// Double factorial
-double bs_double_factorial_d(unsigned int i);
-float bs_double_factorial_f(unsigned int i);
-long double bs_double_factorial_l(unsigned int i);
-
-// Falling factorial
-double bs_falling_factorial_d(double x, unsigned int i);
-float bs_falling_factorial_f(float x, unsigned int i);
-long double bs_falling_factorial_l(long double x, unsigned int i);
-
+long double bs_hermite_l(unsigned int n, long double x);
+long double bs_hermite_next_l(unsigned int n, long double x, long double hn, long double hnm1);
 
 #ifdef __cplusplus
 }
 #endif
-

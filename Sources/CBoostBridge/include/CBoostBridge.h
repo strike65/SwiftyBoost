@@ -23,7 +23,9 @@
 #pragma once
 
 // Umbrella header for CBoostBridge: composed of focused public headers.
-
+//double bs_heuman_lambda_d(double k, double phi);
+//float bs_heuman_lambda_f(float k, float phi);
+//long double bs_heuman_lambda_l(long double k, long double phi);
 #include "special/complex.h"
 #include "special/bs_error.h"
 #include "special/bs_gamma.h"
@@ -35,7 +37,12 @@
 #include "special/bs_trig_helpers.h"
 #include "special/bs_airy.h"
 #include "special/bs_bessel.h"
+#include "special/bs_hermite.h"
+#include "special/bs_jacobi.h"
+#include "special/bs_heu_lambda.h"
+#include "special/bs_jacobi_zeta.h"
 #include "special/bs_legendre.h"
+#include "special/bs_legendre_stieltjes.h"
 #include "special/bs_elliptic_legendre_forms.h"
 #include "special/bs_elliptic_carlson_forms.h"
 #include "special/bs_lambert_w.h"
@@ -43,7 +50,7 @@
 #include "special/bs_hypergeometric.h"
 #include "special/bs_numbers.h"
 #include "special/bs_factorials_combinatorics.h"
-
+#include "special/bs_heu_lambda.h"
 #include "special/bs_laguerre.h"
 #include "special/bs_chebyshev.h"
 #include "special/bs_spherical_harmonics.h"
@@ -51,7 +58,8 @@
 #include "special/bs_gegenbauer.h"
 #include "special/bs_sin_cardinal.h"
 #include "special/bs_a_hyper.h"
-
+#include "special/bs_jacobi_elliptic.h"
+#include "special/bs_jacobi_theta.h"
 // Generic vtable-based distribution factory
 #include "distributions/bs_generic_distribution.h"
 #include "distributions/bs_distribution_helpers.h"

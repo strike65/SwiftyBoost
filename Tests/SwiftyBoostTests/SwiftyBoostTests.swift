@@ -198,6 +198,121 @@ struct FactorialAndCombinatoricsTests {
     }
     #endif
 
+    // MARK: - Falling factorial
+
+    @Test("falling_factorial Double matches bridge and handles zeros")
+    func fallingFactorialDouble() throws {
+        let cases: [(Double, UInt32)] = [
+            (0.0, 0), (5.0, 0), (5.0, 1), (6.0, 3), (6.0, 6), (6.0, 7),
+            (2.5, 4), (-1.5, 4), (-3.0, 2), (-3.0, 4)
+        ]
+        for (x, n) in cases {
+            let isZero: Bool = {
+                if n == 0 { return false }
+                if x >= 0 {
+                    let ix = x.rounded(.towardZero)
+                    if ix == x {
+                        return ix < Double(n)
+                    }
+                }
+                return false
+            }()
+            let got = try SpecialFunctions.falling_factorial(x, n)
+            if isZero {
+                #expect(got == 0, "Expected zero at x=\(x), n=\(n)")
+            } else {
+                let expected = bs_falling_factorial_d(x, n)
+                #expect(got == expected, "Mismatch at x=\(x), n=\(n)")
+            }
+        }
+    }
+
+    @Test("falling_factorial Double throws on overflow and non-finite inputs")
+    func fallingFactorialDoubleGuards() {
+        #expect(throws: SpecialFunctionError<Double>.invalidCombination(message: "falling_factorial overflows for given x and n in Double", value: 171.0)) {
+            _ = try SpecialFunctions.falling_factorial(171.0, 171)
+        }
+        #expect(throws: SpecialFunctionError<Double>.parameterNotFinite(name: "x", value: .infinity)) {
+            _ = try SpecialFunctions.falling_factorial(.infinity, 1)
+        }
+    }
+
+    @Test("falling_factorial Float matches bridge and handles zeros")
+    func fallingFactorialFloat() throws {
+        let cases: [(Float, UInt32)] = [
+            (0, 0), (5, 0), (5, 1), (6, 3), (6, 6), (6, 7),
+            (2.5, 4), (-1.5, 4), (-3, 2), (-3, 4)
+        ]
+        for (x, n) in cases {
+            let isZero: Bool = {
+                if n == 0 { return false }
+                if x >= 0 {
+                    let ix = Double(x).rounded(.towardZero)
+                    if ix == Double(x) {
+                        return ix < Double(n)
+                    }
+                }
+                return false
+            }()
+            let got = try SpecialFunctions.falling_factorial_f(x, n)
+            if isZero {
+                #expect(got == 0, "Expected zero at x=\(x), n=\(n)")
+            } else {
+                let expected = bs_falling_factorial_f(x, n)
+                #expect(got == expected, "Mismatch at x=\(x), n=\(n)")
+            }
+        }
+    }
+
+    @Test("falling_factorial Float throws on overflow and non-finite inputs")
+    func fallingFactorialFloatGuards() {
+        #expect(throws: SpecialFunctionError<Float>.invalidCombination(message: "falling_factorial overflows for given x and n in Float", value: 35.0)) {
+            _ = try SpecialFunctions.falling_factorial_f(35, 35)
+        }
+        do {
+            _ = try SpecialFunctions.falling_factorial_f(.nan, 1)
+            #expect(Bool(false), "Expected parameterNotFinite for NaN input")
+        } catch let error as SpecialFunctionError<Float> {
+            if case let .parameterNotFinite(name: name, value: value) = error {
+                #expect(name == "x")
+                #expect(value.isNaN)
+            } else {
+                #expect(Bool(false), "Unexpected error: \(error)")
+            }
+        } catch {
+            #expect(Bool(false), "Unexpected error type: \(error)")
+        }
+    }
+
+    #if arch(x86_64) || arch(i386)
+    @Test("falling_factorial Float80 matches bridge and handles zeros")
+    func fallingFactorialFloat80() throws {
+        let cases: [(Float80, UInt32)] = [
+            (0, 0), (5, 0), (5, 1), (6, 3), (6, 6), (6, 7),
+            (2.5, 4), (-1.5, 4), (-3, 2), (-3, 4)
+        ]
+        for (x, n) in cases {
+            let isZero: Bool = {
+                if n == 0 { return false }
+                if x >= 0 {
+                    let ix = Double(x).rounded(.towardZero)
+                    if ix == Double(x) {
+                        return ix < Double(n)
+                    }
+                }
+                return false
+            }()
+            let got = try SpecialFunctions.falling_factorial_l(x, n)
+            if isZero {
+                #expect(got == 0, "Expected zero at x=\(x), n=\(n)")
+            } else {
+                let expected = bs_falling_factorial_l(x, n)
+                #expect(got == expected, "Mismatch at x=\(x), n=\(n)")
+            }
+        }
+    }
+    #endif
+
     // MARK: - Binomial coefficient
 
     @Test("binomial_coeff Double matches backend and special cases")

@@ -34,6 +34,10 @@
 #include "impl/special_functions/bs_cardinal_b_splines.hxx"
 #include "impl/special_functions/bs_chebyshev.hxx"
 #include "impl/special_functions/bs_digamma_polygamma_zeta.hxx"
+#include "impl/special_functions/bs_heu_lambda.hxx"
+#include "impl/special_functions/bs_jacobi_zeta.hxx"
+#include "impl/special_functions/bs_jacobi.hxx"
+#include "impl/special_functions/bs_hermite.hxx"
 #include "impl/special_functions/bs_elliptic_carlson_forms.hxx"
 #include "impl/special_functions/bs_elliptic_legendre_forms.hxx"
 #include "impl/special_functions/bs_error.hxx"
@@ -45,6 +49,7 @@
 #include "impl/special_functions/bs_laguerre.hxx"
 #include "impl/special_functions/bs_lambert_w.hxx"
 #include "impl/special_functions/bs_legendre.hxx"
+#include "impl/special_functions/bs_legendre_stieltjes.hxx"
 #include "impl/special_functions/bs_numbers.hxx"
 #include "impl/special_functions/bs_owens_t.hxx"
 #include "impl/special_functions/bs_spherical_harmonics.hxx"
@@ -53,7 +58,8 @@
 #include "impl/special_functions/complex.hxx"
 // Cardinal sine/cosine helpers (real/complex)
 #include "impl/special_functions/bs_sin_cardinal.hxx"
-
+#include "impl/special_functions/bs_jacobi_elliptic.hxx"
+#include "impl/special_functions/bs_jacobi_theta.hxx"
 // Unified generic distribution vtable (runtime factory)
 #include "impl/distributions/bs_generic_distribution.hxx"
 #include "impl/distributions/bs_distribution_helpers.hxx"

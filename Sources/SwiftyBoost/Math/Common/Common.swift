@@ -58,6 +58,8 @@ public enum SpecialFunctionError<T: Real & BinaryFloatingPoint & Sendable>: Erro
     ///   - name: The name of the offending parameter.
     ///   - max: The maximum allowed integer value.
     case parameterExceedsMaximumIntegerValue(name: String, max: Int)
+    case parameterNotInDomain(name: String, value: T)
+
 }
 
 /// Errors thrown by special functions when inputs are invalid or outside the domain.

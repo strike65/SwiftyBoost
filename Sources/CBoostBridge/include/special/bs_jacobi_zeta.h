@@ -26,33 +26,11 @@
 extern "C" {
 #endif
 
-// Factorials
-double bs_factorial_d(unsigned int i);
-float bs_factorial_f(unsigned int i);
-long double bs_factorial_l(unsigned int i);
-
-// Pochhammer (rising factorial)
-double bs_rising_factorial_d(double x, unsigned int i);
-float bs_rising_factorial_f(float x, unsigned int i);
-long double bs_rising_factorial_l(long double x, unsigned int i);
-
-// Binomial coefficients
-double bs_binomial_coefficient_d(unsigned int n, unsigned int k);
-float bs_binomial_coefficient_f(unsigned int n, unsigned int k);
-long double bs_binomial_coefficient_l(unsigned int n, unsigned int k);
-
-// Double factorial
-double bs_double_factorial_d(unsigned int i);
-float bs_double_factorial_f(unsigned int i);
-long double bs_double_factorial_l(unsigned int i);
-
-// Falling factorial
-double bs_falling_factorial_d(double x, unsigned int i);
-float bs_falling_factorial_f(float x, unsigned int i);
-long double bs_falling_factorial_l(long double x, unsigned int i);
-
+// Jacobi Zeta function (Boost.Math jacobi_zeta).
+double bs_jacobi_zeta_d(double k, double phi);
+float bs_jacobi_zeta_f(float k, float phi);
+long double bs_jacobi_zeta_l(long double k, long double phi);
 
 #ifdef __cplusplus
 }
 #endif
-

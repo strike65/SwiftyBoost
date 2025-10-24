@@ -3,7 +3,27 @@
 All notable changes to this project are tracked here, following the principles of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adhering to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
-- Nothing yet.
+- Features:
+  - Added Boost-backed Legendre–Stieltjes polynomials to the bridge plus Swift wrappers for evaluation, derivatives, zeros, and norm-squared helpers.
+  - Added Hermite polynomial wrappers, including the three-term recurrence helper `hermiteNext` for efficient sequence stepping.
+  - Added Jacobi polynomials with first/second/k-th derivative access across precisions.
+  - Added the Jacobi Zeta function ``SpecialFunctions.jacobiZeta(_:modulus:)`` across Float/Double/(x86) Float80.
+  - Added Airy Ai/Bi and derivative wrappers ``SpecialFunctions.airyAi`` / ``SpecialFunctions.airyBi`` / ``SpecialFunctions.airyAiPrime`` / ``SpecialFunctions.airyBiPrime`` along with zero helpers ``SpecialFunctions.airyAiZero`` / ``SpecialFunctions.airyBiZero`` and bulk retrieval APIs.
+  - Added Heuman’s lambda via ``SpecialFunctions.heumanLambda(_:phi:)`` aligned with Boost’s elliptic toolkit.
+  - Added Jacobi elliptic functions (`sn`, `cn`, `dn`, quotient variants) through ``SpecialFunctions.jacobiElliptic(_:theta:)`` (returns the triple) plus individual helpers with Float/Float80 support.
+  - Added falling factorial ``SpecialFunctions.falling_factorial(_:_:)->T`` with Float/Double/(x86) Float80 overloads, mirroring Boost’s implementation with finiteness checks, zero detection, and overflow/underflow guards.
+- Documentation:
+  - Extended DocC guidance with an “Orthogonal Polynomials” overview and refreshed README examples to highlight the new wrappers plus Jacobi Zeta.
+  - Added documentation references to the Airy helpers.
+  - Documented Jacobi theta helpers (q and τ parameterizations) across README and DocC usage guides.
+  - Documented falling factorial helpers in DocC and refreshed README combinatorics examples.
+- Bug Fixes:
+  - Corrected ``SpecialFunctions.jacobiTheta2Tau(_:tau:)`` (`Float` overload) to call the θ₂ bridge variant instead of θ₁.
+  - Updated tau-parameterized theta helpers to report `tau` as the offending argument when throwing ``SpecialFunctionError.parameterNotFinite``.
+  - Fixed the C bridge mappings for θ₂/θ₂τ to call the appropriate Boost `jacobi_theta2{,tau}` kernels.
+- Tests:
+  - Added dedicated suites covering Legendre–Stieltjes, Hermite, Jacobi polynomials, Jacobi Zeta, and Airy functions against the C bridge and invalid-parameter paths.
+  - Added regression tests for falling factorial wrappers and Jacobi theta functions (Float/Double/(x86) Float80) including domain-validation paths.
 
 ## [0.6.0] - 2025-10-23
 - Features:

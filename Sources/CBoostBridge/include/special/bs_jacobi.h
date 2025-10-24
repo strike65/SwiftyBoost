@@ -26,33 +26,22 @@
 extern "C" {
 #endif
 
-// Factorials
-double bs_factorial_d(unsigned int i);
-float bs_factorial_f(unsigned int i);
-long double bs_factorial_l(unsigned int i);
+// Jacobi polynomials and derivatives.
+double bs_jacobi_d(unsigned int n, double alpha, double beta, double x);
+double bs_jacobi_prime_d(unsigned int n, double alpha, double beta, double x);
+double bs_jacobi_double_prime_d(unsigned int n, double alpha, double beta, double x);
+double bs_jacobi_derivative_d(unsigned int n, double alpha, double beta, double x, unsigned int k);
 
-// Pochhammer (rising factorial)
-double bs_rising_factorial_d(double x, unsigned int i);
-float bs_rising_factorial_f(float x, unsigned int i);
-long double bs_rising_factorial_l(long double x, unsigned int i);
+float bs_jacobi_f(unsigned int n, float alpha, float beta, float x);
+float bs_jacobi_prime_f(unsigned int n, float alpha, float beta, float x);
+float bs_jacobi_double_prime_f(unsigned int n, float alpha, float beta, float x);
+float bs_jacobi_derivative_f(unsigned int n, float alpha, float beta, float x, unsigned int k);
 
-// Binomial coefficients
-double bs_binomial_coefficient_d(unsigned int n, unsigned int k);
-float bs_binomial_coefficient_f(unsigned int n, unsigned int k);
-long double bs_binomial_coefficient_l(unsigned int n, unsigned int k);
-
-// Double factorial
-double bs_double_factorial_d(unsigned int i);
-float bs_double_factorial_f(unsigned int i);
-long double bs_double_factorial_l(unsigned int i);
-
-// Falling factorial
-double bs_falling_factorial_d(double x, unsigned int i);
-float bs_falling_factorial_f(float x, unsigned int i);
-long double bs_falling_factorial_l(long double x, unsigned int i);
-
+long double bs_jacobi_l(unsigned int n, long double alpha, long double beta, long double x);
+long double bs_jacobi_prime_l(unsigned int n, long double alpha, long double beta, long double x);
+long double bs_jacobi_double_prime_l(unsigned int n, long double alpha, long double beta, long double x);
+long double bs_jacobi_derivative_l(unsigned int n, long double alpha, long double beta, long double x, unsigned int k);
 
 #ifdef __cplusplus
 }
 #endif
-

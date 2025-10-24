@@ -20,8 +20,8 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 //
-//#pragma once
-//
+#pragma once
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,18 +31,29 @@ double bs_airy_ai_d(double x);
 double bs_airy_bi_d(double x);
 double bs_airy_ai_prime_d(double x);
 double bs_airy_bi_prime_d(double x);
+double bs_airy_ai_zero_d(int m);
+void bs_airy_ai_zeros_d(int start_index, unsigned int number_of_zeros, double* out);
+double bs_airy_bi_zero_d(int m);
+void bs_airy_bi_zeros_d(int start_index, unsigned int number_of_zeros, double* out);
 
 float bs_airy_ai_f(float x);
 float bs_airy_bi_f(float x);
 float bs_airy_ai_prime_f(float x);
 float bs_airy_bi_prime_f(float x);
+float bs_airy_ai_zero_f(int m);
+void bs_airy_ai_zeros_f(int start_index, unsigned int number_of_zeros, float* out);
+float bs_airy_bi_zero_f(int m);
+void bs_airy_bi_zeros_f(int start_index, unsigned int number_of_zeros, float* out);
 
 long double bs_airy_ai_l(long double x);
 long double bs_airy_bi_l(long double x);
 long double bs_airy_ai_prime_l(long double x);
 long double bs_airy_bi_prime_l(long double x);
+long double bs_airy_ai_zero_l(int m);
+void bs_airy_ai_zeros_l(int start_index, unsigned int number_of_zeros, long double* out);
+long double bs_airy_bi_zero_l(int m);
+void bs_airy_bi_zeros_l(int start_index, unsigned int number_of_zeros, long double* out);
 
 #ifdef __cplusplus
 }
 #endif
-

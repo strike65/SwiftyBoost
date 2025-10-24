@@ -22,37 +22,28 @@
 //
 #pragma once
 
+#include <stddef.h> // size_t
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// Factorials
-double bs_factorial_d(unsigned int i);
-float bs_factorial_f(unsigned int i);
-long double bs_factorial_l(unsigned int i);
+// Legendre-Stieltjes polynomial wrappers.
+double bs_legendre_stieltjes_d(unsigned int m, double x);
+double bs_legendre_stieltjes_prime_d(unsigned int m, double x);
+double bs_legendre_stieltjes_norm_sq_d(unsigned int m);
+size_t bs_legendre_stieltjes_zeros_d(unsigned int m, double *out, size_t count);
 
-// Pochhammer (rising factorial)
-double bs_rising_factorial_d(double x, unsigned int i);
-float bs_rising_factorial_f(float x, unsigned int i);
-long double bs_rising_factorial_l(long double x, unsigned int i);
+float bs_legendre_stieltjes_f(unsigned int m, float x);
+float bs_legendre_stieltjes_prime_f(unsigned int m, float x);
+float bs_legendre_stieltjes_norm_sq_f(unsigned int m);
+size_t bs_legendre_stieltjes_zeros_f(unsigned int m, float *out, size_t count);
 
-// Binomial coefficients
-double bs_binomial_coefficient_d(unsigned int n, unsigned int k);
-float bs_binomial_coefficient_f(unsigned int n, unsigned int k);
-long double bs_binomial_coefficient_l(unsigned int n, unsigned int k);
-
-// Double factorial
-double bs_double_factorial_d(unsigned int i);
-float bs_double_factorial_f(unsigned int i);
-long double bs_double_factorial_l(unsigned int i);
-
-// Falling factorial
-double bs_falling_factorial_d(double x, unsigned int i);
-float bs_falling_factorial_f(float x, unsigned int i);
-long double bs_falling_factorial_l(long double x, unsigned int i);
-
+long double bs_legendre_stieltjes_l(unsigned int m, long double x);
+long double bs_legendre_stieltjes_prime_l(unsigned int m, long double x);
+long double bs_legendre_stieltjes_norm_sq_l(unsigned int m);
+size_t bs_legendre_stieltjes_zeros_l(unsigned int m, long double *out, size_t count);
 
 #ifdef __cplusplus
 }
 #endif
-

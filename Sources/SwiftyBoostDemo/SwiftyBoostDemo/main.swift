@@ -30,6 +30,24 @@ internal import Numerics
 // let b = try Distribution.Bernoulli(p: 0.5)
 // print("\(String(describing: b.kurtosis))")
 
+let ja: Double = try SpecialFunctions.jacobiEllipticCd(0.4, theta: 4.5)
+
+print("\(try SpecialFunctions.legendreStieltjes(12, 0.3))")
+do {
+    let Zeros: [Double] = try SpecialFunctions.legendreStieltjesZeros(order: 12)
+    print("\(Zeros)")
+}
+catch let error {
+    print("\(error)")
+}
+do {
+    let Zeros: [Float] = try SpecialFunctions.legendreStieltjesZeros(order: 12)
+    print("\(Zeros)")
+}
+catch let error {
+    print("\(error)")
+}
+
 do {
     // Bernoulli(p)
     let b = try Distribution.Bernoulli(p: 0.5)
