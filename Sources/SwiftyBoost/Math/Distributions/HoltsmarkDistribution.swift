@@ -63,7 +63,7 @@ extension Distribution {
         ///
         /// - Throws: `DistributionError.parameterNotPositive(name: "scale", value: scale)`
         ///   if `scale <= 0`.
-        public init(location loc: T = 0, scale: T = 1) throws {
+        public init(loc: T = 0, scale: T = 1) throws {
             guard scale > 0 else {
                 throw DistributionError.parameterNotPositive(
                     name: "scale",
