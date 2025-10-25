@@ -4,6 +4,10 @@
 
 SwiftyBoost gives Swift developers direct access to Boost.Math special functions through a thin, type-safe wrapper. The package keeps Swift ergonomics—generics, errors, and platform availability—while reusing Boost’s battle-tested numerical algorithms via a small C++ bridge target.
 
+## Disclaimer
+
+Any bugs, crashes, numerical inaccuracies, or documentation mistakes in this Swift wrapper are solely the responsibility of the author of this package. They are not affiliated with, caused by, or endorsed by Boost or Boost.org. The Boost libraries are used here via headers and are respected as upstream dependencies; any wrapper-side behavior or errors should be reported to this project, not to Boost.
+
 ## Features
 - Gamma, Beta, error, Bessel, Airy, Legendre (including Legendre–Stieltjes quadrature polynomials), Gegenbauer, Jacobi, Jacobi elliptic functions, Jacobi theta functions, Hermite, elliptic (Legendre/Carlson forms, Jacobi Zeta, Heuman’s lambda), Lambert W, Owen's T, and other high-precision helpers.
 - Probability distributions with Boost-backed implementations:

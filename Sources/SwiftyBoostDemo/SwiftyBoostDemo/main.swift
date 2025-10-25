@@ -51,7 +51,7 @@ catch let error {
 do {
     print("Quadrature examples:")
     
-    let legendre = try SpecialFunctions.Quadrature.Integrator<Double>(rule: .gaussLegendre(points: 30))
+    let legendre = try Quadrature.Integrator<Double>(rule: .gaussLegendre(points: 30))
     
     let reciprocalLinear = try legendre.integrate(over: .finite(lower: 0.0, upper: 1.0)) { x in 1.0 / (x + 1.0) }
     print("  Gauss-Legendre(30) integral[0,1] 1/(x+1) dx ≈ \(reciprocalLinear.value) (+/-\(reciprocalLinear.estimatedError))")
@@ -63,8 +63,8 @@ do {
     }
     print("  Gauss-Legendre(30) integral[0,pi / 2] sin(x) dx ≈ \(sineIntegral.value)")
     
-    let inverseSine = try SpecialFunctions.Quadrature.integrate(
-        using: SpecialFunctions.Quadrature.Rule.gaussKronrod(points: 21),
+    let inverseSine = try Quadrature.integrate(
+        using: Quadrature.Rule.gaussKronrod(points: 21),
         over: .finite(lower: 0.0, upper: Double.pi)
     ) { (x: Double) in 1.0 / (1.0 + Double.sin(x)) }
     print("  Gauss-Kronrod(21) integral[0,pi] 1/(1+sin(x)) dx ≈ \(inverseSine.value)")
@@ -72,23 +72,23 @@ do {
     let cauchy = try Distribution.Cauchy<Double>(location: -2.0, scale: 0.4)
     let loc = cauchy.location
     let scale = cauchy.scale
-    let cauchyArea = try SpecialFunctions.Quadrature.integrate(
-        using: SpecialFunctions.Quadrature.Rule.sinhSinh(),
+    let cauchyArea = try Quadrature.integrate(
+        using: Quadrature.Rule.sinhSinh(),
         integrand: { (x: Double) in
             let z = (x - loc) / scale
             return 1.0 / (Double.pi * scale * (1.0 + z * z))
         }
     )
     print("  Sinh-Sinh integral(-inf,+inf) Cauchy1(loc:-2, scale:0.4) dx ≈ \(cauchyArea.value)")
-    let cauchyArea1 = try SpecialFunctions.Quadrature.integrate(
-        using: SpecialFunctions.Quadrature.Rule.sinhSinh(),
+    let cauchyArea1 = try Quadrature.integrate(
+        using: Quadrature.Rule.sinhSinh(),
         integrand: { (x: Double) in try! cauchy.pdf(x)
         }
     )
     print("  Sinh-Sinh integral(-inf,+inf) Cauchy2(loc:-2, scale:0.4) dx ≈ \(cauchyArea.value)")
     let hm = try Distribution.Holtsmark(loc : 33, scale: 1.0)
-    let hmArea = try SpecialFunctions.Quadrature.integrate(
-        using: SpecialFunctions.Quadrature.Rule.gaussLegendre(points: 100),
+    let hmArea = try Quadrature.integrate(
+        using: Quadrature.Rule.gaussLegendre(points: 100),
         integrand: { (x: Double) in try! hm.pdf(x)
         }
     )

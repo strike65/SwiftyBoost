@@ -7,7 +7,7 @@ struct HoltsmarkDistributionTests {
 
     @Test("PDF/CDF symmetry and shift invariance")
     func symmetryAndShift() throws {
-        let holts = try Distribution.Holtsmark<Double>(location: 0.4, scale: 1.2)
+        let holts = try Distribution.Holtsmark<Double>(loc: 0.4, scale: 1.2)
 
         let offsets: [Double] = [0.0, 0.5, 1.0, 1.5]
         for offset in offsets {
@@ -26,7 +26,7 @@ struct HoltsmarkDistributionTests {
 
     @Test("CDF/quantile round-trip")
     func quantileRoundTrip() throws {
-        let holts = try Distribution.Holtsmark<Double>(location: 0, scale: 1)
+        let holts = try Distribution.Holtsmark<Double>(loc: 0, scale: 1)
         let ps: [Double] = [1e-6, 1e-3, 0.1, 0.5, 0.9, 1 - 1e-6]
         for p in ps {
             let x = try holts.quantile(p)
@@ -38,7 +38,7 @@ struct HoltsmarkDistributionTests {
     @Test("Moments and entropy availability")
     func momentsAndEntropy() throws {
         let scale: Double = 2.5
-        let holts = try Distribution.Holtsmark<Double>(location: -0.75, scale: scale)
+        let holts = try Distribution.Holtsmark<Double>(loc: -0.75, scale: scale)
 
         // Mean/median/mode coincide with the location parameter.
         #expect(abs((holts.mean ?? .nan) - holts.location) <= 1e-12)

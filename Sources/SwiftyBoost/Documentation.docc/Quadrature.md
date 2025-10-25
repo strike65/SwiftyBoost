@@ -19,7 +19,7 @@ Use ``SpecialFunctions/Quadrature/Integrator`` to amortize handle creation when 
 ```swift
 import SwiftyBoost
 
-let gl32 = try SpecialFunctions.Quadrature.Integrator<Double>(rule: .gaussLegendre(points: 32))
+let gl32 = try Quadrature.Integrator<Double>(rule: .gaussLegendre(points: 32))
 let result = try gl32.integrate(over: .finite(lower: 0, upper: .pi / 2)) { x in
     sin(x)
 }
@@ -36,7 +36,7 @@ print(result.didConverge)     // true for fixed rules
 For single evaluations, call ``SpecialFunctions/Quadrature/integrate(using:over:integrand:)`` which constructs an integrator, evaluates the closure, and disposes the handle automatically.
 
 ```swift
-let gaussian = try SpecialFunctions.Quadrature.integrate(
+let gaussian = try Quadrature.integrate(
     using: .tanhSinh(maxRefinements: 12, tolerance: 1e-12),
     over: .finite(lower: -1, upper: 1)
 ) { (x: Double) in

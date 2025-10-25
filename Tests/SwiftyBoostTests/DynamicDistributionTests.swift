@@ -164,7 +164,7 @@ struct DynamicDistributionTests {
             distributionName: "holtsmark",
             parameters: ["mu": loc, "sigma": scale]
         )
-        let typ = try Distribution.Holtsmark<Double>(location: loc, scale: scale)
+        let typ = try Distribution.Holtsmark<Double>(loc: loc, scale: scale)
 
         let xs: [Double] = [-2.5, -0.75, 0.0, 0.75, 2.5]
         for x in xs {
