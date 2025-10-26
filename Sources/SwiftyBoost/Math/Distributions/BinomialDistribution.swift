@@ -250,7 +250,37 @@ extension Distribution {
         public var latticeOrigin: T? { nil }
 
         /// The Shannon entropy H[X] where defined (nats).
-        public var entropy: T? { dyn.entropy }
+        public var entropy: T? {
+            let n = Int(self.nTrials)
+            var p = self.pSuccess
+            if n == 0 { return 0 }
+            if p <= 0 || p >= 1 { return 0 }
+            if p > 0.5 { p = 1 - p }
+            let q     = 1 - p
+            let logq  = T.log(onePlus: -p)
+            let ratio = p / q
+            var P   = T.exp(T(n) * logq)
+            var H:T = 0
+            var c:T = 0
+            @inline(__always)
+            func add_comp(_ y: T) {
+                let t  = H + y
+                if abs(H) >= abs(y) {
+                    c += (H - t) + y
+                } else {
+                    c += (y - t) + H
+                }
+                H = t
+            }
+            for k in 0...n {
+                add_comp( -P * T.log(P) )
+                if k < n {
+                    let factor = (T(n - k) / T(k + 1)) * ratio
+                    P *= factor
+                }
+            }
+            return H + c
+        }
 
         // MARK: - Planning helpers (one-sided bounds and trial-count solvers)
         //
@@ -296,7 +326,7 @@ extension Distribution {
             }
             else {
                 #if arch(i386) || arch(x86_64)
-                return T(bs_binomial_find_lower_bound_on_p_f(
+                return T(bs_binomial_find_lower_bound_on_p_l(
                     Float80(n),
                     Float80(k),
                     Float80(p0),
@@ -343,7 +373,7 @@ extension Distribution {
             }
             else {
                 #if arch(i386) || arch(x86_64)
-                return T(bs_binomial_find_upper_bound_on_p_f(
+                return T(bs_binomial_find_upper_bound_on_p_l(
                     Float80(n),
                     Float80(k),
                     Float80(p0),
@@ -385,7 +415,7 @@ extension Distribution {
             }
             else {
                 #if arch(i386) || arch(x86_64)
-                res = Int(ceil(bs_binomial_find_minimum_number_of_trials_f(Float80(s), Float80(p0), Float80(alpha))))
+                res = Int(ceil(bs_binomial_find_minimum_number_of_trials_l(Float80(s), Float80(p0), Float80(alpha))))
                 #else
                 res = Int(ceil(bs_binomial_find_minimum_number_of_trials_d(Double(s), Double(p0), Double(alpha))))
                 #endif
@@ -419,11 +449,31 @@ extension Distribution {
             }
             else {
                 #if arch(i386) || arch(x86_64)
-                return Int(floor(bs_binomial_find_maximum_number_of_trials_f(Float80(s), Float80(p0), Float80(alpha))))
+                return Int(floor(bs_binomial_find_maximum_number_of_trials_l(Float80(s), Float80(p0), Float80(alpha))))
                 #else
                 return Int(floor(bs_binomial_find_maximum_number_of_trials_d(Double(s), Double(p0), Double(alpha))))
                 #endif
             }
         }
+        
+        /// Indicates whether this distribution is discrete (`true`) or continuous (`false`).
+        ///
+        /// Binomial distributions are discrete over the integers `[0, n]`, so this always returns `true`.
+        public var isDiscrete: Bool { dyn.isDiscrete }
+
+        /// Computes the Kullback–Leibler divergence `D_KL(self || other)` when defined.
+        ///
+        /// - Parameters:
+        ///   - other: The reference binomial distribution *Q*.
+        ///   - options: Summation/integration configuration; defaults to ``Distribution/KLDivergenceOptions/automatic()``.
+        /// - Returns: The divergence in nats, or `nil` if it cannot be evaluated.
+        /// - Throws: Rethrows any backend or quadrature errors.
+        public func klDivergence(
+            relativeTo other: Self,
+            options: Distribution.KLDivergenceOptions<T> = .automatic()
+        ) throws -> T? {
+            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        }
+
     }
 }

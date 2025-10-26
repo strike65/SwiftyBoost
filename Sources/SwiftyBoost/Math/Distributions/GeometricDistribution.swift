@@ -243,6 +243,26 @@ extension Distribution {
             let hNats = -T.log(self.pSuccess) - ((1 - self.pSuccess ) / self.pSuccess) * ln1mp
             return hNats
         }
+        /// Indicates whether this distribution is discrete (`true`) or continuous (`false`).
+        ///
+        /// Geometric distributions are discrete on the non-negative integers, so this always returns `true`.
+        public var isDiscrete: Bool { dyn.isDiscrete }
+
+        /// Computes the Kullback–Leibler divergence `D_KL(self || other)` when defined.
+        ///
+        /// - Parameters:
+        ///   - other: The reference geometric distribution *Q*.
+        ///   - options: Summation/integration configuration; defaults to ``Distribution/KLDivergenceOptions/automatic()``.
+        /// - Returns: The divergence in nats, or `nil` if it cannot be evaluated.
+        /// - Throws: Rethrows any backend or quadrature errors.
+        public func klDivergence(
+            relativeTo other: Self,
+            options: Distribution.KLDivergenceOptions<T> = .automatic()
+        ) throws -> T? {
+            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        }
+
+
 
         // MARK: - Planning helpers (one-sided bounds and trial-count solvers)
         //
@@ -279,7 +299,7 @@ extension Distribution {
             }
             else {
                 #if arch(i386) || arch(x86_64)
-                return T(bs_geometric_find_lower_bound_on_p_f(
+                return T(bs_geometric_find_lower_bound_on_p_l(
                     Float80(n),
                     Float80(alpha)))
                 #else
@@ -313,7 +333,7 @@ extension Distribution {
             }
             else {
                 #if arch(i386) || arch(x86_64)
-                return T(bs_geometric_find_upper_bound_on_p_f(
+                return T(bs_geometric_find_upper_bound_on_p_l(
                     Float80(n),
                     Float80(alpha)))
                 #else
@@ -357,7 +377,7 @@ extension Distribution {
             }
             else {
                 #if arch(i386) || arch(x86_64)
-                res = Int(ceil(bs_geometric_find_minimum_number_of_trials_f(Float80(f), Float80(p0), Float80(alpha))))
+                res = Int(ceil(bs_geometric_find_minimum_number_of_trials_l(Float80(f), Float80(p0), Float80(alpha))))
                 #else
                 res = Int(ceil(bs_geometric_find_minimum_number_of_trials_d(Double(f), Double(p0), Double(alpha))))
                 #endif
@@ -391,16 +411,16 @@ extension Distribution {
             }
             let res : Int
             if T.self == Double.self {
-                res = Int(ceil(bs_geometric_find_maximum_number_of_trials_d(Double(f), Double(p0), Double(alpha))))
+                res = Int(floor(bs_geometric_find_maximum_number_of_trials_d(Double(f), Double(p0), Double(alpha))))
             }
             else if T.self == Float.self {
-                res = Int(ceil(bs_geometric_find_maximum_number_of_trials_f(Float(f), Float(p0), Float(alpha))))
+                res = Int(floor(bs_geometric_find_maximum_number_of_trials_f(Float(f), Float(p0), Float(alpha))))
             }
             else {
                 #if arch(i386) || arch(x86_64)
-                res = Int(ceil(bs_geometric_find_maximum_number_of_trials_f(Float80(f), Float80(p0), Float80(alpha))))
+                res = Int(floor(bs_geometric_find_maximum_number_of_trials_l(Float80(f), Float80(p0), Float80(alpha))))
                 #else
-                res = Int(ceil(bs_geometric_find_maximum_number_of_trials_d(Double(f), Double(p0), Double(alpha))))
+                res = Int(floor(bs_geometric_find_maximum_number_of_trials_d(Double(f), Double(p0), Double(alpha))))
                 #endif
             }
             return res

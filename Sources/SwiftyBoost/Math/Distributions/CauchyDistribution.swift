@@ -237,5 +237,24 @@ extension Distribution {
         ///
         /// - Note: For Cauchy with scale γ, h = ln(4πγ). The backend provides this value.
         public var entropy: T? { dyn.entropy }
+
+        /// Indicates whether this distribution is discrete (`true`) or continuous (`false`).
+        ///
+        /// Cauchy distributions are continuous, so this always returns `false`.
+        public var isDiscrete: Bool { dyn.isDiscrete }
+
+        /// Computes the Kullback–Leibler divergence `D_KL(self || other)` when defined.
+        ///
+        /// - Parameters:
+        ///   - other: The reference Cauchy distribution *Q*.
+        ///   - options: Quadrature configuration; defaults to ``Distribution/KLDivergenceOptions/automatic()``.
+        /// - Returns: The divergence in nats, or `nil` if it cannot be evaluated.
+        /// - Throws: Rethrows any backend or quadrature errors.
+        public func klDivergence(
+            relativeTo other: Self,
+            options: Distribution.KLDivergenceOptions<T> = .automatic()
+        ) throws -> T? {
+            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        }
     }
 }

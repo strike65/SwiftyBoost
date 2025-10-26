@@ -44,4 +44,5 @@ Use this documentation catalog with DocC to explore how to configure Boost-backe
 - ``Distribution/Bernoulli``
 - ``Distribution/Holtsmark``
 - ``Distribution/Arcsine``
+- ``Distribution/Empirical``
 - <doc:Distributions>

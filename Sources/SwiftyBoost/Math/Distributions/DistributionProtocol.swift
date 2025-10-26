@@ -34,6 +34,61 @@
 /// an error specific to the conforming type (for example, a domain error).
 
 import SwiftyBoostPrelude
+
+extension Distribution {
+    /// Configuration for numerically estimating KL divergence when no closed form is available.
+    public struct KLDivergenceOptions<T: Real & BinaryFloatingPoint & Sendable>: Sendable, Equatable {
+        public var finiteRule: Quadrature.Rule
+        public var semiInfiniteRule: Quadrature.Rule
+        public var infiniteRule: Quadrature.Rule
+        public var densityFloor: T
+        public var discreteTailCutoff: T
+        public var maxDiscreteEvaluations: Int
+
+        public init(
+            finiteRule: Quadrature.Rule = .gaussKronrod(points: 61),
+            semiInfiniteRule: Quadrature.Rule = .expSinh(),
+            infiniteRule: Quadrature.Rule = .tanhSinh(),
+            densityFloor: T? = nil,
+            discreteTailCutoff: T? = nil,
+            maxDiscreteEvaluations: Int = 250_000
+        ) {
+            self.finiteRule = finiteRule
+            self.semiInfiniteRule = semiInfiniteRule
+            self.infiniteRule = infiniteRule
+            self.densityFloor = densityFloor ?? Self.defaultDensityFloor(for: T.self)
+            self.discreteTailCutoff = discreteTailCutoff ?? Self.defaultTailCutoff(for: T.self)
+            self.maxDiscreteEvaluations = maxDiscreteEvaluations
+        }
+
+        public static func automatic(for type: T.Type = T.self) -> Self {
+            Self(
+                finiteRule: .gaussKronrod(points: 61),
+                semiInfiniteRule: .expSinh(),
+                infiniteRule: .tanhSinh(),
+                densityFloor: defaultDensityFloor(for: type),
+                discreteTailCutoff: defaultTailCutoff(for: type)
+            )
+        }
+
+        private static func defaultDensityFloor(for type: T.Type) -> T {
+            if type == Float.self {
+                return T(1e-9)
+            }
+            if type == Double.self {
+                return T(1e-18)
+            }
+            return T(1e-24)
+        }
+
+        private static func defaultTailCutoff(for type: T.Type) -> T {
+            if type == Float.self {
+                return T(1e-6)
+            }
+            return T(1e-9)
+        }
+    }
+}
 internal protocol DistributionProtocol {
     /// The real number type used by this distribution (for example, `Float`, `Double`, `Float80`).
     ///
@@ -197,4 +252,27 @@ internal protocol DistributionProtocol {
     /// Implementations should return `nil` when the entropy is undefined or does not
     /// exist (for example, diverges). Units are in nats (natural logarithm base).
     var entropy: RealType? { get }
+
+    /// The Kullback–Leibler divergence `D_KL(self || other)` where defined.
+    ///
+    /// - Parameters:
+    ///   - other: Distribution to compare against (must share support).
+    ///   - options: Numerical integration/summation configuration.
+    /// - Returns: Divergence in nats, `nil` when undefined, or `infinity` when divergent.
+    func klDivergence(
+        relativeTo other: Self,
+        options: Distribution.KLDivergenceOptions<RealType>
+    ) throws -> RealType?
+
+    /// Indicates whether the distribution is discrete (`true`) or continuous (`false`).
+    ///
+    /// Implementations should return `true` when the support is lattice-based and `false` otherwise.
+    var isDiscrete: Bool { get }
+}
+
+extension DistributionProtocol {
+    /// Convenience overload that uses ``Distribution/KLDivergenceOptions/automatic(for:)``.
+    func klDivergence(relativeTo other: Self) throws -> RealType? {
+        try klDivergence(relativeTo: other, options: .automatic(for: RealType.self))
+    }
 }

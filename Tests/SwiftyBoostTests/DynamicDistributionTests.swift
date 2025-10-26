@@ -220,6 +220,571 @@ struct DynamicDistributionTests {
         }
     }
 
+    @Test("Kolmogorov–Smirnov<Double> dynamic matches typed")
+    func kolmogorovSmirnovDynamicMatchesTypedDouble() throws {
+        let n: Double = 32
+        let dyn = try Distribution.Dynamic<Double>(
+            distributionName: "kolmogorov_smirnov",
+            parameters: ["n": n]
+        )
+        let typ = try Distribution.KolmogorovSmirnov<Double>(numberOfObservations: n)
+
+        let xs: [Double] = [0.05, 0.1, 0.2, 0.4, 0.8]
+        for x in xs {
+            let pd = try dyn.pdf(x)
+            let pt = try typ.pdf(x)
+            #expect(abs(pd - pt) <= 1e-12)
+
+            let cd = try dyn.cdf(x)
+            let ct = try typ.cdf(x)
+            #expect(abs(cd - ct) <= 1e-12)
+
+            let sd = try dyn.sf(x)
+            let st = try typ.sf(x)
+            #expect(abs(sd - st) <= 1e-12)
+        }
+
+        let ps: [Double] = [1e-9, 1e-6, 1e-3, 0.1, 0.5, 0.9, 1 - 1e-9]
+        for p in ps {
+            let qd = try dyn.quantile(p)
+            let qt = try typ.quantile(p)
+            #expect(abs(qd - qt) <= 1e-10)
+        }
+
+        if let meanDyn = dyn.mean, let meanTyp = typ.mean {
+            #expect(abs(meanDyn - meanTyp) <= 1e-12)
+        }
+        if let varianceDyn = dyn.variance, let varianceTyp = typ.variance {
+            #expect(abs(varianceDyn - varianceTyp) <= 1e-12)
+        }
+        if let skewDyn = dyn.skewness, let skewTyp = typ.skewness {
+            #expect(abs(skewDyn - skewTyp) <= 1e-12)
+        }
+        if let kurtDyn = dyn.kurtosis, let kurtTyp = typ.kurtosis {
+            #expect(abs(kurtDyn - kurtTyp) <= 1e-12)
+        }
+    }
+
+    @Test("Landau<Double> dynamic matches typed")
+    func landauDynamicMatchesTypedDouble() throws {
+        let location: Double = -0.75
+        let scale: Double = 1.6
+        let dyn = try Distribution.Dynamic<Double>(
+            distributionName: "landau",
+            parameters: ["mu": location, "c": scale]
+        )
+        let typ = try Distribution.Landau<Double>(location: location, scale: scale)
+
+        let xs: [Double] = [-3.0, -1.0, 0.0, 1.0, 3.0]
+        for x in xs {
+            let pd = try dyn.pdf(x)
+            let pt = try typ.pdf(x)
+            #expect(abs(pd - pt) <= 1e-12)
+
+            let cd = try dyn.cdf(x)
+            let ct = try typ.cdf(x)
+            #expect(abs(cd - ct) <= 1e-12)
+        }
+
+        let ps: [Double] = [1e-6, 1e-3, 0.1, 0.5, 0.9, 1 - 1e-6]
+        for p in ps {
+            let qd = try dyn.quantile(p)
+            let qt = try typ.quantile(p)
+            #expect(abs(qd - qt) <= 1e-10)
+        }
+
+        #expect(dyn.mean == nil && typ.mean == nil)
+        #expect(dyn.variance == nil && typ.variance == nil)
+        #expect(dyn.skewness == nil && typ.skewness == nil)
+        #expect(dyn.kurtosis == nil && typ.kurtosis == nil)
+        if let entropyDyn = dyn.entropy, let entropyTyp = typ.entropy {
+            #expect(abs(entropyDyn - entropyTyp) <= 1e-12)
+        }
+    }
+
+    @Test("Laplace<Double> dynamic matches typed")
+    func laplaceDynamicMatchesTypedDouble() throws {
+        let location: Double = 0.3
+        let scale: Double = 0.9
+        let dyn = try Distribution.Dynamic<Double>(
+            distributionName: "laplace",
+            parameters: ["location": location, "scale": scale]
+        )
+        let typ = try Distribution.Laplace<Double>(location: location, scale: scale)
+
+        let xs: [Double] = [-1.5, -0.3, 0.0, 0.3, 1.5]
+        for x in xs {
+            let pd = try dyn.pdf(x)
+            let pt = try typ.pdf(x)
+            #expect(abs(pd - pt) <= 1e-12)
+
+            let cd = try dyn.cdf(x)
+            let ct = try typ.cdf(x)
+            #expect(abs(cd - ct) <= 1e-12)
+        }
+
+        let ps: [Double] = [1e-9, 1e-6, 1e-3, 0.1, 0.5, 0.9, 1 - 1e-9]
+        for p in ps {
+            let qd = try dyn.quantile(p)
+            let qt = try typ.quantile(p)
+            #expect(abs(qd - qt) <= 1e-12)
+        }
+
+        #expect(dyn.mean == typ.mean)
+        #expect(dyn.variance == typ.variance)
+        #expect(dyn.skewness == typ.skewness)
+        #expect(dyn.kurtosis == typ.kurtosis)
+        #expect(dyn.kurtosisExcess == typ.kurtosisExcess)
+        if let entropyDyn = dyn.entropy, let entropyTyp = typ.entropy {
+            #expect(abs(entropyDyn - entropyTyp) <= 1e-12)
+        }
+    }
+
+    @Test("Logistic<Double> dynamic matches typed")
+    func logisticDynamicMatchesTypedDouble() throws {
+        let location: Double = -0.4
+        let scale: Double = 1.25
+        let dyn = try Distribution.Dynamic<Double>(
+            distributionName: "logistic",
+            parameters: ["location": location, "scale": scale]
+        )
+        let typ = try Distribution.Logistic<Double>(location: location, scale: scale)
+
+        let xs: [Double] = [-3.0, -1.0, 0.0, 1.0, 3.0]
+        for x in xs {
+            let pd = try dyn.pdf(x)
+            let pt = try typ.pdf(x)
+            #expect(abs(pd - pt) <= 1e-12)
+
+            let cd = try dyn.cdf(x)
+            let ct = try typ.cdf(x)
+            #expect(abs(cd - ct) <= 1e-12)
+
+            let hd = try dyn.hazard(x)
+            let ht = try typ.hazard(x)
+            #expect(abs(hd - ht) <= 1e-12)
+        }
+
+        let ps: [Double] = [1e-9, 1e-6, 1e-3, 0.1, 0.5, 0.9, 1 - 1e-9]
+        for p in ps {
+            let qd = try dyn.quantile(p)
+            let qt = try typ.quantile(p)
+            #expect(abs(qd - qt) <= 1e-12)
+        }
+
+        #expect(dyn.mean == typ.mean)
+        #expect(dyn.variance == typ.variance)
+        #expect(dyn.skewness == typ.skewness)
+        #expect(dyn.kurtosis == typ.kurtosis)
+        #expect(dyn.kurtosisExcess == typ.kurtosisExcess)
+        if let eDyn = dyn.entropy, let eTyp = typ.entropy {
+            #expect(abs(eDyn - eTyp) <= 1e-12)
+        }
+    }
+
+    @Test("LogNormal<Double> dynamic matches typed")
+    func logNormalDynamicMatchesTypedDouble() throws {
+        let location: Double = 0.5
+        let scale: Double = 0.75
+        let dyn = try Distribution.Dynamic<Double>(
+            distributionName: "lognormal",
+            parameters: ["location": location, "scale": scale]
+        )
+        let typ = try Distribution.LogNormal<Double>(location: location, scale: scale)
+
+        let xs: [Double] = [0.0001, 0.01, 0.1, 0.5, 2.0]
+        for x in xs {
+            let pd = try dyn.pdf(x)
+            let pt = try typ.pdf(x)
+            #expect(abs(pd - pt) <= 1e-12)
+
+            let cd = try dyn.cdf(x)
+            let ct = try typ.cdf(x)
+            #expect(abs(cd - ct) <= 1e-12)
+        }
+
+        let ps: [Double] = [1e-12, 1e-6, 1e-3, 0.1, 0.5, 0.9, 1 - 1e-9]
+        for p in ps {
+            let qd = try dyn.quantile(p)
+            let qt = try typ.quantile(p)
+            #expect(abs(qd - qt) <= 1e-10)
+        }
+
+        #expect(dyn.mean == typ.mean)
+        #expect(dyn.variance == typ.variance)
+        #expect(dyn.skewness == typ.skewness)
+        #expect(dyn.kurtosis == typ.kurtosis)
+        #expect(dyn.kurtosisExcess == typ.kurtosisExcess)
+        if let eDyn = dyn.entropy, let eTyp = typ.entropy {
+            #expect(abs(eDyn - eTyp) <= 1e-12)
+        }
+    }
+
+    @Test("Map-Airy<Double> dynamic matches typed")
+    func mapAiryDynamicMatchesTypedDouble() throws {
+        let location: Double = 0.35
+        let scale: Double = 1.4
+        let dyn = try Distribution.Dynamic<Double>(
+            distributionName: "mapairy",
+            parameters: ["location": location, "scale": scale]
+        )
+        let typ = try Distribution.MapAiry<Double>(location: location, scale: scale)
+
+        let xs: [Double] = [-3.0, -1.0, 0.0, 1.0, 3.0]
+        for x in xs {
+            let pd = try dyn.pdf(x)
+            let pt = try typ.pdf(x)
+            #expect(abs(pd - pt) <= 1e-10)
+
+            let cd = try dyn.cdf(x)
+            let ct = try typ.cdf(x)
+            #expect(abs(cd - ct) <= 1e-10)
+        }
+
+        let ps: [Double] = [1e-6, 1e-3, 0.1, 0.5, 0.9, 1 - 1e-6]
+        for p in ps {
+            let qd = try dyn.quantile(p)
+            let qt = try typ.quantile(p)
+            #expect(abs(qd - qt) <= 1e-8)
+        }
+
+        #expect(abs((dyn.mean ?? .nan) - (typ.mean ?? .nan)) <= 1e-12)
+        #expect(dyn.variance == nil && typ.variance == nil)
+        #expect(dyn.skewness == nil && typ.skewness == nil)
+        #expect(dyn.kurtosis == nil && typ.kurtosis == nil)
+        if let eDyn = dyn.entropy, let eTyp = typ.entropy {
+            #expect(abs(eDyn - eTyp) <= 1e-10)
+        }
+    }
+
+    @Test("NegativeBinomial<Double> dynamic matches typed")
+    func negativeBinomialDynamicMatchesTypedDouble() throws {
+        let successes: Double = 3.2
+        let p: Double = 0.37
+        let dyn = try Distribution.Dynamic<Double>(
+            distributionName: "negative_binomial",
+            parameters: ["successes": successes, "p": p]
+        )
+        let typ = try Distribution.NegativeBinomial<Double>(successes: successes, probabilityOfSuccess: p)
+
+        let xs: [Double] = [0, 1, 2, 5, 10]
+        for x in xs {
+            let pd = try dyn.pdf(x)
+            let pt = try typ.pdf(x)
+            #expect(abs(pd - pt) <= 1e-12)
+
+            let cd = try dyn.cdf(x)
+            let ct = try typ.cdf(x)
+            #expect(abs(cd - ct) <= 1e-12)
+
+            let hd = try dyn.hazard(Double(x))
+            let ht = try typ.hazard(Double(x))
+            if hd.isFinite && ht.isFinite {
+                #expect(abs(hd - ht) <= 1e-12)
+            }
+        }
+
+        let ps: [Double] = [1e-6, 1e-3, 0.1, 0.5, 0.9, 1 - 1e-6]
+        for prob in ps {
+            let qd = try dyn.quantile(prob)
+            let qt = try typ.quantile(prob)
+            #expect(abs(qd - qt) <= 1e-10)
+        }
+
+        #expect(abs((dyn.mean ?? .nan) - (typ.mean ?? .nan)) <= 1e-12)
+        #expect(abs((dyn.variance ?? .nan) - (typ.variance ?? .nan)) <= 1e-12)
+        #expect(abs((dyn.skewness ?? .nan) - (typ.skewness ?? .nan)) <= 1e-12)
+        #expect(abs((dyn.kurtosis ?? .nan) - (typ.kurtosis ?? .nan)) <= 1e-12)
+        if let eDyn = dyn.entropy, let eTyp = typ.entropy {
+            #expect(abs(eDyn - eTyp) <= 1e-12)
+        }
+    }
+
+    @Test("Hyperexponential<Double> dynamic matches typed")
+    func hyperexponentialDynamicMatchesTypedDouble() throws {
+        let probabilities: [Double] = [0.15, 0.55, 0.3]
+        let rates: [Double] = [0.65, 1.45, 3.25]
+
+        var params: [String: Double] = [:]
+        for (idx, rate) in rates.enumerated() {
+            params["rate\(idx)"] = rate
+        }
+        for (idx, probability) in probabilities.enumerated() {
+            params["prob\(idx)"] = probability
+        }
+
+        let dyn = try Distribution.Dynamic<Double>(
+            distributionName: "hyperexponential",
+            parameters: params
+        )
+        let typ = try Distribution.Hyperexponential<Double>(
+            probabilities: probabilities,
+            rates: rates
+        )
+
+        let xs: [Double] = [0.0, 0.05, 0.2, 0.75, 1.2]
+        for x in xs {
+            let pd = try dyn.pdf(x)
+            let pt = try typ.pdf(x)
+            #expect(abs(pd - pt) <= 1e-12)
+
+            let cd = try dyn.cdf(x)
+            let ct = try typ.cdf(x)
+            #expect(abs(cd - ct) <= 1e-12)
+
+            let sd = try dyn.sf(x)
+            let st = try typ.sf(x)
+            #expect(abs(sd - st) <= 1e-12)
+        }
+
+        let ps: [Double] = [1e-9, 1e-6, 0.01, 0.5, 0.9, 1 - 1e-9]
+        for p in ps {
+            let qd = try dyn.quantile(p)
+            let qt = try typ.quantile(p)
+            #expect(abs(qd - qt) <= 1e-11)
+        }
+
+        let x: Double = 0.8
+        let hd = try dyn.hazard(x)
+        let ht = try typ.hazard(x)
+        #expect(abs(hd - ht) <= 1e-12)
+
+        let cd = try dyn.chf(x)
+        let ct = try typ.chf(x)
+        #expect(abs(cd - ct) <= 1e-12)
+    }
+
+    @Test("InverseChiSquared<Double> dynamic matches typed")
+    func inverseChiSquaredDynamicMatchesTypedDouble() throws {
+        let df: Double = 8.5
+        let scale: Double = 0.45
+
+        let dyn = try Distribution.Dynamic<Double>(
+            distributionName: "inverse_chi_squared",
+            parameters: [
+                "df": df,
+                "scale": scale
+            ]
+        )
+        let typ = try Distribution.InverseChiSquared<Double>(
+            degreesOfFreedom: df,
+            scale: scale
+        )
+
+        let xs: [Double] = [0.05, 0.1, 0.25, 0.75, 1.5]
+        for x in xs {
+            let pd = try dyn.pdf(x)
+            let pt = try typ.pdf(x)
+            #expect(abs(pd - pt) <= 1e-12)
+
+            let cd = try dyn.cdf(x)
+            let ct = try typ.cdf(x)
+            #expect(abs(cd - ct) <= 1e-12)
+
+            let sd = try dyn.sf(x)
+            let st = try typ.sf(x)
+            #expect(abs(sd - st) <= 1e-12)
+        }
+
+        let ps: [Double] = [1e-9, 1e-6, 0.05, 0.5, 0.95, 1 - 1e-9]
+        for p in ps {
+            let qd = try dyn.quantile(p)
+            let qt = try typ.quantile(p)
+            #expect(abs(qd - qt) <= 1e-11)
+        }
+
+        let x: Double = 0.4
+        let hd = try dyn.hazard(x)
+        let ht = try typ.hazard(x)
+        #expect(abs(hd - ht) <= 1e-12)
+
+        let cd = try dyn.chf(x)
+        let ct = try typ.chf(x)
+        #expect(abs(cd - ct) <= 1e-12)
+    }
+
+    @Test("NonCentralChiSquared<Double> dynamic matches typed")
+    func nonCentralChiSquaredDynamicMatchesTypedDouble() throws {
+        let df: Double = 6.0
+        let lambda: Double = 3.5
+
+        let dyn = try Distribution.Dynamic<Double>(
+            distributionName: "non_central_chi_squared",
+            parameters: [
+                "df": df,
+                "lambda": lambda
+            ]
+        )
+        let typ = try Distribution.NonCentralChiSquared<Double>(
+            degreesOfFreedom: df,
+            nonCentrality: lambda
+        )
+
+        let xs: [Double] = [0.1, 0.5, 1.0, 2.5, 5.0, 8.0]
+        for x in xs {
+            let pd = try dyn.pdf(x)
+            let pt = try typ.pdf(x)
+            #expect(abs(pd - pt) <= 1e-12)
+
+            let cd = try dyn.cdf(x)
+            let ct = try typ.cdf(x)
+            #expect(abs(cd - ct) <= 1e-12)
+
+            let sd = try dyn.sf(x)
+            let st = try typ.sf(x)
+            #expect(abs(sd - st) <= 1e-12)
+        }
+
+        let ps: [Double] = [1e-6, 1e-3, 0.1, 0.5, 0.9, 1 - 1e-6]
+        for p in ps {
+            let qd = try dyn.quantile(p)
+            let qt = try typ.quantile(p)
+            #expect(abs(qd - qt) <= 1e-10)
+        }
+
+        if let meanDyn = dyn.mean, let meanTyp = typ.mean {
+            #expect(abs(meanDyn - meanTyp) <= 1e-12)
+        }
+        if let varDyn = dyn.variance, let varTyp = typ.variance {
+            #expect(abs(varDyn - varTyp) <= 1e-12)
+        }
+        if let skewDyn = dyn.skewness, let skewTyp = typ.skewness {
+            #expect(abs(skewDyn - skewTyp) <= 1e-12)
+        }
+        if let kurtDyn = dyn.kurtosis, let kurtTyp = typ.kurtosis {
+            #expect(abs(kurtDyn - kurtTyp) <= 1e-12)
+        }
+    }
+
+    @Test("InverseGamma<Double> dynamic matches typed wrapper")
+    func inverseGammaDynamicMatchesTypedDouble() throws {
+        let shape: Double = 6.5
+        let scale: Double = 1.3
+
+        let dyn = try Distribution.Dynamic<Double>(
+            distributionName: "inverse_gamma",
+            parameters: [
+                "shape": shape,
+                "scale": scale
+            ]
+        )
+        let typ = try Distribution.InverseGamma<Double>(shape: shape, scale: scale)
+
+        let xs: [Double] = [0.01, 0.05, 0.1, 0.5, 1.5, 4.0]
+        for x in xs {
+            let pd = try dyn.pdf(x)
+            let pt = try typ.pdf(x)
+            #expect(abs(pd - pt) <= 1e-12)
+
+            let cd = try dyn.cdf(x)
+            let ct = try typ.cdf(x)
+            #expect(abs(cd - ct) <= 1e-12)
+
+            let sd = try dyn.sf(x)
+            let st = try typ.sf(x)
+            #expect(abs(sd - st) <= 1e-12)
+        }
+
+        let ps: [Double] = [1e-8, 1e-5, 1e-3, 0.1, 0.5, 0.9, 0.999]
+        for p in ps {
+            let xd = try dyn.quantile(p)
+            let xt = try typ.quantile(p)
+            let denom = max(abs(xt), 1.0)
+            #expect(abs(xd - xt) / denom <= 1e-12)
+        }
+
+        let qs: [Double] = [1e-6, 1e-4, 0.05, 0.5]
+        for q in qs {
+            let xd = try dyn.quantileComplement(q)
+            let xt = try typ.quantileComplement(q)
+            let denom = max(abs(xt), 1.0)
+            #expect(abs(xd - xt) / denom <= 1e-12)
+        }
+
+        let expectedMean = scale / (shape - 1)
+        let expectedVariance = (scale * scale) / ((shape - 1) * (shape - 1) * (shape - 2))
+        let expectedMode = scale / (shape + 1)
+        let expectedSkewness = 4 * Foundation.sqrt(shape - 2) / (shape - 3)
+        let expectedKurtosisExcess = (30 * shape - 66) / ((shape - 3) * (shape - 4))
+
+        #expect(abs((dyn.mean ?? .nan) - expectedMean) <= 1e-12)
+        #expect(abs((dyn.variance ?? .nan) - expectedVariance) <= 1e-12)
+        #expect(abs((dyn.mode ?? .nan) - expectedMode) <= 1e-12)
+        #expect(abs((dyn.skewness ?? .nan) - expectedSkewness) <= 1e-12)
+        #expect(abs((dyn.kurtosisExcess ?? .nan) - expectedKurtosisExcess) <= 1e-12)
+        if let kurtosis = dyn.kurtosis {
+            #expect(abs(kurtosis - (expectedKurtosisExcess + 3)) <= 1e-12)
+        } else {
+            Issue.record("Expected kurtosis for inverse gamma with shape \(shape)")
+        }
+    }
+
+    @Test("InverseNormal<Double> dynamic matches typed wrapper")
+    func inverseNormalDynamicMatchesTypedDouble() throws {
+        let mu: Double = 1.7
+        let lambda: Double = 2.2
+
+        let dyn = try Distribution.Dynamic<Double>(
+            distributionName: "inverse_gaussian",
+            parameters: [
+                "mean": mu,
+                "lambda": lambda
+            ]
+        )
+        let typ = try Distribution.InverseNormal<Double>(mean: mu, shape: lambda)
+
+        let xs: [Double] = [0.02, 0.1, 0.5, 1.0, 2.5]
+        for x in xs {
+            let pd = try dyn.pdf(x)
+            let pt = try typ.pdf(x)
+            #expect(abs(pd - pt) <= 1e-12)
+
+            let cd = try dyn.cdf(x)
+            let ct = try typ.cdf(x)
+            #expect(abs(cd - ct) <= 1e-12)
+
+            let sd = try dyn.sf(x)
+            let st = try typ.sf(x)
+            #expect(abs(sd - st) <= 1e-12)
+        }
+
+        let ps: [Double] = [1e-6, 1e-3, 0.05, 0.5, 0.9, 0.999]
+        for p in ps {
+            let xd = try dyn.quantile(p)
+            let xt = try typ.quantile(p)
+            let denom = max(abs(xt), 1.0)
+            #expect(abs(xd - xt) / denom <= 1e-12)
+        }
+
+        let qs: [Double] = [1e-5, 1e-3, 0.01, 0.25]
+        for q in qs {
+            let xd = try dyn.quantileComplement(q)
+            let xt = try typ.quantileComplement(q)
+            let denom = max(abs(xt), 1.0)
+            #expect(abs(xd - xt) / denom <= 1e-12)
+        }
+
+        let expectedVariance = (mu * mu * mu) / lambda
+        let expectedSkewness = 3 * Foundation.sqrt(mu / lambda)
+        let expectedKurtosisExcess = 15 * mu / lambda
+        let expectedMode = mu * (
+            Foundation.sqrt(1 + (9 * mu * mu) / (4 * lambda * lambda))
+            - (3 * mu) / (2 * lambda)
+        )
+
+        #expect(dyn.mean == mu)
+        #expect(abs((dyn.variance ?? .nan) - expectedVariance) <= 1e-12)
+        #expect(abs((dyn.mode ?? .nan) - expectedMode) <= 1e-12)
+        #expect(abs((dyn.skewness ?? .nan) - expectedSkewness) <= 1e-12)
+        #expect(abs((dyn.kurtosisExcess ?? .nan) - expectedKurtosisExcess) <= 1e-12)
+        if let kurtosis = dyn.kurtosis {
+            let expectedBoostKurtosis = expectedKurtosisExcess - 3
+            #expect(abs(kurtosis - expectedBoostKurtosis) <= 1e-12)
+        } else {
+            Issue.record("Expected kurtosis for inverse normal with λ \(lambda)")
+        }
+    }
+
     @Test("Gamma<Double> moments and hazards")
     func gammaDynamicMomentsAndHazard() throws {
         let shape: Double = 5.0, scale: Double = 2.0
@@ -298,6 +863,84 @@ struct DynamicDistributionTests {
             let Hd = try d.chf(x)
             let Ht = try t.chf(x)
             #expect(abs(Hd - Ht) <= 1e-5)
+        }
+    }
+
+    @Test("Dynamic aliases for newly added continuous distributions")
+    func dynamicAliasesForNewDistributions() throws {
+        // Rayleigh with sigma alias
+        do {
+            let scale: Double = 1.3
+            let dyn = try Distribution.Dynamic<Double>(distributionName: "rayleigh", parameters: ["sigma": scale])
+            let typ = try Distribution.Rayleigh<Double>(scale: scale)
+            let x: Double = 0.85
+            #expect(abs(try dyn.pdf(x) - typ.pdf(x)) <= 1e-12)
+            #expect(abs(try dyn.cdf(x) - typ.cdf(x)) <= 1e-12)
+            let p: Double = 0.42
+            #expect(abs(try dyn.quantile(p) - typ.quantile(p)) <= 1e-12)
+        }
+
+        // SAS Point5 with name alias and scale key "c"
+        do {
+            let location: Double = -0.3
+            let scale: Double = 0.9
+            let dyn = try Distribution.Dynamic<Double>(distributionName: "sas_point5", parameters: ["loc": location, "c": scale])
+            let typ = try Distribution.SASPoint5<Double>(location: location, scale: scale)
+            let x: Double = 1.1
+            #expect(abs(try dyn.pdf(x) - typ.pdf(x)) <= 1e-12)
+            #expect(abs(try dyn.cdf(x) - typ.cdf(x)) <= 1e-12)
+        }
+
+        // Skew-normal with alias and omega/alpha parameters
+        do {
+            let dyn = try Distribution.Dynamic<Double>(
+                distributionName: "skewnormal",
+                parameters: ["mu": 0.5, "omega": 1.2, "alpha": -3.0]
+            )
+            let typ = try Distribution.SkewNormal<Double>(location: 0.5, scale: 1.2, shape: -3)
+            let x: Double = -0.4
+            #expect(abs(try dyn.pdf(x) - typ.pdf(x)) <= 1e-12)
+            #expect(abs(try dyn.cdf(x) - typ.cdf(x)) <= 1e-12)
+            let p: Double = 0.73
+            #expect(abs(try dyn.quantile(p) - typ.quantile(p)) <= 5e-11)
+        }
+
+        // Triangular with shorthand parameters a,b,c
+        do {
+            let dyn = try Distribution.Dynamic<Double>(
+                distributionName: "triangle",
+                parameters: ["a": -1.0, "c": 0.2, "b": 2.5]
+            )
+            let typ = try Distribution.Triangular<Double>(lower: -1.0, mode: 0.2, upper: 2.5)
+            let x: Double = 0.9
+            #expect(abs(try dyn.pdf(x) - typ.pdf(x)) <= 1e-12)
+            #expect(abs(try dyn.cdf(x) - typ.cdf(x)) <= 1e-12)
+        }
+
+        // Uniform with rectangular alias and endpoints a/b
+        do {
+            let dyn = try Distribution.Dynamic<Double>(
+                distributionName: "rectangular",
+                parameters: ["a": -2.0, "b": 3.0]
+            )
+            let typ = try Distribution.Uniform<Double>(lower: -2.0, upper: 3.0)
+            let x: Double = 1.1
+            #expect(abs(try dyn.pdf(x) - typ.pdf(x)) <= 1e-12)
+            #expect(abs(try dyn.cdf(x) - typ.cdf(x)) <= 1e-12)
+            let p: Double = 0.6
+            #expect(abs(try dyn.quantile(p) - typ.quantile(p)) <= 1e-12)
+        }
+
+        // Weibull with aliases for shape/scale
+        do {
+            let dyn = try Distribution.Dynamic<Double>(
+                distributionName: "weibull",
+                parameters: ["alpha": 1.7, "lambda": 0.8]
+            )
+            let typ = try Distribution.Weibull<Double>(shape: 1.7, scale: 0.8)
+            let x: Double = 0.9
+            #expect(abs(try dyn.pdf(x) - typ.pdf(x)) <= 1e-12)
+            #expect(abs(try dyn.cdf(x) - typ.cdf(x)) <= 1e-12)
         }
     }
 

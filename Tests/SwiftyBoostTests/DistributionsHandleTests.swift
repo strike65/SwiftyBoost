@@ -212,6 +212,68 @@ struct DistributionsHandleTests {
         #expect(abs(variance - expectedVariance) <= 1e-12)
     }
 
+    @Test("Binomial<Double> entropy matches direct summation")
+    func binomialEntropyMatchesDirectSummation() throws {
+        func combination(_ n: Int, _ k: Int) -> Double {
+            if k < 0 || k > n { return 0 }
+            if k == 0 || k == n { return 1 }
+            var result = 1.0
+            for i in 1...k {
+                result *= Double(n - (k - i)) / Double(i)
+            }
+            return result
+        }
+
+        func expectedEntropy(n: Int, p: Double) -> Double {
+            let q = 1 - p
+            var total = 0.0
+            for k in 0...n {
+                let probability = combination(n, k)
+                    * Foundation.pow(p, Double(k))
+                    * Foundation.pow(q, Double(n - k))
+                if probability > 0 {
+                    total -= probability * Foundation.log(probability)
+                }
+            }
+            return total
+        }
+
+        let cases: [(n: Int, p: Double, tolerance: Double)] = [
+            (n: 1, p: 0.5, tolerance: 1e-13),
+            (n: 10, p: 0.2, tolerance: 5e-13),
+            (n: 12, p: 0.83, tolerance: 5e-13),
+            (n: 0, p: 0.42, tolerance: 0)
+        ]
+
+        for (n, p, tolerance) in cases {
+            let bin = try Distribution.Binomial<Double>(
+                numberOfTrials: Double(n),
+                probabibilityOfSuccess: p
+            )
+            guard let entropy = bin.entropy else {
+                Issue.record("Expected entropy to be available for Binomial(\(n), \(p)).")
+                continue
+            }
+            if n == 0 || p == 0 || p == 1 {
+                #expect(abs(entropy) <= 1e-13)
+                continue
+            }
+            let expected = expectedEntropy(n: n, p: p)
+            #expect(abs(entropy - expected) <= tolerance)
+        }
+
+        // Sanity check for boundary probabilities.
+        let degenerate = try Distribution.Binomial<Double>(
+            numberOfTrials: 15,
+            probabibilityOfSuccess: 1
+        )
+        if let entropy = degenerate.entropy {
+            #expect(abs(entropy) <= 1e-13)
+        } else {
+            Issue.record("Expected entropy to be available for degenerate Binomial.")
+        }
+    }
+
     @Test("Bernoulli<Double> pmf, quantiles, and entropy")
     func bernoulliDoubleProperties() throws {
         let p: Double = 0.35

@@ -59,6 +59,22 @@ let geomMean = geom.mean
 ```
 
 ```swift
+// Empirical distribution built from samples (discrete vs continuous is detected automatically)
+let raw: [Double] = [1, 2, 2, 4]
+let empirical = try Distribution.Empirical(samples: raw)
+
+let pmf2 = try empirical.pdf(2)          // returns smoothed mass  (≈ 0.4545…)
+let cdf2 = try empirical.cdf(2)          // 0.7272…
+let entropy = empirical.entropy          // Miller–Madow corrected entropy
+
+// Bootstrap confidence interval for the entropy (percentile by default)
+let estimate = try empirical.entropyEstimate(bootstrapSamples: 32, confidenceLevel: 0.9)
+if let ci = estimate.confidenceInterval {
+    print("Entropy ≈ \(estimate.value) in [\(ci.lower), \(ci.upper)]")
+}
+```
+
+```swift
 // Fisher’s F (df1 = 10, df2 = 20)
 let f = try Distribution.FisherF<Double>(degreesOfFreedom1: 10, degreesOfFreedom2: 20)
 let f_pdf = try f.pdf(2.0)
@@ -102,6 +118,30 @@ let gumbelMode = gumbel.mode
 ## Implementation model
 
 Typed distribution wrappers (Gamma, Student’s t, Fisher’s F, Arcsine, Geometric, Binomial, Cauchy, Holtsmark, Exponential, Extreme Value/Gumbel) delegate to ``Distribution/Dynamic``, a unified runtime vtable backed by Boost.Math via the C bridge. Each instance constructs its Boost backend once through the dynamic factory and reuses it for all evaluations to ensure performance and consistent numerical policies.
+
+## KL divergence (relative entropy)
+
+Any pair of SwiftyBoost distributions can be compared using
+``Distribution/DistributionProtocol/klDivergence(relativeTo:options:)``.
+Continuous cases rely on adaptive quadrature and can be tuned through
+``Distribution/KLDivergenceOptions``; discrete lattices are handled automatically.
+
+```swift
+let p = try Distribution.Exponential<Double>(lambda: 1.2)
+let q = try Distribution.Exponential<Double>(lambda: 0.75)
+
+// Defaults choose exp-sinh / tanh-sinh rules for semi-infinite and infinite domains.
+let divergence = try p.klDivergence(relativeTo: q)
+
+// Custom quadrature settings:
+let options = Distribution.KLDivergenceOptions<Double>(
+    finiteRule: .gaussKronrod(points: 91),
+    semiInfiniteRule: .sinhSinh(),
+    infiniteRule: .tanhSinh(maxRefinements: 15),
+    densityFloor: 1e-20
+)
+let tuned = try p.klDivergence(relativeTo: q, options: options)
+```
 
 ## Error handling
 

@@ -2,7 +2,7 @@
 
 [![Documentation](https://img.shields.io/badge/docs-website-blue?logo=swift)](https://strike65.github.io/SwiftyBoost/documentation/swiftyboost) [![Pages](https://github.com/strike65/SwiftyBoost/actions/workflows/docs.yml/badge.svg)](https://github.com/strike65/SwiftyBoost/actions/workflows/docs.yml)
 
-SwiftyBoost gives Swift developers direct access to Boost.Math special functions through a thin, type-safe wrapper. The package keeps Swift ergonomics—generics, errors, and platform availability—while reusing Boost’s battle-tested numerical algorithms via a small C++ bridge target.
+SwiftyBoost gives Swift developers direct access to selected functions/methods if Boost.Math through a thin, type-safe wrapper. The package keeps Swift ergonomics—generics, errors, and platform availability—while reusing Boost’s battle-tested numerical algorithms via a small C++ bridge target.
 
 ## Disclaimer
 
@@ -11,14 +11,17 @@ Any bugs, crashes, numerical inaccuracies, or documentation mistakes in this Swi
 ## Features
 - Gamma, Beta, error, Bessel, Airy, Legendre (including Legendre–Stieltjes quadrature polynomials), Gegenbauer, Jacobi, Jacobi elliptic functions, Jacobi theta functions, Hermite, elliptic (Legendre/Carlson forms, Jacobi Zeta, Heuman’s lambda), Lambert W, Owen's T, and other high-precision helpers.
 - Probability distributions with Boost-backed implementations:
-  - Gamma, Beta, Chi-squared, Student’s t, Fisher’s F, Bernoulli, Geometric, Binomial, Cauchy, Exponential, Extreme Value (Gumbel), Holtsmark, and Arcsine (PDF/PMF, CDF/SF, quantiles, hazards, moments).
+  - Gamma, Beta, Chi-squared, Non-central Chi-squared, Student’s t, Non-central Student’s t, Fisher’s F, Non-central F, Pareto, Bernoulli, Geometric, Poisson, Binomial, Negative Binomial, Cauchy, Exponential, Extreme Value (Gumbel), Normal, Logistic, Log-normal, Laplace (double exponential), Landau, Kolmogorov–Smirnov, Map-Airy, Holtsmark, Hyperexponential, Inverse Chi-Squared, Inverse Gamma, Inverse Normal (Inverse Gaussian/Wald), and Arcsine (PDF/PMF, CDF/SF, quantiles, hazards, moments).
   - Typed wrappers delegate internally to a unified runtime vtable (`Distribution.Dynamic`) for consistent behavior across precisions.
+  - Continuous and discrete distributions expose `klDivergence(relativeTo:options:)`, powered by configurable quadrature/integration defaults via `Distribution.KLDivergenceOptions`.
   - Unified runtime factory to construct distributions by name at runtime (see "Dynamic Distribution Factory").
+- Empirical distribution constructed directly from sample data with automatic discrete/continuous detection, KNN/KDE entropy and KL estimators, and bootstrap confidence intervals.
 - High-precision mathematical constants (`π`, `e`, `√2`, Euler–Mascheroni, Catalan, ζ(3), φ, …) available through `Constants` helpers across `Float`, `Double`, and (x86_64) `Float80`.
 - `CBoostBridge` target that forwards Swift calls into the vendored Boost headers under `extern/boost`.
 - Architectural awareness with dedicated `Float`, `Double`, and (x86_64) `Float80` overloads plus generic `BinaryFloatingPoint` entry points.
 - Re-exported Swift Numerics `Complex<T>` type with SwiftyBoost convenience APIs: arithmetic, polar helpers, and Boost-backed elementary functions (`exp`, `log`, `sin`, `cos`, `tan`, `sinh`, `cosh`, `tanh`, `atan`). Double/Float/(x86_64) Float80 specializations call bridge functions (`bs_*`).
 - Fixed and adaptive quadrature helpers (`SpecialFunctions.Quadrature`) covering Gauss–Legendre, Gauss–Kronrod, tanh–sinh, sinh–sinh, and exp–sinh rules with reusable integrators, metadata, and abscissa/weight export.
+- some features are implemented by the author (e.g. KL-Divergence, entropy in some cases)
 
 ## Requirements
 - Swift 6.2 or later.
@@ -134,9 +137,72 @@ let geom_mean = geom.mean
 let holtsmark = try Distribution.Holtsmark<Double>(location: 0, scale: 1)
 let holtsmark_pdf = try holtsmark.pdf(0.5)
 
+// Relative entropy (KL divergence) between two exponentials
+let p = try Distribution.Exponential<Double>(lambda: 1.2)
+let q = try Distribution.Exponential<Double>(lambda: 0.75)
+let divergence = try p.klDivergence(relativeTo: q)
+
+// Hyperexponential mixture (three phases)
+let hyperexp = try Distribution.Hyperexponential<Double>(
+    probabilities: [0.25, 0.5, 0.25],
+    rates: [0.5, 1.2, 3.0]
+)
+let hyperexpMean = hyperexp.mean
+
+// Inverse chi-squared (ν = 8, τ = 0.5)
+let invChiSq = try Distribution.InverseChiSquared<Double>(
+    degreesOfFreedom: 8,
+    scale: 0.5
+)
+let invChiSqMean = invChiSq.mean
+
+// Inverse gamma (α = 4.5, β = 1.2)
+let invGamma = try Distribution.InverseGamma<Double>(shape: 4.5, scale: 1.2)
+let invGammaVariance = invGamma.variance
+
+// Empirical distribution from raw samples (automatic discrete vs continuous detection)
+let samples: [Double] = [1, 2, 2, 4]
+let empirical = try Distribution.Empirical(samples: samples)
+let empiricalCDF = try empirical.cdf(2)
+let empiricalEntropy = empirical.entropy
+let maybeEstimate = try empirical.entropyEstimate(bootstrapSamples: 32, confidenceLevel: 0.9)
+
+// KL divergence between two empirical samples via KNN estimator
+let other = try Distribution.Empirical(samples: [0, 1, 2, 2])
+let kl = try empirical.klDivergence(relativeTo: other, estimator: .knn(k: 3))
+
+// Inverse normal / Gaussian (μ = 1.2, λ = 3.4)
+let invNormal = try Distribution.InverseNormal<Double>(mean: 1.2, shape: 3.4)
+let invNormalQuantile = try invNormal.quantile(0.95)
+
 // Arcsine on [0, 1]
 let arcsine = try Distribution.Arcsine<Double>(minX: 0, maxX: 1)
 let arcsine_pdf = try arcsine.pdf(0.2)
+
+// Rayleigh(σ = 0.8)
+let rayleigh = try Distribution.Rayleigh<Double>(scale: 0.8)
+let rayleighEntropy = rayleigh.entropy
+
+// SaS Point5 (μ = 0, c = 1)
+let sasPoint5 = try Distribution.SASPoint5<Double>(location: 0, scale: 1)
+let sasMedian = sasPoint5.median
+
+// Skew-normal
+let skewNormal = try Distribution.SkewNormal<Double>(location: 0.5, scale: 1.2, shape: -3)
+let skewCdf = try skewNormal.cdf(0)
+
+// Triangular on [-1, 2] with mode 0.2
+let triangle = try Distribution.Triangular<Double>(lower: -1, mode: 0.2, upper: 2)
+let triangleMean = triangle.mean
+
+// Uniform on [-1, 3]
+let uniform = try Distribution.Uniform<Double>(lower: -1, upper: 3)
+let uniformPdf = try uniform.pdf(1)
+
+// Weibull(k = 1.5, λ = 0.7)
+let weibull = try Distribution.Weibull<Double>(shape: 1.5, scale: 0.7)
+let weibullQuantile = try weibull.quantile(0.9)
+
 ```
 
 ```swift
@@ -208,6 +274,46 @@ let dynGeom = try Distribution.Dynamic<Double>(
 let dynHolts = try Distribution.Dynamic<Double>(
   distributionName: "holtsmark",
   parameters: ["loc": 0.0, "scale": 1.0]
+)
+
+// Hyperexponential (aliases: hyper_exponential, hyperexp)
+let dynHyperexp = try Distribution.Dynamic<Double>(
+  distributionName: "hyperexponential",
+  parameters: [
+    "rate0": 0.5,
+    "rate1": 1.5,
+    "rate2": 3.0,
+    "prob0": 0.2,
+    "prob1": 0.5,
+    "prob2": 0.3
+  ]
+)
+
+// Inverse chi-squared (aliases: inv_chi_squared, inverse_chi2)
+let dynInvChiSq = try Distribution.Dynamic<Double>(
+  distributionName: "inverse_chi_squared",
+  parameters: [
+    "df": 8.0,
+    "scale": 0.5
+  ]
+)
+
+// Inverse gamma (aliases: inversegamma, inv_gamma)
+let dynInvGamma = try Distribution.Dynamic<Double>(
+  distributionName: "inverse_gamma",
+  parameters: [
+    "shape": 4.5,
+    "scale": 1.2
+  ]
+)
+
+// Inverse normal / Gaussian (aliases: inverse_gaussian, inverse_normal, wald)
+let dynInvNormal = try Distribution.Dynamic<Double>(
+  distributionName: "inverse_gaussian",
+  parameters: [
+    "mean": 1.2,
+    "lambda": 3.4
+  ]
 )
 
 // Arcsine (aliases: arcsine_distribution)

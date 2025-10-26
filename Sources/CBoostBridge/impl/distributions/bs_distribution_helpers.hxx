@@ -11,14 +11,15 @@
 #include <boost/math/distributions/complement.hpp>
 #include <boost/math/distributions/binomial.hpp>
 #include <boost/math/distributions/geometric.hpp>
-
+#include <boost/math/distributions/negative_binomial.hpp>
+#include <boost/math/distributions/non_central_chi_squared.hpp>
 using boost::math::students_t_distribution;
 using boost::math::beta_distribution;
 using boost::math::complement;
 using boost::math::chi_squared_distribution;
 using boost::math::binomial_distribution;
 using boost::math::geometric_distribution;
-
+using boost::math::non_central_chi_squared_distribution;
 extern "C" {
 
 // Static utility: required degrees of freedom
@@ -214,7 +215,75 @@ long double bs_geometric_find_maximum_number_of_trials_l(long double failures, l
     return bs_wrap<long double>([&]{ return geometric_distribution<long double>::find_maximum_number_of_trials(failures, success_fraction, alpha); });
 }
 
+float bs_negative_binomial_find_lower_bound_on_p_f(float trials,
+                                          float successes,
+                                          float alpha) {
+        return bs_wrap<float>([&]{ return negative_binomial_distribution<float>::find_lower_bound_on_p(trials, successes, alpha);});
+}
 
+double bs_negative_binomial_find_lower_bound_on_p_d(double trials, double successes, double alpha) {
+        return bs_wrap<double>([&]{ return negative_binomial_distribution<double>::find_lower_bound_on_p(trials, successes, alpha); });
+}
+
+long double bs_negative_binomial_find_lower_bound_on_p_l(long double trials, long double successes, long double alpha) {
+        return bs_wrap<long double>([&]{ return negative_binomial_distribution<long double>::find_lower_bound_on_p(trials, successes, alpha); });
+}
+
+float bs_negative_binomial_find_upper_bound_on_p_f(float trials,
+                                          float successes,
+                                          float alpha) {
+        return bs_wrap<float>([&]{ return negative_binomial_distribution<float>::find_upper_bound_on_p(trials, successes, alpha);});
+}
+
+double bs_negative_binomial_find_upper_bound_on_p_d(double trials, double successes, double alpha) {
+        return bs_wrap<double>([&]{ return negative_binomial_distribution<double>::find_upper_bound_on_p(trials, successes, alpha); });
+}
+
+long double bs_negative_binomial_find_upper_bound_on_p_l(long double trials, long double successes, long double alpha) {
+        return bs_wrap<long double>([&]{ return negative_binomial_distribution<long double>::find_upper_bound_on_p(trials, successes, alpha); });
+}
+
+float bs_negative_binomial_find_minimum_number_of_trials_f(float failures, float success_fraction, float alpha) {
+    return bs_wrap<float>([&]{ return negative_binomial_distribution<float>::find_minimum_number_of_trials(failures, success_fraction, alpha); });
+}
+
+double bs_negative_binomial_find_minimum_number_of_trials_d(double failures, double success_fraction, double alpha){
+    return bs_wrap<double>([&]{ return negative_binomial_distribution<double>::find_minimum_number_of_trials(failures, success_fraction, alpha); });
+}
+long double bs_negative_binomial_find_minimum_number_of_trials_l(long double failures, long double success_fraction, long double alpha){
+    return bs_wrap<long double>([&]{ return negative_binomial_distribution<long double>::find_minimum_number_of_trials(failures, success_fraction, alpha); });
+}
+
+float bs_negative_binomial_find_maximum_number_of_trials_f(float failures, float success_fraction, float alpha) {
+    return bs_wrap<float>([&]{ return negative_binomial_distribution<float>::find_maximum_number_of_trials(failures, success_fraction, alpha); });
+}
+
+double bs_negative_binomial_find_maximum_number_of_trials_d(double failures, double success_fraction, double alpha){
+    return bs_wrap<double>([&]{ return negative_binomial_distribution<double>::find_maximum_number_of_trials(failures, success_fraction, alpha); });
+}
+long double bs_negative_binomial_find_maximum_number_of_trials_l(long double failures, long double success_fraction, long double alpha){
+    return bs_wrap<long double>([&]{ return negative_binomial_distribution<long double>::find_maximum_number_of_trials(failures, success_fraction, alpha); });
+}
+
+float bs_non_central_chisquare_find_degreesOfFreedom_f(float lambda, float x, float p) {
+    return bs_wrap<float>([&]{ return non_central_chi_squared_distribution<float>::find_degrees_of_freedom(lambda, x, p); });
+}
+double bs_non_central_chisquare_find_degreesOfFreedom_d(double lambda, double x, double p) {
+    return bs_wrap<double>([&]{ return non_central_chi_squared_distribution<double>::find_degrees_of_freedom(lambda, x, p); });
+}
+float bs_non_central_chisquare_find_degreesOfFreedom_l(long double lambda, long double x, long double p) {
+    return bs_wrap<long double>([&]{ return non_central_chi_squared_distribution<long double>::find_degrees_of_freedom(lambda, x, p); });
+}
+
+float bs_non_central_chisquare_find_non_centrality_f(float v, float x, float p) {
+    return bs_wrap<float>([&]{ return non_central_chi_squared_distribution<float>::find_non_centrality(v, x, p); });
+}
+double bs_non_central_chisquare_find_non_centrality_d(double v, double x, double p) {
+    return bs_wrap<double>([&]{ return non_central_chi_squared_distribution<double>::find_non_centrality(v, x, p); });
+}
+long double bs_non_central_chisquare_find_non_centrality_l(long double v, long double x, long double p) {
+    return bs_wrap<long double>([&]{ return non_central_chi_squared_distribution<long double>::find_non_centrality(v, x, p); });
+}
 
 
 } // extern "C"

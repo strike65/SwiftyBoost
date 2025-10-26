@@ -73,9 +73,7 @@ public enum Quadrature {
     /// Specifies how to interpret integration bounds.
     ///
     /// - `.automatic`: Use the rule’s natural interval:
-    ///   - Gauss–Legendre, Gauss–Jacobi, Gauss–Kronrod: [-1, 1]
-    ///   - Gauss–Hermite: (-∞, ∞)
-    ///   - Gauss–Laguerre: [0, ∞)
+    ///   - Gauss–Legendre, Gauss–Kronrod: [-1, 1]
     ///   - Tanh–Sinh, Sinh–Sinh: (-∞, ∞)
     ///   - Exp–Sinh: [0, ∞)
     /// - `.finite(lower:upper:)`: Integrate over a finite, ordered interval [lower, upper].

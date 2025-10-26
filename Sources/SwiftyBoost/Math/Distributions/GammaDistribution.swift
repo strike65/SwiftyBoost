@@ -267,6 +267,34 @@ extension Distribution {
         public var latticeOrigin: T? { nil }
 
         /// Entropy H[X] (Shannon), where defined.
-        public var entropy: T? { dyn.entropy }
+        public var entropy: T? {
+            do {
+                let lg = try SpecialFunctions.logGamma(self.shape)
+                let dg = try SpecialFunctions.digamma(self.shape)
+                return self.shape + T.log(self.scale) + lg + (1 - self.shape) * dg
+            }
+            catch _ {
+                return dyn.entropy
+            }
+        }
+
+        /// Indicates whether this distribution is discrete (`true`) or continuous (`false`).
+        ///
+        /// Gamma distributions are continuous on `[0, ∞)`, so this always returns `false`.
+        public var isDiscrete: Bool { dyn.isDiscrete }
+
+        /// Computes the Kullback–Leibler divergence `D_KL(self || other)` when defined.
+        ///
+        /// - Parameters:
+        ///   - other: The reference gamma distribution *Q*.
+        ///   - options: Quadrature configuration; defaults to ``Distribution/KLDivergenceOptions/automatic()``.
+        /// - Returns: The divergence in nats, or `nil` if it cannot be evaluated.
+        /// - Throws: Rethrows any backend or quadrature errors.
+        public func klDivergence(
+            relativeTo other: Self,
+            options: Distribution.KLDivergenceOptions<T> = .automatic()
+        ) throws -> T? {
+            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        }
     }
 }

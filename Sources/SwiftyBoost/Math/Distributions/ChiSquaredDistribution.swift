@@ -205,18 +205,7 @@ extension Distribution {
             do {
                 let lgA: T = try SpecialFunctions.logGamma(self.degreesOfFreedom / 2)
                 let dgA: T = try SpecialFunctions.digamma(self.degreesOfFreedom / 2)
-                let term1: T
-                if T.self == Double.self {
-                    term1 = self.degreesOfFreedom / 2 + T(log(Double(2)))
-                } else if T.self == Float.self {
-                    term1 = self.degreesOfFreedom / 2 + T(log(Float(2)))
-                } else {
-                    #if arch(x86_64) || arch(i386)
-                    term1 = self.degreesOfFreedom / 2 + T(log(Float80(2)))
-                    #else
-                    term1 = self.degreesOfFreedom / 2 + T(log(Double(2)))
-                    #endif
-                }
+                let term1 = self.degreesOfFreedom / 2 + Constants.lnTwo()
                 let term2: T = lgA + (1 - (self.degreesOfFreedom / 2)) * dgA
                 return term1 + term2
             } catch {
@@ -309,5 +298,24 @@ extension Distribution {
             }
             return Int(res) + 1
         }
+        /// Indicates whether this distribution is discrete (`true`) or continuous (`false`).
+        ///
+        /// Chi-squared distributions are continuous on `[0, ∞)`, so this always returns `false`.
+        public var isDiscrete: Bool { dyn.isDiscrete }
+
+        /// Computes the Kullback–Leibler divergence `D_KL(self || other)` when defined.
+        ///
+        /// - Parameters:
+        ///   - other: The reference chi-squared distribution *Q*.
+        ///   - options: Quadrature configuration; defaults to ``Distribution/KLDivergenceOptions/automatic()``.
+        /// - Returns: The divergence in nats, or `nil` if it cannot be evaluated.
+        /// - Throws: Rethrows any backend or quadrature errors.
+        public func klDivergence(
+            relativeTo other: Self,
+            options: Distribution.KLDivergenceOptions<T> = .automatic()
+        ) throws -> T? {
+            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        }
+
     }
 }

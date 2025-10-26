@@ -114,6 +114,39 @@ public enum DistributionError<T: Real & BinaryFloatingPoint & Sendable>: Error &
 /// - Returns: `x` converted to `Double`.
 @usableFromInline internal func D<T: Real & BinaryFloatingPoint & Sendable>(_ x: T) -> Double { Double(x) }
 
+@usableFromInline internal func poisson_window<T: Real & BinaryFloatingPoint & Sendable>(mean mu: T, tail eps: T) throws -> (Int, Int) {
+    let one: T = 1
+    var j0 = Int(mu.rounded(.down))
+    if j0 < 0 { j0 = 0 }
+    let logmu = T.log(mu)
+    
+    @inline(__always)
+    func logP(_ j: Int) throws -> T {
+        let lg = try SpecialFunctions.logGamma(T(j) + one)
+        return -mu + T(j) * logmu - lg
+    }
+    
+    var mass: T = 0
+    var Jm = j0, Jp = j0
+    var steps = 0
+    
+    let lp0 = try logP(j0)
+    mass = T.exp(lp0)
+    
+    while (one - mass) > eps {
+        if Jm > 0 {
+            mass += T.exp(try logP(Jm - 1));
+            Jm -= 1
+        }
+        mass += T.exp(try logP(Jp + 1));
+        Jp += 1
+        steps += 1
+        if steps > 100_000 || (Jp - Jm) > 10_000 { break }
+    }
+    return (Jm, Jp)
+}
+
+
 // MARK: - Numerically stable helpers
 extension SpecialFunctions {
     

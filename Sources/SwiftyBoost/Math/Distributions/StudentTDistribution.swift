@@ -57,16 +57,25 @@ extension Distribution {
         }
         
         // MARK: DistributionProtocol — Support
+        /// Lower bound of the support (`−∞` for Student’s t).
         public var supportLowerBound: T { dyn.supportLowerBound }
+        /// Upper bound of the support (`+∞` for Student’s t).
         public var supportUpperBound: T { dyn.supportUpperBound }
+        /// Convenience tuple containing both support bounds.
         public var range: (lower: T, upper: T) { dyn.range }
         
         // MARK: PDF/CDF/SF/Quantile
+        /// Probability density function evaluated at `x`.
         public func pdf(_ x: T) throws -> T { try dyn.pdf(x) }
+        /// Natural logarithm of the PDF evaluated at `x`.
         public func logPdf(_ x: T) throws -> T { try dyn.logPdf(x) }
+        /// Cumulative distribution function `F(x) = P(X ≤ x)`.
         public func cdf(_ x: T) throws -> T { try dyn.cdf(x) }
+        /// Survival function `S(x) = P(X > x)`.
         public func sf(_ x: T) throws -> T { try dyn.sf(x) }
+        /// Lower-tail quantile (inverse CDF).
         public func quantile(_ p: T) throws -> T { try dyn.quantile(p) }
+        /// Upper-tail quantile (inverse survival function).
         public func quantileComplement(_ q: T) throws -> T {
             try dyn.quantileComplement(q)
         }
@@ -81,13 +90,42 @@ extension Distribution {
         public var kurtosisExcess: T? { dyn.kurtosisExcess }
         
         // MARK: Hazards
+        /// Instantaneous hazard function `h(x) = f(x) / S(x)`.
         public func hazard(_ x: T) throws -> T { try dyn.hazard(x) }
+        /// Cumulative hazard function `H(x) = −log S(x)`.
         public func chf(_ x: T) throws -> T { try dyn.chf(x) }
         
         // Lattice/discrete-only properties (continuous ⇒ nil)
+
+        /// Lattice spacing for discrete distributions (not applicable to Student’s t).
         public var latticeStep: T? { nil }
+
+        /// Lattice origin for discrete distributions (not applicable to Student’s t).
         public var latticeOrigin: T? { nil }
+
+        /// Differential entropy `h[X]`, when available from the backend.
         public var entropy: T? { dyn.entropy }
+
+        /// Indicates whether this distribution is discrete (`true`) or continuous (`false`).
+        ///
+        /// Student’s t distributions are continuous, so this always returns `false`.
+        public var isDiscrete: Bool { dyn.isDiscrete }
+
+        /// Computes the Kullback–Leibler divergence `D_KL(self || other)` when defined.
+        ///
+        /// - Parameters:
+        ///   - other: The reference Student’s t distribution *Q*.
+        ///   - options: Quadrature configuration; defaults to ``Distribution/KLDivergenceOptions/automatic()``.
+        /// - Returns: The divergence in nats, or `nil` if it cannot be evaluated.
+        /// - Throws: Rethrows any backend or quadrature errors.
+        public func klDivergence(
+            relativeTo other: Self,
+            options: Distribution.KLDivergenceOptions<T> = .automatic()
+        ) throws -> T? {
+            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        }
+
+
         
         // MARK: Planning helper
         /// Find degrees of freedom ν given effect size, α, β, and σ.

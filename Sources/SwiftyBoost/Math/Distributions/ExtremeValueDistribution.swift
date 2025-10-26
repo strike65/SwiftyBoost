@@ -212,5 +212,24 @@ extension Distribution {
             let em: T = Constants.pi()
             return T.log(self.scale) + em + 1
         }
+        /// Indicates whether this distribution is discrete (`true`) or continuous (`false`).
+        ///
+        /// The Gumbel (extreme value) distribution is continuous, so this always returns `false`.
+        public var isDiscrete: Bool { dyn.isDiscrete }
+
+        /// Computes the Kullback–Leibler divergence `D_KL(self || other)` when defined.
+        ///
+        /// - Parameters:
+        ///   - other: The reference extreme-value distribution *Q*.
+        ///   - options: Quadrature configuration; defaults to ``Distribution/KLDivergenceOptions/automatic()``.
+        /// - Returns: The divergence in nats, or `nil` if it cannot be evaluated.
+        /// - Throws: Rethrows any backend or quadrature errors.
+        public func klDivergence(
+            relativeTo other: Self,
+            options: Distribution.KLDivergenceOptions<T> = .automatic()
+        ) throws -> T? {
+            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        }
+
     }
 }

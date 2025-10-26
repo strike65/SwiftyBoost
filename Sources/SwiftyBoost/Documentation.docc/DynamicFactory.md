@@ -109,8 +109,24 @@ let peak = gumbel.mode
   - Params: `p|prob|probability|success|theta` (required)
 - Binomial: `binomial`, `binomial_distribution`
   - Params: `n|trials` (required, interpreted as the trial count), `p|prob|probability|success` (required)
+- Negative binomial: `negative_binomial`, `negativebinomial`, `neg_binomial`, `negative_binomial_distribution`, `nbinom`
+  - Params: `r|successes|target|count` (required, > 0), `p|prob|probability|success` (required, 0 < p ≤ 1)
 - Cauchy: `cauchy`, `cauchy_distribution`
   - Params: `location|loc|mu|median|x0` (optional, defaults to 0), `scale|gamma|sigma|b` (required, > 0)
+- Normal: `normal`, `normal_distribution`, `gauss`, `gaussian`, `gaussian_distribution`, `gauss_distribution`
+  - Params: `location|loc|mu|mean` (optional, defaults to 0), `sd|standard_deviation|sigma` (optional, defaults to 1, must be > 0)
+- Logistic: `logistic`, `logistic_distribution`
+  - Params: `location|loc|mu|median` (optional, defaults to 0), `scale|s|sigma|diversity` (optional, defaults to 1, must be > 0)
+- Log-normal: `lognormal`, `log_normal`, `lognormal_distribution`
+  - Params: `location|loc|mu|meanlog` (optional, defaults to 0), `scale|sigma|sd|standard_deviation` (optional, defaults to 1, must be > 0)
+- Laplace: `laplace`, `laplace_distribution`, `double_exponential`, `doubleexponential`
+  - Params: `location|loc|mu|mean` (optional, defaults to 0), `scale|diversity|b` (required, > 0)
+- Landau: `landau`, `landau_distribution`
+  - Params: `location|loc|mu` (optional, defaults to 0), `scale|c|sigma` (required, > 0)
+- Kolmogorov–Smirnov: `kolmogorov_smirnov`, `kolmogorov-smirnov`, `kolmogorovsmirnov`, `kolmogorov_smirnov_distribution`, `ks`, `ks_distribution`
+  - Params: `n|sample_count|samplecount|sample_size|samples|observations` (required, > 0)
+- Map-Airy: `mapairy`, `map_airy`, `mapairy_distribution`
+  - Params: `location|loc|mu` (optional, defaults to 0), `scale|c|sigma` (required, > 0)
 - Exponential: `exponential`, `exponential_distribution`, `exp`
   - Params: `lambda|rate` (required, > 0)
 - Extreme value (Gumbel): `extremevalue`, `extreme_value`, `gumbel`, `extreme_value_distribution`
@@ -119,12 +135,44 @@ let peak = gumbel.mode
   - Params: `p|prob|probability|success|theta` (required)
 - Holtsmark: `holtsmark`, `holtsmark_distribution`
   - Params: `location|loc|mu|median|x0` (optional, defaults to 0), `scale|gamma|sigma|b` (required, > 0)
+- Hyperexponential: `hyperexponential`, `hyper_exponential`, `hyperexp`, `hyperexponential_distribution`
+  - Params: Indexed rates `rateN|lambdaN` (at least one strictly positive rate; `N` = 0, 1, …). Optional indexed weights `probN|pN|weightN` are accepted and normalised to a probability vector when provided; omit them for a uniform mixture.
+- Non-central chi-squared: `non_central_chi_squared`, `noncentral_chi_squared`, `noncentralchisquared`, `non_central_chi2`, `noncentral_chi2`, `nc_chi_squared`, `ncchisquared`
+  - Params: `df|nu|degreesOfFreedom` (required, > 0), `lambda|noncentrality|delta|nc` (required, ≥ 0)
+- Non-central F: `non_central_f`, `noncentral_f`, `noncentralf`, `non_central_f_ratio`, `noncentral_f_ratio`, `nc_f`, `ncf`
+  - Params: `df1|d1|m|degreesOfFreedom1` (required, > 0), `df2|d2|n|degreesOfFreedom2` (required, > 0), `lambda|noncentrality|delta|nc` (required, ≥ 0)
+- Non-central StudentT: `non_central_t`, `noncentral_t`, `noncentralt`, `non_central_student_t`, `noncentral_student_t`, `noncentralstudentt`, `nc_t`
+  - Params: `df|nu|degreesOfFreedom` (required, > 0), `lambda|noncentrality|delta|nc` (required, finite real)
+- Pareto: `pareto`, `pareto_distribution`
+  - Params: `scale|xm|minimum|lower|x0` (required, > 0), `shape|alpha` (required, > 0)
+- Poisson: `poisson`, `poisson_distribution`
+  - Params: `lambda|mean|mu` (required, ≥ 0)
+- Rayleigh: `rayleigh`, `rayleigh_distribution`
+  - Params: `scale|sigma|beta` (required, > 0)
+- SaS Point5 (alpha = 1/2): `saspoint5`, `sas_point5`, `sas_point_5`, `saspointfive`, `sas0.5`, `sas_alpha_half`, `stable_point5`, `stable_alpha_half`
+  - Params: `location|loc|mu` (optional, defaults to 0), `scale|sigma|c` (optional, defaults to 1, must be > 0)
+- Skew normal: `skew_normal`, `skewnormal`, `skew_normal_distribution`
+  - Params: `location|loc|mu` (optional, defaults to 0), `scale|sigma|omega` (optional, defaults to 1, must be > 0), `shape|alpha|skew` (optional, defaults to 0)
+- Triangular: `triangular`, `triangular_distribution`, `triangle`
+  - Params: `lower|min|minimum|a` (required), `mode|peak|c` (required), `upper|max|maximum|b` (required, must satisfy `upper > lower`)
+- Uniform: `uniform`, `uniform_distribution`, `uniform_real`, `rectangular`, `rectangular_distribution`
+  - Params: `lower|min|minimum|a` (optional, defaults to 0), `upper|max|maximum|b` (optional, defaults to 1, must satisfy `upper > lower`)
+- Inverse chi-squared: `inverse_chi_squared`, `inversechisquared`, `inv_chi_squared`, `invchisquared`, `inverse_chi2`, `inv_chi2`
+  - Params: `df|nu|degreesOfFreedom|v` (required, > 0), optional `scale|sigma2|xi` (defaults to `1 / df`).
+- Inverse gamma: `inverse_gamma`, `inversegamma`, `inv_gamma`, `invgamma`
+  - Params: `shape|alpha|k` (required, > 0), optional `scale|theta|beta` (defaults to `1`).
+- Inverse normal / Gaussian (Wald): `inverse_gaussian`, `inversegaussian`, `inverse_normal`, `inversenormal`, `wald`
+  - Params: `mean|mu|location` (required, > 0), optional `scale|lambda|shape` (defaults to `1`).
 - Arcsine: `arcsine`, `arcsine_distribution`
   - Params: `minX|min|a|lower` (required), `maxX|max|b|upper` (required)
+- Weibull: `weibull`, `weibull_distribution`
+  - Params: `shape|k|alpha` (required, > 0), `scale|lambda|beta` (optional, defaults to 1, must be > 0)
 
 ### Additional Notes
 
 - ``Distribution/Geometric`` and ``Distribution/Holtsmark`` both reuse the factory under the hood; the dynamic entries remain valuable for configuration-driven scenarios that need to swap distributions at runtime.
+- ``Distribution/Empirical`` is implemented entirely in Swift and is not registered with the factory—construct it via ``Distribution/Empirical/init(samples:)`` instead.
+- ``Distribution/Dynamic`` exposes ``Distribution/DistributionProtocol/klDivergence(relativeTo:options:)``. Continuous comparisons rely on numerical quadrature controlled via ``Distribution/KLDivergenceOptions``; discrete distributions fall back to lattice summation with configurable tail cut-offs.
 
 ## Nullability and Initialization
 

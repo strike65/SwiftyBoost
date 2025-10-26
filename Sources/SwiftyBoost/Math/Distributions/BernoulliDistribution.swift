@@ -84,5 +84,41 @@ extension Distribution {
                 return nil
             }
         }
+        
+        /// Indicates whether this distribution is discrete (`true`) or continuous (`false`).
+        ///
+        /// Bernoulli distributions are discrete with support `{0, 1}`, so this always returns `true`.
+        public var isDiscrete: Bool { dyn.isDiscrete }
+
+        /// Computes the Kullback–Leibler divergence `D_KL(self || other)` when defined.
+        ///
+        /// - Parameters:
+        ///   - other: The reference Bernoulli distribution *Q*.
+        ///   - options: Summation/integration configuration; defaults to ``Distribution/KLDivergenceOptions/automatic()``.
+        /// - Returns: The divergence in nats, or `nil` if it cannot be evaluated.
+        /// - Throws: Rethrows any backend or quadrature errors.
+        public func klDivergence(
+            relativeTo other: Self,
+            options: Distribution.KLDivergenceOptions<T> = .automatic()
+        ) throws -> T? {
+            let p = self.success_fraction
+            let q = other.success_fraction
+            precondition(p >= 0 && p <= 1 && q >= 0 && q <= 1, "p,q ∈ [0,1]")
+            if p == 0 {
+                if q == 1 { return .infinity }          // -log(0) = ∞
+                return -T.log(onePlus: -q)
+            }
+            if p == 1 {
+                if q == 0 { return .infinity }          // -log(0) = ∞
+                return -T.log(q)
+            }
+            if q == 0 { return .infinity }
+            if q == 1 { return .infinity }
+            var kl: T = 0.0
+            kl += p * (T.log(p) - T.log(q))
+            kl += (1 - p) * (T.log(onePlus: -p) - T.log(onePlus: -q))
+            return kl
+        }
+
     }
 }

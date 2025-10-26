@@ -70,6 +70,30 @@ float bs_geometric_find_maximum_number_of_trials_f(float failures, float success
 double bs_geometric_find_maximum_number_of_trials_d(double failures, double success_fraction, double alpha);
 long double bs_geometric_find_maximum_number_of_trials_l(long double failures, long double success_fraction, long double alpha);
 
+float bs_negative_binomial_find_lower_bound_on_p_f(float trials, float successes, float alpha) ;
+double bs_negative_binomial_find_lower_bound_on_p_d(double trials, double successes, double alpha);
+long double bs_negative_binomial_find_lower_bound_on_p_l(long double trials, long double successes, long double alpha);
+
+float bs_negative_binomial_find_upper_bound_on_p_f(float trials, float successes, float alpha);
+double bs_negative_binomial_find_upper_bound_on_p_d(double trials, double successes, double alpha);
+long double bs_negative_binomial_find_upper_bound_on_p_l(long double trials, long double successes, long double alpha);
+
+float bs_negative_binomial_find_minimum_number_of_trials_f(float events, float success_fraction, float alpha);
+double bs_negative_binomial_find_minimum_number_of_trials_d(double events, double success_fraction, double alpha);
+long double bs_negative_binomial_find_minimum_number_of_trials_l(long double events, long double success_fraction, long double alpha);
+
+float bs_negative_binomial_find_maximum_number_of_trials_f(float events, float success_fraction, float alpha);
+double bs_negative_binomial_find_maximum_number_of_trials_d(double events, double success_fraction, double alpha);
+long double bs_negative_binomial_find_maximum_number_of_trials_l(long double events, long double success_fraction, long double alpha);
+
+float bs_non_central_chisquare_find_degreesOfFreedom_f(float lambda, float x, float p);
+double bs_non_central_chisquare_find_degreesOfFreedom_d(double lambda, double x, double p);
+float bs_non_central_chisquare_find_degreesOfFreedom_l(long double lambda, long double x, long double p);
+
+float bs_non_central_chisquare_find_non_centrality_f(float v, float x, float p);
+double bs_non_central_chisquare_find_non_centrality_d(double v, double x, double p);
+long double bs_non_central_chisquare_find_non_centrality_l(long double v, long double x, long double p);
+
 
 #ifdef __cplusplus
 }
