@@ -40,7 +40,7 @@ let package = Package(
     name: "YourApp",
     platforms: [ .iOS(.v16), .macOS(.v13) ],
     dependencies: [
-        .package(url: "https://github.com/strike65/SwiftyBoost.git", from: "0.6.0")
+        .package(url: "https://github.com/strike65/SwiftyBoost.git", from: "1.0.0")
     ],
     targets: [
         .target(

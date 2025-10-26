@@ -3,7 +3,11 @@
 All notable changes to this project are tracked here, following the principles of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adhering to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
+- _No changes yet._
+
+## [1.0.0] - 2025-10-26
 - Features:
+  - Added ``Distribution.Empirical`` — a pure Swift empirical distribution with automatic discrete/continuous detection, KNN/KDE estimators, Miller–Madow corrections, bootstrap confidence intervals, and multimodality heuristics.
   - Added Boost-backed Logistic, Log-normal, Map-Airy, and Negative Binomial distributions to the unified factory with typed wrappers ``Distribution.Logistic``, ``Distribution.LogNormal``, ``Distribution.MapAiry``, and ``Distribution.NegativeBinomial`` (parameter validation, runtime aliases, heavy-tail handling).
   - Added Boost-backed Kolmogorov–Smirnov, Laplace (double exponential), and Landau distributions to the unified factory and introduced the typed wrappers ``Distribution.KolmogorovSmirnov``, ``Distribution.Laplace``, and ``Distribution.Landau`` (including parameter validation, moments, and runtime aliases).
   - Added configurable ``Distribution.KLDivergenceOptions`` plus a general-purpose ``Distribution.Dynamic.klDivergence(relativeTo:options:)`` implementation that covers continuous (finite/semi-infinite/infinite) and discrete (finite/unbounded lattice) distributions; typed wrappers now expose ``klDivergence(relativeTo:options:)`` and forward to the dynamic backend whenever a closed form is unavailable.
@@ -24,6 +28,7 @@ All notable changes to this project are tracked here, following the principles o
   - Added Boost-backed Pareto and Poisson distributions to the factory with typed wrappers ``Distribution.Pareto`` and ``Distribution.Poisson`` (analytic moments in Swift, discrete lattice metadata for Poisson).
   - Added Boost-backed Rayleigh, SaS Point5 (alpha = 1/2), Skew-normal, Triangular, Uniform, and Weibull distributions to the unified factory with typed wrappers ``Distribution.Rayleigh``, ``Distribution.SASPoint5``, ``Distribution.SkewNormal``, ``Distribution.Triangular``, ``Distribution.Uniform``, and ``Distribution.Weibull`` (parameter validation, alias coverage, moment/entropy plumbing, and KL divergence interop).
 - Documentation:
+  - Documented the empirical distribution (DocC article, distribution index entries, README examples, and factory guidance noting it is a pure Swift implementation).
   - Documented the Logistic, Log-normal, Map-Airy, and Negative Binomial distributions (DocC pages, distribution index, README feature list) and updated factory references / design notes.
   - Documented the Rayleigh, SaS Point5, Skew-normal, Triangular, Uniform, and Weibull distributions (DocC coverage, README snippets, factory alias tables, and `DIST-Factory-README.md` updates).
   - Documented the Kolmogorov–Smirnov, Laplace, and Landau distributions (DocC articles, distribution index, README feature list) and refreshed factory alias tables / `DIST-Factory-README.md` coverage for the new names.
@@ -45,6 +50,7 @@ All notable changes to this project are tracked here, following the principles o
   - Fixed the C bridge mappings for θ₂/θ₂τ to call the appropriate Boost `jacobi_theta2{,tau}` kernels.
   - Fixed ``Distribution.Bernoulli.klDivergence(relativeTo:options:)`` and ``Distribution.Exponential.klDivergence(relativeTo:options:)`` to return nats in line with the dynamic backend and corrected the exponential analytic form.
 - Tests:
+  - Added CSV-backed empirical fixtures (continuous/discrete, n=200) with Swift Testing coverage for entropy, KL divergence estimators, lattice metadata, and multimodality heuristics.
   - Added regression and parity suites for ``Distribution.Logistic``, ``Distribution.LogNormal``, ``Distribution.MapAiry``, and ``Distribution.NegativeBinomial`` (typed vs dynamic behaviour, analytic properties, entropy scaling).
   - Added analytic and dynamic parity tests for ``Distribution.NonCentralChiSquared`` plus regression coverage for the central limit (λ → 0) case.
   - Added parity and regression suites for ``Distribution.NonCentralF`` and ``Distribution.NonCentralStudentT`` (analytic moments, dynamic equality, λ → 0 reductions).
@@ -152,6 +158,7 @@ All notable changes to this project are tracked here, following the principles o
 - Vendored Boost.Math headers under `extern/boost`.
 - Published core Gamma, Beta, error, Legendre, and Bessel function wrappers with Swift-friendly APIs and error handling.
 
+[1.0.0]: https://github.com/strike65/SwiftyBoost/releases/tag/1.0.0
 [0.6.0]: https://github.com/strike65/SwiftyBoost/releases/tag/0.6.0
 [0.5.0]: https://github.com/strike65/SwiftyBoost/releases/tag/0.5.0
 [0.1.0]: https://github.com/strike65/SwiftyBoost/releases/tag/0.1.0
