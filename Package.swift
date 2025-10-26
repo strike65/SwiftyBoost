@@ -26,12 +26,9 @@ let package = Package(
             name: "CBoostBridge",
             publicHeadersPath: "include",
             cSettings: [
-                // Für C/ObjC-Header-Suche (falls nötig)
                 .headerSearchPath("../../extern/boost/include")
             ],
             cxxSettings: [
-                // Für C++-Header-Suche (Boost)
-                .unsafeFlags(["-xc++", "-std=c++20"]),
                 .headerSearchPath("../../extern/boost/include")
             ],
         ),
