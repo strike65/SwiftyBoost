@@ -66,7 +66,13 @@ let package = Package(
         ),
         .testTarget(
             name: "SwiftyBoostTests",
-            dependencies: ["SwiftyBoost", "CBoostBridge"]
+            dependencies: ["SwiftyBoost", "CBoostBridge"],
+            exclude: [
+                "TestHelpers/analyze_sample.m"
+            ],
+            resources: [
+                .process("TestData")
+            ]
         ),
     ],
     cxxLanguageStandard: .cxx20

@@ -321,13 +321,51 @@ public:
         if (buffer_size < static_cast<int>(Points)) {
             return false;
         }
-        const auto& abs = GaussType::abscissa();
-        const auto& wgt = GaussType::weights();
-        for (unsigned i = 0; i < Points; ++i) {
-            abscissa[i] = abs[i];
-            weights[i] = wgt[i];
+        // Boost exposes only ceil(N/2) entries: zero (if N odd) and positive nodes.
+        // Expand to the full N nodes by mirroring symmetry.
+        const auto& abs_half = GaussType::abscissa();
+        const auto& wgt_half = GaussType::weights();
+        const unsigned halfCount = static_cast<unsigned>(abs_half.size());
+
+        if constexpr (Points % 2 == 1) {
+            // Odd N: first entry is the zero node.
+            if (halfCount < 1) {
+                return false;
+            }
+            unsigned out = 0;
+            // Zero node
+            abscissa[out] = Real(0);
+            weights[out] = wgt_half[0];
+            ++out;
+            // Mirror remaining positive nodes.
+            for (unsigned i = 1; i < halfCount; ++i) {
+                const Real x = abs_half[i];
+                const Real w = wgt_half[i];
+                abscissa[out] = -x;
+                weights[out] = w;
+                ++out;
+                abscissa[out] = x;
+                weights[out] = w;
+                ++out;
+            }
+            // out should equal Points: 1 + 2*(halfCount - 1) == Points
+            return true;
+        } else {
+            // Even N: all entries are positive nodes; mirror each.
+            unsigned out = 0;
+            for (unsigned i = 0; i < halfCount; ++i) {
+                const Real x = abs_half[i];
+                const Real w = wgt_half[i];
+                abscissa[out] = -x;
+                weights[out] = w;
+                ++out;
+                abscissa[out] = x;
+                weights[out] = w;
+                ++out;
+            }
+            // out should equal Points: 2*halfCount == Points
+            return true;
         }
-        return true;
     }
 };
 
