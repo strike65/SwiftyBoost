@@ -1,7 +1,9 @@
 # Changelog
 
 All notable changes to this project are tracked here, following the principles of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adhering to [Semantic Versioning](https://semver.org/).
-/Users/volker/Documents/Develop_current/personal/SwiftyBoost/SwiftyBoost/extern
+
+## Unreleased
+-_No changes yet._
 ## 1.0.2
 - romved unnecessary folder
 ## 1.0.1
