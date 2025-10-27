@@ -1,10 +1,11 @@
 # Changelog
 
 All notable changes to this project are tracked here, following the principles of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adhering to [Semantic Versioning](https://semver.org/).
-
-## Unreleased
-- _No changes yet._
-
+/Users/volker/Documents/Develop_current/personal/SwiftyBoost/SwiftyBoost/extern
+## 1.0.2
+- romved unnecessary folder
+## 1.0.1
+- fix: typo in README.md
 ## [1.0.0] - 2025-10-26
 - Features:
   - Added ``Distribution.Empirical`` — a pure Swift empirical distribution with automatic discrete/continuous detection, KNN/KDE estimators, Miller–Madow corrections, bootstrap confidence intervals, and multimodality heuristics.
