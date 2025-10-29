@@ -13,7 +13,6 @@ Use this documentation catalog with DocC to explore how to configure Boost-backe
 ### Essentials
 
 - <doc:UsingSpecialFunctions>
-- <doc:ResultTypePromotions>
 
 ### Constants
 

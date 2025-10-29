@@ -178,73 +178,34 @@ public extension SpecialFunctions {
         return T(bs_cyl_bessel_k_d(dv, dx))
     }
 
-    // MARK: - Mixed-precision promotions for cylindrical Bessel (Float ↔ Double)
-
-    /// J_v(x) with mixed `Float`/`Double` arguments; returns `Double`.
-    @inlinable static func besselJ(v: Float, x: Double) throws -> Double { try besselJ(v: Double(v), x: x) }
-    /// J_v(x) with mixed `Double`/`Float` arguments; returns `Double`.
-    @inlinable static func besselJ(v: Double, x: Float) throws -> Double { try besselJ(v: v, x: Double(x)) }
-
-    /// Y_v(x) with mixed `Float`/`Double` arguments; returns `Double`.
-    @inlinable static func besselY(v: Float, x: Double) throws -> Double { try besselY(v: Double(v), x: x) }
-    /// Y_v(x) with mixed `Double`/`Float` arguments; returns `Double`.
-    @inlinable static func besselY(v: Double, x: Float) throws -> Double { try besselY(v: v, x: Double(x)) }
-
-    /// I_v(x) with mixed `Float`/`Double` arguments; returns `Double`.
-    @inlinable static func modifiedBesselI(v: Float, x: Double) throws -> Double { try modifiedBesselI(v: Double(v), x: x) }
-    /// I_v(x) with mixed `Double`/`Float` arguments; returns `Double`.
-    @inlinable static func modifiedBesselI(v: Double, x: Float) throws -> Double { try modifiedBesselI(v: v, x: Double(x)) }
-
-    /// K_v(x) with mixed `Float`/`Double` arguments; returns `Double`.
-    @inlinable static func modifiedBesselK(v: Float, x: Double) throws -> Double { try modifiedBesselK(v: Double(v), x: x) }
-    /// K_v(x) with mixed `Double`/`Float` arguments; returns `Double`.
-    @inlinable static func modifiedBesselK(v: Double, x: Float) throws -> Double { try modifiedBesselK(v: v, x: Double(x)) }
-
-    // MARK: - Mixed-precision promotions for cylindrical Bessel derivatives (Float ↔ Double)
-
-    /// J′_v(x) with mixed `Float`/`Double` arguments; returns `Double`.
-    @inlinable static func besselJPrime(v: Float, x: Double) throws -> Double { try besselJPrime(v: Double(v), x: x) }
-    /// J′_v(x) with mixed `Double`/`Float` arguments; returns `Double`.
-    @inlinable static func besselJPrime(v: Double, x: Float) throws -> Double { try besselJPrime(v: v, x: Double(x)) }
-
-    /// I′_v(x) with mixed `Float`/`Double` arguments; returns `Double`.
-    @inlinable static func modifiedBesselIPrime(v: Float, x: Double) throws -> Double { try modifiedBesselIPrime(v: Double(v), x: x) }
-    /// I′_v(x) with mixed `Double`/`Float` arguments; returns `Double`.
-    @inlinable static func modifiedBesselIPrime(v: Double, x: Float) throws -> Double { try modifiedBesselIPrime(v: v, x: Double(x)) }
-
-    /// K′_v(x) with mixed `Float`/`Double` arguments; returns `Double`.
-    @inlinable static func modifiedBesselKPrime(v: Float, x: Double) throws -> Double { try modifiedBesselKPrime(v: Double(v), x: x) }
-    /// K′_v(x) with mixed `Double`/`Float` arguments; returns `Double`.
-    @inlinable static func modifiedBesselKPrime(v: Double, x: Float) throws -> Double { try modifiedBesselKPrime(v: v, x: Double(x)) }
-
     // MARK: - Integer order convenience overloads (result type follows x)
 
     /// J_v(x) where `v` is integer; result type matches `x`.
     @inlinable static func besselJ<V: BinaryInteger>(v: V, x: Double) throws -> Double { try besselJ(v: Double(v), x: x) }
-    @inlinable static func besselJ<V: BinaryInteger>(v: V, x: Float) throws -> Float { try besselJ_f(v: Float(v), x: x) }
+    @inlinable static func besselJ<V: BinaryInteger>(v: V, x: Float) throws -> Float { try besselJ(v: Float(v), x: x) }
     #if arch(x86_64)
-    @inlinable static func besselJ<V: BinaryInteger>(v: V, x: Float80) throws -> Float80 { try besselJ_l(v: Float80(v), x: x) }
+    @inlinable static func besselJ<V: BinaryInteger>(v: V, x: Float80) throws -> Float80 { try besselJ(v: Float80(v), x: x) }
     #endif
 
     /// Y_v(x) where `v` is integer; result type matches `x`.
     @inlinable static func besselY<V: BinaryInteger>(v: V, x: Double) throws -> Double { try besselY(v: Double(v), x: x) }
-    @inlinable static func besselY<V: BinaryInteger>(v: V, x: Float) throws -> Float { try besselY_f(v: Float(v), x: x) }
+    @inlinable static func besselY<V: BinaryInteger>(v: V, x: Float) throws -> Float { try besselY(v: Float(v), x: x) }
     #if arch(x86_64)
-    @inlinable static func besselY<V: BinaryInteger>(v: V, x: Float80) throws -> Float80 { try besselY_l(v: Float80(v), x: x) }
+    @inlinable static func besselY<V: BinaryInteger>(v: V, x: Float80) throws -> Float80 { try besselY(v: Float80(v), x: x) }
     #endif
 
     /// I_v(x) where `v` is integer; result type matches `x`.
     @inlinable static func modifiedBesselI<V: BinaryInteger>(v: V, x: Double) throws -> Double { try modifiedBesselI(v: Double(v), x: x) }
-    @inlinable static func modifiedBesselI<V: BinaryInteger>(v: V, x: Float) throws -> Float { try modifiedBesselI_f(v: Float(v), x: x) }
+    @inlinable static func modifiedBesselI<V: BinaryInteger>(v: V, x: Float) throws -> Float { try modifiedBesselI(v: Float(v), x: x) }
     #if arch(x86_64)
-    @inlinable static func modifiedBesselI<V: BinaryInteger>(v: V, x: Float80) throws -> Float80 { try modifiedBesselI_l(v: Float80(v), x: x) }
+    @inlinable static func modifiedBesselI<V: BinaryInteger>(v: V, x: Float80) throws -> Float80 { try besselYmodifiedBesselI(v: Float80(v), x: x) }
     #endif
 
     /// K_v(x) where `v` is integer; result type matches `x`.
     @inlinable static func modifiedBesselK<V: BinaryInteger>(v: V, x: Double) throws -> Double { try modifiedBesselK(v: Double(v), x: x) }
-    @inlinable static func modifiedBesselK<V: BinaryInteger>(v: V, x: Float) throws -> Float { try modifiedBesselK_f(v: Float(v), x: x) }
+    @inlinable static func modifiedBesselK<V: BinaryInteger>(v: V, x: Float) throws -> Float { try modifiedBesselK(v: Float(v), x: x) }
     #if arch(x86_64)
-    @inlinable static func modifiedBesselK<V: BinaryInteger>(v: V, x: Float80) throws -> Float80 { try modifiedBesselK_l(v: Float80(v), x: x) }
+    @inlinable static func modifiedBesselK<V: BinaryInteger>(v: V, x: Float80) throws -> Float80 { try modifiedBesselK(v: Float80(v), x: x) }
     #endif
 
     /// J′_v(x) where `v` is integer; result type matches `x`.
@@ -510,7 +471,7 @@ public extension SpecialFunctions {
     // MARK: - Float overloads
     
     /// Cylindrical Bessel function of the first kind J_v(x) for Float.
-    @inlinable static func besselJ_f(v: Float, x: Float) throws -> Float {
+    @inlinable static func besselJ(v: Float, x: Float) throws -> Float {
         guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_cyl_bessel_j_f(v, x)
@@ -519,7 +480,7 @@ public extension SpecialFunctions {
     /// Cylindrical Bessel function of the second kind Y_v(x) for Float.
     ///
     /// Domain: requires x > 0.
-    @inlinable static func besselY_f(v: Float, x: Float) throws -> Float {
+    @inlinable static func besselY(v: Float, x: Float) throws -> Float {
         guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
@@ -527,7 +488,7 @@ public extension SpecialFunctions {
     }
     
     /// Modified Bessel function of the first kind I_v(x) for Float.
-    @inlinable static func modifiedBesselI_f(v: Float, x: Float) throws -> Float {
+    @inlinable static func modifiedBesselI(v: Float, x: Float) throws -> Float {
         guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_cyl_bessel_i_f(v, x)
@@ -536,7 +497,7 @@ public extension SpecialFunctions {
     /// Modified Bessel function of the second kind K_v(x) for Float.
     ///
     /// Domain: requires x > 0.
-    @inlinable static func modifiedBesselK_f(v: Float, x: Float) throws -> Float {
+    @inlinable static func modifiedBesselK(v: Float, x: Float) throws -> Float {
         guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
@@ -640,53 +601,10 @@ public extension SpecialFunctions {
 
     // MARK: - Float80 overloads (x86_64)
     
-#if arch(x86_64)
-    // MARK: - Mixed-precision promotions with Float80 (result → Float80)
-
-    /// J_v(x) with one `Float80` argument; returns `Float80`.
-    @inlinable static func besselJ(v: Float80, x: Double) throws -> Float80 { try besselJ_l(v: v, x: Float80(x)) }
-    @inlinable static func besselJ(v: Double, x: Float80) throws -> Float80 { try besselJ_l(v: Float80(v), x: x) }
-    @inlinable static func besselJ(v: Float80, x: Float) throws -> Float80 { try besselJ_l(v: v, x: Float80(x)) }
-    @inlinable static func besselJ(v: Float, x: Float80) throws -> Float80 { try besselJ_l(v: Float80(v), x: x) }
-
-    /// Y_v(x) with one `Float80` argument; returns `Float80`.
-    @inlinable static func besselY(v: Float80, x: Double) throws -> Float80 { try besselY_l(v: v, x: Float80(x)) }
-    @inlinable static func besselY(v: Double, x: Float80) throws -> Float80 { try besselY_l(v: Float80(v), x: x) }
-    @inlinable static func besselY(v: Float80, x: Float) throws -> Float80 { try besselY_l(v: v, x: Float80(x)) }
-    @inlinable static func besselY(v: Float, x: Float80) throws -> Float80 { try besselY_l(v: Float80(v), x: x) }
-
-    /// I_v(x) with one `Float80` argument; returns `Float80`.
-    @inlinable static func modifiedBesselI(v: Float80, x: Double) throws -> Float80 { try modifiedBesselI_l(v: v, x: Float80(x)) }
-    @inlinable static func modifiedBesselI(v: Double, x: Float80) throws -> Float80 { try modifiedBesselI_l(v: Float80(v), x: x) }
-    @inlinable static func modifiedBesselI(v: Float80, x: Float) throws -> Float80 { try modifiedBesselI_l(v: v, x: Float80(x)) }
-    @inlinable static func modifiedBesselI(v: Float, x: Float80) throws -> Float80 { try modifiedBesselI_l(v: Float80(v), x: x) }
-
-    /// K_v(x) with one `Float80` argument; returns `Float80`.
-    @inlinable static func modifiedBesselK(v: Float80, x: Double) throws -> Float80 { try modifiedBesselK_l(v: v, x: Float80(x)) }
-    @inlinable static func modifiedBesselK(v: Double, x: Float80) throws -> Float80 { try modifiedBesselK_l(v: Float80(v), x: x) }
-    @inlinable static func modifiedBesselK(v: Float80, x: Float) throws -> Float80 { try modifiedBesselK_l(v: v, x: Float80(x)) }
-    @inlinable static func modifiedBesselK(v: Float, x: Float80) throws -> Float80 { try modifiedBesselK_l(v: Float80(v), x: x) }
-
-    /// J′_v(x) with one `Float80` argument; returns `Float80`.
-    @inlinable static func besselJPrime(v: Float80, x: Double) throws -> Float80 { try besselJPrime(v: v, x: Float80(x)) }
-    @inlinable static func besselJPrime(v: Double, x: Float80) throws -> Float80 { try besselJPrime(v: Float80(v), x: x) }
-    @inlinable static func besselJPrime(v: Float80, x: Float) throws -> Float80 { try besselJPrime(v: v, x: Float80(x)) }
-    @inlinable static func besselJPrime(v: Float, x: Float80) throws -> Float80 { try besselJPrime(v: Float80(v), x: x) }
-
-    /// I′_v(x) with one `Float80` argument; returns `Float80`.
-    @inlinable static func modifiedBesselIPrime(v: Float80, x: Double) throws -> Float80 { try modifiedBesselIPrime(v: v, x: Float80(x)) }
-    @inlinable static func modifiedBesselIPrime(v: Double, x: Float80) throws -> Float80 { try modifiedBesselIPrime(v: Float80(v), x: x) }
-    @inlinable static func modifiedBesselIPrime(v: Float80, x: Float) throws -> Float80 { try modifiedBesselIPrime(v: v, x: Float80(x)) }
-    @inlinable static func modifiedBesselIPrime(v: Float, x: Float80) throws -> Float80 { try modifiedBesselIPrime(v: Float80(v), x: x) }
-
-    /// K′_v(x) with one `Float80` argument; returns `Float80`.
-    @inlinable static func modifiedBesselKPrime(v: Float80, x: Double) throws -> Float80 { try modifiedBesselKPrime(v: v, x: Float80(x)) }
-    @inlinable static func modifiedBesselKPrime(v: Double, x: Float80) throws -> Float80 { try modifiedBesselKPrime(v: Float80(v), x: x) }
-    @inlinable static func modifiedBesselKPrime(v: Float80, x: Float) throws -> Float80 { try modifiedBesselKPrime(v: v, x: Float80(x)) }
-    @inlinable static func modifiedBesselKPrime(v: Float, x: Float80) throws -> Float80 { try modifiedBesselKPrime(v: Float80(v), x: x) }
+#if arch(x86_64) || arch(i386)
 
     /// Cylindrical Bessel function of the first kind J_v(x) for Float80 (x86_64 only).
-    @inlinable static func besselJ_l(v: Float80, x: Float80) throws -> Float80 {
+    @inlinable static func besselJ(v: Float80, x: Float80) throws -> Float80 {
         guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_cyl_bessel_j_l(v, x)
@@ -695,7 +613,7 @@ public extension SpecialFunctions {
     /// Cylindrical Bessel function of the second kind Y_v(x) for Float80 (x86_64 only).
     ///
     /// Domain: requires x > 0.
-    @inlinable static func besselY_l(v: Float80, x: Float80) throws -> Float80 {
+    @inlinable static func besselY(v: Float80, x: Float80) throws -> Float80 {
         guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }
@@ -703,7 +621,7 @@ public extension SpecialFunctions {
     }
     
     /// Modified Bessel function of the first kind I_v(x) for Float80 (x86_64 only).
-    @inlinable static func modifiedBesselI_l(v: Float80, x: Float80) throws -> Float80 {
+    @inlinable static func besselYmodifiedBesselI(v: Float80, x: Float80) throws -> Float80 {
         guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         return bs_cyl_bessel_i_l(v, x)
@@ -712,7 +630,7 @@ public extension SpecialFunctions {
     /// Modified Bessel function of the second kind K_v(x) for Float80 (x86_64 only).
     ///
     /// Domain: requires x > 0.
-    @inlinable static func modifiedBesselK_l(v: Float80, x: Float80) throws -> Float80 {
+    @inlinable static func modifiedBesselK(v: Float80, x: Float80) throws -> Float80 {
         guard v.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "v", value: v) }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
         guard x > 0 else { throw SpecialFunctionError.parameterNotPositive(name: "x", value: x) }

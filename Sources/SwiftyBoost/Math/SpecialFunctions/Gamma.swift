@@ -68,8 +68,6 @@ public extension SpecialFunctions {
         return T(bs_tgamma_d(dx))
     }
 
-    // MARK: - Mixed-precision promotions (Float ↔ Double) for binary-argument APIs
-    
     /// Compute the natural logarithm of the Gamma function ln Γ(x).
     ///
     /// Overview:
@@ -118,8 +116,6 @@ public extension SpecialFunctions {
         return T(bs_lgamma_d(dx))
     }
 
-    // Single-argument `logGamma` does not require mixed-precision overloads.
-    
     // MARK: - Gamma ratios
     
     /// Compute the ratio Γ(a) / Γ(b) in a numerically stable way.
@@ -168,12 +164,6 @@ public extension SpecialFunctions {
         let da = D(a), db = D(b)
         return T(bs_tgamma_ratio_d(da, db))
     }
-
-    // Mixed Float/Double → Double
-    /// Γ(a) / Γ(b) with mixed `Float`/`Double` arguments; returns `Double`.
-    @inlinable static func gammaRatio(_ a: Float, _ b: Double) throws -> Double { try gammaRatio(Double(a), b) }
-    /// Γ(a) / Γ(b) with mixed `Double`/`Float` arguments; returns `Double`.
-    @inlinable static func gammaRatio(_ a: Double, _ b: Float) throws -> Double { try gammaRatio(a, Double(b)) }
     
     /// Compute the ratio Γ(a) / Γ(a + δ) in a numerically stable way.
     ///
@@ -218,12 +208,6 @@ public extension SpecialFunctions {
         return T(bs_tgamma_delta_ratio_d(da, dd))
     }
 
-    // Mixed Float/Double → Double
-    /// Γ(a) / Γ(a + δ) with mixed `Float`/`Double` arguments; returns `Double`.
-    @inlinable static func gammaDeltaRatio(_ a: Float, delta: Double) throws -> Double { try gammaDeltaRatio(Double(a), delta: delta) }
-    /// Γ(a) / Γ(a + δ) with mixed `Double`/`Float` arguments; returns `Double`.
-    @inlinable static func gammaDeltaRatio(_ a: Double, delta: Float) throws -> Double { try gammaDeltaRatio(a, delta: Double(delta)) }
-    
     // MARK: - Incomplete gamma (lower/upper, regularized, and inverses)
     
     /// Compute the lower incomplete gamma function γ(a, x).
@@ -265,12 +249,6 @@ public extension SpecialFunctions {
         return T(bs_tgamma_lower_d(da, dx))
     }
 
-    // Mixed Float/Double → Double
-    /// Lower incomplete gamma γ(a, x) with mixed `Float`/`Double` arguments; returns `Double`.
-    @inlinable static func incompleteGammaLower(_ a: Float, x: Double) throws -> Double { try incompleteGammaLower(Double(a), x: x) }
-    /// Lower incomplete gamma γ(a, x) with mixed `Double`/`Float` arguments; returns `Double`.
-    @inlinable static func incompleteGammaLower(_ a: Double, x: Float) throws -> Double { try incompleteGammaLower(a, x: Double(x)) }
-    
     /// Compute the upper incomplete gamma function Γ(a, x).
     ///
     /// Definition:
@@ -309,12 +287,6 @@ public extension SpecialFunctions {
         return T(bs_tgamma_upper_d(da, dx))
     }
 
-    // Mixed Float/Double → Double
-    /// Upper incomplete gamma Γ(a, x) with mixed `Float`/`Double` arguments; returns `Double`.
-    @inlinable static func incompleteGammaUpper(_ a: Float, x: Double) throws -> Double { try incompleteGammaUpper(Double(a), x: x) }
-    /// Upper incomplete gamma Γ(a, x) with mixed `Double`/`Float` arguments; returns `Double`.
-    @inlinable static func incompleteGammaUpper(_ a: Double, x: Float) throws -> Double { try incompleteGammaUpper(a, x: Double(x)) }
-    
     /// Compute the regularized lower incomplete gamma function P(a, x).
     ///
     /// Definition:
@@ -354,12 +326,6 @@ public extension SpecialFunctions {
         return T(bs_gamma_p_d(da, dx))
     }
 
-    // Mixed Float/Double → Double
-    /// Regularized lower incomplete gamma P(a, x) with mixed `Float`/`Double` arguments; returns `Double`.
-    @inlinable static func regularizedGammaP(_ a: Float, x: Double) throws -> Double { try regularizedGammaP(Double(a), x: x) }
-    /// Regularized lower incomplete gamma P(a, x) with mixed `Double`/`Float` arguments; returns `Double`.
-    @inlinable static func regularizedGammaP(_ a: Double, x: Float) throws -> Double { try regularizedGammaP(a, x: Double(x)) }
-    
     /// Compute the regularized upper incomplete gamma function Q(a, x).
     ///
     /// Definition:
@@ -398,12 +364,6 @@ public extension SpecialFunctions {
         return T(bs_gamma_q_d(da, dx))
     }
 
-    // Mixed Float/Double → Double
-    /// Regularized upper incomplete gamma Q(a, x) with mixed `Float`/`Double` arguments; returns `Double`.
-    @inlinable static func regularizedGammaQ(_ a: Float, x: Double) throws -> Double { try regularizedGammaQ(Double(a), x: x) }
-    /// Regularized upper incomplete gamma Q(a, x) with mixed `Double`/`Float` arguments; returns `Double`.
-    @inlinable static func regularizedGammaQ(_ a: Double, x: Float) throws -> Double { try regularizedGammaQ(a, x: Double(x)) }
-    
     /// Invert the regularized lower incomplete gamma: find x such that P(a, x) = p.
     ///
     /// Domain:
@@ -435,12 +395,6 @@ public extension SpecialFunctions {
         return T(bs_gamma_p_inv_d(da, dp))
     }
 
-    // Mixed Float/Double → Double
-    /// Inverse regularized P: x = P⁻¹(a, p) with mixed `Float`/`Double` arguments; returns `Double`.
-    @inlinable static func regularizedGammaPInv(_ a: Float, p: Double) throws -> Double { try regularizedGammaPInv(Double(a), p: p) }
-    /// Inverse regularized P: x = P⁻¹(a, p) with mixed `Double`/`Float` arguments; returns `Double`.
-    @inlinable static func regularizedGammaPInv(_ a: Double, p: Float) throws -> Double { try regularizedGammaPInv(a, p: Double(p)) }
-    
     /// Invert the regularized upper incomplete gamma: find x such that Q(a, x) = q.
     ///
     /// Domain:
@@ -472,12 +426,6 @@ public extension SpecialFunctions {
         return T(bs_gamma_q_inv_d(da, dq))
     }
 
-    // Mixed Float/Double → Double
-    /// Inverse regularized Q: x = Q⁻¹(a, q) with mixed `Float`/`Double` arguments; returns `Double`.
-    @inlinable static func regularizedGammaQInv(_ a: Float, q: Double) throws -> Double { try regularizedGammaQInv(Double(a), q: q) }
-    /// Inverse regularized Q: x = Q⁻¹(a, q) with mixed `Double`/`Float` arguments; returns `Double`.
-    @inlinable static func regularizedGammaQInv(_ a: Double, q: Float) throws -> Double { try regularizedGammaQInv(a, q: Double(q)) }
-    
     // MARK: - Derivatives of regularized incomplete gamma (w.r.t. x)
     
     /// Derivative with respect to x of the regularized lower incomplete gamma P(a, x).
@@ -521,13 +469,6 @@ public extension SpecialFunctions {
         guard dx >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
         return T(bs_gamma_p_derivative_d(da, dx))
     }
-
-    // Mixed Float/Double → Double
-    /// Derivative d/dx P(a, x) with mixed `Float`/`Double` arguments; returns `Double`.
-    @inlinable static func regularizedGammaPDerivative(_ a: Float, x: Double) throws -> Double { try regularizedGammaPDerivative(Double(a), x: x) }
-    /// Derivative d/dx P(a, x) with mixed `Double`/`Float` arguments; returns `Double`.
-    @inlinable static func regularizedGammaPDerivative(_ a: Double, x: Float) throws -> Double { try regularizedGammaPDerivative(a, x: Double(x)) }
-    
 
     // MARK: - Float overloads
     
@@ -766,12 +707,6 @@ public extension SpecialFunctions {
         return bs_tgamma_ratio_l(a, b)
     }
 
-    // Mixed Float/Double with Float80 → Float80
-    @inlinable static func gammaRatio(_ a: Float80, _ b: Double) throws -> Float80 { try gammaRatio(a, Float80(b)) }
-    @inlinable static func gammaRatio(_ a: Double, _ b: Float80) throws -> Float80 { try gammaRatio(Float80(a), b) }
-    @inlinable static func gammaRatio(_ a: Float80, _ b: Float) throws -> Float80 { try gammaRatio(a, Float80(b)) }
-    @inlinable static func gammaRatio(_ a: Float, _ b: Float80) throws -> Float80 { try gammaRatio(Float80(a), b) }
-    
     /// Γ(a) / Γ(a + δ) for `Float80` (x86_64 only).
     ///
     /// See ``SpecialFunctions/gammaDeltaRatio(_:delta:)`` for discussion of domain and motivation.
@@ -792,12 +727,6 @@ public extension SpecialFunctions {
         return bs_tgamma_delta_ratio_l(a, delta)
     }
 
-    // Mixed Float/Double with Float80 → Float80
-    @inlinable static func gammaDeltaRatio(_ a: Float80, delta: Double) throws -> Float80 { try gammaDeltaRatio(a, delta: Float80(delta)) }
-    @inlinable static func gammaDeltaRatio(_ a: Double, delta: Float80) throws -> Float80 { try gammaDeltaRatio(Float80(a), delta: delta) }
-    @inlinable static func gammaDeltaRatio(_ a: Float80, delta: Float) throws -> Float80 { try gammaDeltaRatio(a, delta: Float80(delta)) }
-    @inlinable static func gammaDeltaRatio(_ a: Float, delta: Float80) throws -> Float80 { try gammaDeltaRatio(Float80(a), delta: delta) }
-    
     /// Lower incomplete gamma γ(a, x) for `Float80` (x86_64 only).
     ///
     /// See ``SpecialFunctions/incompleteGammaLower(_:x:)`` for definition, domain, and discussion.
@@ -809,12 +738,6 @@ public extension SpecialFunctions {
         return bs_tgamma_lower_l(a, x)
     }
 
-    // Mixed Float/Double with Float80 → Float80
-    @inlinable static func incompleteGammaLower(_ a: Float80, x: Double) throws -> Float80 { try incompleteGammaLower(a, x: Float80(x)) }
-    @inlinable static func incompleteGammaLower(_ a: Double, x: Float80) throws -> Float80 { try incompleteGammaLower(Float80(a), x: x) }
-    @inlinable static func incompleteGammaLower(_ a: Float80, x: Float) throws -> Float80 { try incompleteGammaLower(a, x: Float80(x)) }
-    @inlinable static func incompleteGammaLower(_ a: Float, x: Float80) throws -> Float80 { try incompleteGammaLower(Float80(a), x: x) }
-    
     /// Upper incomplete gamma Γ(a, x) for `Float80` (x86_64 only).
     ///
     /// See ``SpecialFunctions/incompleteGammaUpper(_:x:)`` for definition, domain, and discussion.
@@ -826,12 +749,6 @@ public extension SpecialFunctions {
         return bs_tgamma_upper_l(a, x)
     }
 
-    // Mixed Float/Double with Float80 → Float80
-    @inlinable static func incompleteGammaUpper(_ a: Float80, x: Double) throws -> Float80 { try incompleteGammaUpper(a, x: Float80(x)) }
-    @inlinable static func incompleteGammaUpper(_ a: Double, x: Float80) throws -> Float80 { try incompleteGammaUpper(Float80(a), x: x) }
-    @inlinable static func incompleteGammaUpper(_ a: Float80, x: Float) throws -> Float80 { try incompleteGammaUpper(a, x: Float80(x)) }
-    @inlinable static func incompleteGammaUpper(_ a: Float, x: Float80) throws -> Float80 { try incompleteGammaUpper(Float80(a), x: x) }
-    
     /// Regularized lower incomplete gamma P(a, x) for `Float80` (x86_64 only).
     ///
     /// See ``SpecialFunctions/regularizedGammaP(_:x:)`` for definition, domain, and discussion.
@@ -842,12 +759,6 @@ public extension SpecialFunctions {
         guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Float80.infinity) }
         return bs_gamma_p_l(a, x)
     }
-
-    // Mixed Float/Double with Float80 → Float80
-    @inlinable static func regularizedGammaP(_ a: Float80, x: Double) throws -> Float80 { try regularizedGammaP(a, x: Float80(x)) }
-    @inlinable static func regularizedGammaP(_ a: Double, x: Float80) throws -> Float80 { try regularizedGammaP(Float80(a), x: x) }
-    @inlinable static func regularizedGammaP(_ a: Float80, x: Float) throws -> Float80 { try regularizedGammaP(a, x: Float80(x)) }
-    @inlinable static func regularizedGammaP(_ a: Float, x: Float80) throws -> Float80 { try regularizedGammaP(Float80(a), x: x) }
     
     /// Regularized upper incomplete gamma Q(a, x) for `Float80` (x86_64 only).
     ///
@@ -860,12 +771,6 @@ public extension SpecialFunctions {
         return bs_gamma_q_l(a, x)
     }
 
-    // Mixed Float/Double with Float80 → Float80
-    @inlinable static func regularizedGammaQ(_ a: Float80, x: Double) throws -> Float80 { try regularizedGammaQ(a, x: Float80(x)) }
-    @inlinable static func regularizedGammaQ(_ a: Double, x: Float80) throws -> Float80 { try regularizedGammaQ(Float80(a), x: x) }
-    @inlinable static func regularizedGammaQ(_ a: Float80, x: Float) throws -> Float80 { try regularizedGammaQ(a, x: Float80(x)) }
-    @inlinable static func regularizedGammaQ(_ a: Float, x: Float80) throws -> Float80 { try regularizedGammaQ(Float80(a), x: x) }
-    
     /// Inverse regularized lower incomplete gamma x = P⁻¹(a, p) for `Float80` (x86_64 only).
     ///
     /// See ``SpecialFunctions/regularizedGammaPInv(_:p:)`` for domain and discussion.
@@ -877,12 +782,6 @@ public extension SpecialFunctions {
         return bs_gamma_p_inv_l(a, p)
     }
 
-    // Mixed Float/Double with Float80 → Float80
-    @inlinable static func regularizedGammaPInv(_ a: Float80, p: Double) throws -> Float80 { try regularizedGammaPInv(a, p: Float80(p)) }
-    @inlinable static func regularizedGammaPInv(_ a: Double, p: Float80) throws -> Float80 { try regularizedGammaPInv(Float80(a), p: p) }
-    @inlinable static func regularizedGammaPInv(_ a: Float80, p: Float) throws -> Float80 { try regularizedGammaPInv(a, p: Float80(p)) }
-    @inlinable static func regularizedGammaPInv(_ a: Float, p: Float80) throws -> Float80 { try regularizedGammaPInv(Float80(a), p: p) }
-    
     /// Inverse regularized upper incomplete gamma x = Q⁻¹(a, q) for `Float80` (x86_64 only).
     ///
     /// See ``SpecialFunctions/regularizedGammaQInv(_:q:)`` for domain and discussion.
@@ -894,12 +793,6 @@ public extension SpecialFunctions {
         return bs_gamma_q_inv_l(a, q)
     }
 
-    // Mixed Float/Double with Float80 → Float80
-    @inlinable static func regularizedGammaQInv(_ a: Float80, q: Double) throws -> Float80 { try regularizedGammaQInv(a, q: Float80(q)) }
-    @inlinable static func regularizedGammaQInv(_ a: Double, q: Float80) throws -> Float80 { try regularizedGammaQInv(Float80(a), q: q) }
-    @inlinable static func regularizedGammaQInv(_ a: Float80, q: Float) throws -> Float80 { try regularizedGammaQInv(a, q: Float80(q)) }
-    @inlinable static func regularizedGammaQInv(_ a: Float, q: Float80) throws -> Float80 { try regularizedGammaQInv(Float80(a), q: q) }
-    
     /// Derivative d/dx P(a, x) for `Float80` (x86_64 only).
     ///
     /// See ``SpecialFunctions/regularizedGammaPDerivative(_:x:)`` for definition, domain, and discussion.
@@ -910,13 +803,6 @@ public extension SpecialFunctions {
         guard x >= 0 else { throw SpecialFunctionError.parameterOutOfRange(name: "x", min: 0.0, max: Double.infinity) }
         return bs_gamma_p_derivative_l(a, x)
     }
-
-    // Mixed Float/Double with Float80 → Float80
-    @inlinable static func regularizedGammaPDerivative(_ a: Float80, x: Double) throws -> Float80 { try regularizedGammaPDerivative(a, x: Float80(x)) }
-    @inlinable static func regularizedGammaPDerivative(_ a: Double, x: Float80) throws -> Float80 { try regularizedGammaPDerivative(Float80(a), x: x) }
-    @inlinable static func regularizedGammaPDerivative(_ a: Float80, x: Float) throws -> Float80 { try regularizedGammaPDerivative(a, x: Float80(x)) }
-    @inlinable static func regularizedGammaPDerivative(_ a: Float, x: Float80) throws -> Float80 { try regularizedGammaPDerivative(Float80(a), x: x) }
-    
 #endif
     
 }

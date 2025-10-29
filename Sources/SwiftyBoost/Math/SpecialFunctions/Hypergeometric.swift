@@ -57,15 +57,6 @@ public extension SpecialFunctions {
         return T(bs_hypergeometric_1F0(da, dz))
     }
 
-    /// 1F0(a; ; z) with mixed `Float`/`Double` arguments; returns `Double`.
-    ///
-    /// See ``SpecialFunctions/hypergeometric1F0(a:z:)->T`` for definition and domain notes.
-    @inlinable static func hypergeometric1F0(a: Float, z: Double) throws -> Double { try hypergeometric1F0(a: Double(a), z: z) }
-    /// 1F0(a; ; z) with mixed `Double`/`Float` arguments; returns `Double`.
-    ///
-    /// See ``SpecialFunctions/hypergeometric1F0(a:z:)->T`` for definition and domain notes.
-    @inlinable static func hypergeometric1F0(a: Double, z: Float) throws -> Double { try hypergeometric1F0(a: a, z: Double(z)) }
-    
     /// 1F0(a; ; z) for `Float`.
     @inlinable static func hypergeometric1F0(a: Float, z: Float) throws -> Float {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
@@ -80,15 +71,6 @@ public extension SpecialFunctions {
         guard z.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z", value: z) }
         return bs_hypergeometric_1F0_l(a, z)
     }
-
-    /// 1F0(a; ; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric1F0(a: Float80, z: Double) throws -> Float80 { try hypergeometric1F0(a: a, z: Float80(z)) }
-    /// 1F0(a; ; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric1F0(a: Double, z: Float80) throws -> Float80 { try hypergeometric1F0(a: Float80(a), z: z) }
-    /// 1F0(a; ; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric1F0(a: Float80, z: Float) throws -> Float80 { try hypergeometric1F0(a: a, z: Float80(z)) }
-    /// 1F0(a; ; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric1F0(a: Float, z: Float80) throws -> Float80 { try hypergeometric1F0(a: Float80(a), z: z) }
 #endif
     
     
@@ -124,15 +106,6 @@ public extension SpecialFunctions {
         return T(bs_hypergeometric_0F1(db, dz))
     }
 
-    /// 0F1(; b; z) with mixed `Float`/`Double` arguments; returns `Double`.
-    ///
-    /// See ``SpecialFunctions/hypergeometric0F1(b:z:)->T`` for definition and domain notes.
-    @inlinable static func hypergeometric0F1(b: Float, z: Double) throws -> Double { try hypergeometric0F1(b: Double(b), z: z) }
-    /// 0F1(; b; z) with mixed `Double`/`Float` arguments; returns `Double`.
-    ///
-    /// See ``SpecialFunctions/hypergeometric0F1(b:z:)->T`` for definition and domain notes.
-    @inlinable static func hypergeometric0F1(b: Double, z: Float) throws -> Double { try hypergeometric0F1(b: b, z: Double(z)) }
-    
     /// 0F1(; b; z) for `Float`.
     @inlinable static func hypergeometric0F1(b: Float, z: Float) throws -> Float {
         guard b.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "b", value: b) }
@@ -147,15 +120,6 @@ public extension SpecialFunctions {
         guard z.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z", value: z) }
         return bs_hypergeometric_0F1_l(b, z)
     }
-
-    /// 0F1(; b; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric0F1(b: Float80, z: Double) throws -> Float80 { try hypergeometric0F1(b: b, z: Float80(z)) }
-    /// 0F1(; b; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric0F1(b: Double, z: Float80) throws -> Float80 { try hypergeometric0F1(b: Float80(b), z: z) }
-    /// 0F1(; b; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric0F1(b: Float80, z: Float) throws -> Float80 { try hypergeometric0F1(b: b, z: Float80(z)) }
-    /// 0F1(; b; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric0F1(b: Float, z: Float80) throws -> Float80 { try hypergeometric0F1(b: Float80(b), z: z) }
 #endif
     
     
@@ -193,15 +157,6 @@ public extension SpecialFunctions {
         return T(bs_hypergeometric_2F0(da, db, dz))
     }
 
-    /// 2F0(a, b; z) with a single `Float` mixed argument; returns `Double`.
-    ///
-    /// See ``SpecialFunctions/hypergeometric2F0(a:b:z:)->T`` for behavior and domain notes.
-    @inlinable static func hypergeometric2F0(a: Float, b: Double, z: Double) throws -> Double { try hypergeometric2F0(a: Double(a), b: b, z: z) }
-    /// 2F0(a, b; z) with a single `Float` mixed argument; returns `Double`.
-    @inlinable static func hypergeometric2F0(a: Double, b: Float, z: Double) throws -> Double { try hypergeometric2F0(a: a, b: Double(b), z: z) }
-    /// 2F0(a, b; z) with a single `Float` mixed argument; returns `Double`.
-    @inlinable static func hypergeometric2F0(a: Double, b: Double, z: Float) throws -> Double { try hypergeometric2F0(a: a, b: b, z: Double(z)) }
-    
     /// 2F0(a, b; ; z) for `Float`.
     @inlinable static func hypergeometric2F0(a: Float, b: Float, z: Float) throws -> Float {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
@@ -219,18 +174,6 @@ public extension SpecialFunctions {
         return bs_hypergeometric_2F0_l(a, b, z)
     }
 
-    /// 2F0(a, b; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric2F0(a: Float80, b: Double, z: Double) throws -> Float80 { try hypergeometric2F0(a: a, b: Float80(b), z: Float80(z)) }
-    /// 2F0(a, b; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric2F0(a: Double, b: Float80, z: Double) throws -> Float80 { try hypergeometric2F0(a: Float80(a), b: b, z: Float80(z)) }
-    /// 2F0(a, b; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric2F0(a: Double, b: Double, z: Float80) throws -> Float80 { try hypergeometric2F0(a: Float80(a), b: Float80(b), z: z) }
-    /// 2F0(a, b; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric2F0(a: Float80, b: Float, z: Float) throws -> Float80 { try hypergeometric2F0(a: a, b: Float80(b), z: Float80(z)) }
-    /// 2F0(a, b; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric2F0(a: Float, b: Float80, z: Float) throws -> Float80 { try hypergeometric2F0(a: Float80(a), b: b, z: Float80(z)) }
-    /// 2F0(a, b; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric2F0(a: Float, b: Float, z: Float80) throws -> Float80 { try hypergeometric2F0(a: Float80(a), b: Float80(b), z: z) }
 #endif
     
     
@@ -266,16 +209,6 @@ public extension SpecialFunctions {
         guard dz.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "z", value: z) }
         return T(bs_hypergeometric_1F1(da, db, dz))
     }
-
-    /// 1F1(a; b; z) with a single `Float` mixed argument; returns `Double`.
-    ///
-    /// See ``SpecialFunctions/hypergeometric1F1(a:b:z:)->T`` for definition and domain notes.
-    @inlinable static func hypergeometric1F1(a: Float, b: Double, z: Double) throws -> Double { try hypergeometric1F1(a: Double(a), b: b, z: z) }
-    /// 1F1(a; b; z) with a single `Float` mixed argument; returns `Double`.
-    @inlinable static func hypergeometric1F1(a: Double, b: Float, z: Double) throws -> Double { try hypergeometric1F1(a: a, b: Double(b), z: z) }
-    /// 1F1(a; b; z) with a single `Float` mixed argument; returns `Double`.
-    @inlinable static func hypergeometric1F1(a: Double, b: Double, z: Float) throws -> Double { try hypergeometric1F1(a: a, b: b, z: Double(z)) }
-    
     /// 1F1(a; b; z) for `Float`.
     @inlinable static func hypergeometric1F1(a: Float, b: Float, z: Float) throws -> Float {
         guard a.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "a", value: a) }
@@ -293,18 +226,6 @@ public extension SpecialFunctions {
         return bs_hypergeometric_1F1_l(a, b, z)
     }
 
-    /// 1F1(a; b; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric1F1(a: Float80, b: Double, z: Double) throws -> Float80 { try hypergeometric1F1(a: a, b: Float80(b), z: Float80(z)) }
-    /// 1F1(a; b; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric1F1(a: Double, b: Float80, z: Double) throws -> Float80 { try hypergeometric1F1(a: Float80(a), b: b, z: Float80(z)) }
-    /// 1F1(a; b; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric1F1(a: Double, b: Double, z: Float80) throws -> Float80 { try hypergeometric1F1(a: Float80(a), b: Float80(b), z: z) }
-    /// 1F1(a; b; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric1F1(a: Float80, b: Float, z: Float) throws -> Float80 { try hypergeometric1F1(a: a, b: Float80(b), z: Float80(z)) }
-    /// 1F1(a; b; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric1F1(a: Float, b: Float80, z: Float) throws -> Float80 { try hypergeometric1F1(a: Float80(a), b: b, z: Float80(z)) }
-    /// 1F1(a; b; z) with one `Float80` mixed argument; returns `Float80` (x86_64).
-    @inlinable static func hypergeometric1F1(a: Float, b: Float, z: Float80) throws -> Float80 { try hypergeometric1F1(a: Float80(a), b: Float80(b), z: z) }
 #endif
     
     
@@ -331,60 +252,38 @@ public extension SpecialFunctions {
     ///
     /// Returns:
     /// - pFq(a; b; z) as `Double`.
-    @inlinable static func hypergeometricPFQ(a: [Double], b: [Double], z: Double) -> Double {
-        a.withUnsafeBufferPointer { ap in
-            b.withUnsafeBufferPointer { bp in
-                bs_hypergeometric_pFq_d(ap.baseAddress, ap.count, bp.baseAddress, bp.count, z)
+    @inlinable static func hypergeometricPFQ<T: Real & BinaryFloatingPoint & Sendable>(a: [T], b: [T], z: T) -> T {
+        if a.isEmpty && b.isEmpty { return T.exp(z) }
+        else {
+            return a.withUnsafeBufferPointer { ap in
+                T(b.withUnsafeBufferPointer { bp in
+                    bs_hypergeometric_pFq_d((ap.baseAddress as! UnsafePointer<Double>), ap.count, (bp.baseAddress as! UnsafePointer<Double>), bp.count, Double(z))
+                })
             }
         }
     }
 
     /// Generalized hypergeometric function pFq(a; b; z) with Float parameters.
     @inlinable static func hypergeometricPFQ(a: [Float], b: [Float], z: Float) -> Float {
-        a.withUnsafeBufferPointer { ap in
-            b.withUnsafeBufferPointer { bp in
-                bs_hypergeometric_pFq_f(ap.baseAddress, ap.count, bp.baseAddress, bp.count, z)
+        if a.isEmpty && b.isEmpty { return exp(z) } else {
+            return a.withUnsafeBufferPointer { ap in
+                b.withUnsafeBufferPointer { bp in
+                    bs_hypergeometric_pFq_f(ap.baseAddress, ap.count, bp.baseAddress, bp.count, z)
+                }
             }
         }
-    }
-
-    /// pFq(a; b; z) with `[Float]` parameters and `Double` z; returns `Double`.
-    @inlinable static func hypergeometricPFQ(a: [Float], b: [Float], z: Double) -> Double {
-        let ad = a.map(Double.init), bd = b.map(Double.init)
-        return hypergeometricPFQ(a: ad, b: bd, z: z)
-    }
-    /// pFq(a; b; z) with `[Double]` parameters and `Float` z; returns `Double`.
-    @inlinable static func hypergeometricPFQ(a: [Double], b: [Double], z: Float) -> Double {
-        return hypergeometricPFQ(a: a, b: b, z: Double(z))
     }
     
 #if arch(x86_64)
     /// Generalized hypergeometric function pFq(a; b; z) with Float80 parameters (x86_64 only).
     @inlinable static func hypergeometricPFQ(a: [Float80], b: [Float80], z: Float80) -> Float80 {
-        a.withUnsafeBufferPointer { ap in
-            b.withUnsafeBufferPointer { bp in
-                bs_hypergeometric_pFq_l(ap.baseAddress, ap.count, bp.baseAddress, bp.count, z)
+        if a.isEmpty && b.isEmpty { return exp(z) } else {
+            return a.withUnsafeBufferPointer { ap in
+                b.withUnsafeBufferPointer { bp in
+                    bs_hypergeometric_pFq_l(ap.baseAddress, ap.count, bp.baseAddress, bp.count, z)
+                }
             }
         }
-    }
-
-    /// pFq(a; b; z) with `[Float80]` parameters and `Double` z; returns `Float80` (x86_64).
-    @inlinable static func hypergeometricPFQ(a: [Float80], b: [Float80], z: Double) -> Float80 {
-        a.withUnsafeBufferPointer { ap in
-            b.withUnsafeBufferPointer { bp in
-                bs_hypergeometric_pFq_l(ap.baseAddress, ap.count, bp.baseAddress, bp.count, Float80(z))
-            }
-        }
-    }
-    /// pFq(a; b; z) with `[Double]` parameters and `Float80` z; returns `Float80` (x86_64).
-    @inlinable static func hypergeometricPFQ(a: [Double], b: [Double], z: Float80) -> Float80 {
-        let al = a.map(Float80.init), bl = b.map(Float80.init)
-        return hypergeometricPFQ(a: al, b: bl, z: z)
-    }
-    /// pFq(a; b; z) with `[Float]` parameters and `Float80` z; returns `Float80` (x86_64).
-    @inlinable static func hypergeometricPFQ(a: [Float], b: [Float], z: Float80) -> Float80 {
-        let al = a.map(Float80.init), bl = b.map(Float80.init)
-        return hypergeometricPFQ(a: al, b: bl, z: z)
     }
 #endif
 }

@@ -186,22 +186,22 @@ public extension SpecialFunctions {
     /// Digamma ψ(x) for `Float80` (x86_64 only).
     @inlinable static func digamma(_ x: Float80) throws -> Float80 {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
-        if x <= 0, x == x.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x") }
+        if x <= 0, x == x.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x", value: x) }
         return bs_digamma_l(x)
     }
     
     /// Trigamma ψ₁(x) for `Float80` (x86_64 only).
     @inlinable static func trigamma(_ x: Float80) throws -> Float80 {
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
-        if x <= 0, x == x.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x") }
+        if x <= 0, x == x.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x", value: x) }
         return bs_trigamma_l(x)
     }
     
     /// Polygamma ψ⁽ⁿ⁾(x) for `Float80` (x86_64 only). Order `n` must be ≥ 0.
     @inlinable static func polygamma(order n: Int, _ x: Float80) throws -> Float80 {
-        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "order", value: order) }
+        guard n >= 0 else { throw SpecialFunctionError.parameterNotPositive(name: "order", value: Float80(n)) }
         guard x.isFinite else { throw SpecialFunctionError.parameterNotFinite(name: "x", value: x) }
-        if x <= 0, x == x.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x") }
+        if x <= 0, x == x.rounded(.towardZero) { throw SpecialFunctionError.poleAtNonPositiveInteger(name: "x", value: x) }
         return bs_polygamma_l(Int32(n), x)
     }
     

@@ -664,19 +664,15 @@ do {
         // 1F0
         print("  1F0<Double>: \(try SpecialFunctions.hypergeometric1F0(a: 0.75 as Double, z: 0.2 as Double))")
         print("  1F0<Float>: \(try SpecialFunctions.hypergeometric1F0(a: 0.75 as Float, z: 0.2 as Float))")
-        print("  1F0<Float,Double mixed -> Double>: \(try SpecialFunctions.hypergeometric1F0(a: 0.5 as Float, z: 0.25 as Double))")
         // 0F1
         print("  0F1<Double>: \(try SpecialFunctions.hypergeometric0F1(b: 1.25 as Double, z: 0.3 as Double))")
         print("  0F1<Float>: \(try SpecialFunctions.hypergeometric0F1(b: 1.25 as Float, z: 0.3 as Float))")
-        print("  0F1<Double,Float mixed -> Double>: \(try SpecialFunctions.hypergeometric0F1(b: 1.5 as Double, z: 0.2 as Float))")
         // 2F0
         print("  2F0<Double>: \(try SpecialFunctions.hypergeometric2F0(a: 0.5 as Double, b: 1.25 as Double, z: 0.1 as Double))")
         print("  2F0<Float>: \(try SpecialFunctions.hypergeometric2F0(a: 0.5 as Float, b: 1.25 as Float, z: 0.1 as Float))")
-        print("  2F0<Float,Double mixed -> Double>: \(try SpecialFunctions.hypergeometric2F0(a: 0.5 as Float, b: 1.25 as Double, z: 0.1 as Double))")
         // 1F1 (Kummer’s M)
         print("  1F1<Double>: \(try SpecialFunctions.hypergeometric1F1(a: 0.75 as Double, b: 1.5 as Double, z: 0.2 as Double))")
         print("  1F1<Float>: \(try SpecialFunctions.hypergeometric1F1(a: 0.75 as Float, b: 1.5 as Float, z: 0.2 as Float))")
-        print("  1F1<Double,Float mixed -> Double>: \(try SpecialFunctions.hypergeometric1F1(a: 0.75 as Double, b: 1.5 as Float, z: 0.2 as Double))")
         // pFq arrays
         let aD: [Double] = [0.5, 1.25]
         let bD: [Double] = [1.5, 2.25, 3.0]
@@ -684,19 +680,11 @@ do {
         let bF: [Float] = [1.5, 2.25, 3.0]
         print("  pFq<Double>: \(SpecialFunctions.hypergeometricPFQ(a: aD, b: bD, z: 0.2))")
         print("  pFq<Float>: \(SpecialFunctions.hypergeometricPFQ(a: aF, b: bF, z: 0.2 as Float))")
-        print("  pFq<[Float], Double z -> Double>: \(SpecialFunctions.hypergeometricPFQ(a: aF, b: bF, z: 0.2 as Double))")
-        print("  pFq<[Double], Float z -> Double>: \(SpecialFunctions.hypergeometricPFQ(a: aD, b: bD, z: 0.2 as Float))")
 #if arch(x86_64)
         let aL: [Float80] = [0.5, 1.25]
         let bL: [Float80] = [1.5, 2.25, 3.0]
         let pFqL1 = SpecialFunctions.hypergeometricPFQ(a: aL, b: bL, z: 0.2 as Float80)
         print("  pFq<Float80>: \(pFqL1)")
-        let pFqL2 = SpecialFunctions.hypergeometricPFQ(a: aL, b: bL, z: 0.2 as Double)
-        print("  pFq<[Float80], Double z -> Float80>: \(pFqL2)")
-        let pFqL3 = SpecialFunctions.hypergeometricPFQ(a: aD, b: bD, z: 0.2 as Float80)
-        print("  pFq<[Double], Float80 z -> Float80>: \(pFqL3)")
-        let pFqL4 = SpecialFunctions.hypergeometricPFQ(a: aF, b: bF, z: 0.2 as Float80)
-        print("  pFq<[Float], Float80 z -> Float80>: \(pFqL4)")
 #endif
     } catch {
         print("SpecialFunctions hypergeometric error: \(error)")
@@ -726,10 +714,6 @@ do {
         print("  solveAForRegularizedIncompleteBeta<Float>: \(SpecialFunctions.solveAForRegularizedIncompleteBeta(b: bF, x: xF, p: pF))")
         print("  solveBForRegularizedIncompleteBeta<Float>: \(SpecialFunctions.solveBForRegularizedIncompleteBeta(a: aF, x: xF, p: pF))")
         print("  regularizedIncompleteBetaDerivative<Float>: \(try SpecialFunctions.regularizedIncompleteBetaDerivative(aF, bF, x: xF))")
-        // Mixed promotions examples
-        print("  beta<Float,Double mixed -> Double>: \(try SpecialFunctions.beta(aF, bD))")
-        print("  regularizedIncompleteBeta<Double,Float mixed -> Double>: \(try SpecialFunctions.regularizedIncompleteBeta(aD, bF, x: xD))")
-        print("  inverseRegularizedIncompleteBeta<Double,Float mixed -> Double>: \(try SpecialFunctions.inverseRegularizedIncompleteBeta(aD, bF, p: pD))")
 #if arch(x86_64)
         // Float80 overloads
         let aL = 2.25 as Float80, bL = 1.75 as Float80, xL = 0.35 as Float80, pL = 0.55 as Float80
@@ -742,9 +726,6 @@ do {
         print("  solveAForRegularizedIncompleteBeta<Float80>: \(SpecialFunctions.solveAForRegularizedIncompleteBeta(b: bL, x: xL, p: pL))")
         print("  solveBForRegularizedIncompleteBeta<Float80>: \(SpecialFunctions.solveBForRegularizedIncompleteBeta(a: aL, x: xL, p: pL))")
         print("  regularizedIncompleteBetaDerivative<Float80>: \(try SpecialFunctions.regularizedIncompleteBetaDerivative(aL, bL, x: xL))")
-        // Mixed with Float80
-        print("  beta<Float80,Double mixed -> Float80>: \(try SpecialFunctions.beta(aL, bD))")
-        print("  regularizedIncompleteBeta<Float80, Double x mixed -> Float80>: \(try SpecialFunctions.regularizedIncompleteBeta(aL, bL, x: Double(xL)))")
 #endif
     } catch {
         print("SpecialFunctions beta family error: \(error)")
@@ -762,19 +743,11 @@ do {
         print("  C_n^λ<Float>: \(try SpecialFunctions.gegenbauer(n: n, lambda: 0.5 as Float, x: 0.3 as Float))")
         print("  d/dx C_n^λ<Float>: \(try SpecialFunctions.gegenbauerPrime(n: n, lambda: 0.5 as Float, x: 0.3 as Float))")
         print("  d^k/dx^k C_n^λ<Float> (k=2): \(try SpecialFunctions.gegenbauerDerivative(n: n, lambda: 0.5 as Float, x: 0.3 as Float, k: 2))")
-        // Mixed promotions examples
-        print("  C_n^λ<Float,Double mixed -> Double>: \(try SpecialFunctions.gegenbauer(n: n, lambda: 0.5 as Float, x: 0.3 as Double))")
-        print("  d/dx C_n^λ<Double,Float mixed -> Double>: \(try SpecialFunctions.gegenbauerPrime(n: n, lambda: 0.5 as Double, x: 0.3 as Float))")
-        print("  d^k/dx^k C_n^λ<Double,Float mixed -> Double>: \(try SpecialFunctions.gegenbauerDerivative(n: n, lambda: 0.5 as Double, x: 0.3 as Float, k: 2))")
 #if arch(x86_64)
         // Float80
         print("  C_n^λ<Float80>: \(try SpecialFunctions.gegenbauer(n: n, lambda: 0.5 as Float80, x: 0.3 as Float80))")
         print("  d/dx C_n^λ<Float80>: \(try SpecialFunctions.gegenbauerPrime(n: n, lambda: 0.5 as Float80, x: 0.3 as Float80))")
         print("  d^k/dx^k C_n^λ<Float80> (k=2): \(try SpecialFunctions.gegenbauerDerivative(n: n, lambda: 0.5 as Float80, x: 0.3 as Float80, k: 2))")
-        // Mixed with Float80
-        print("  C_n^λ<Float80,Double mixed -> Float80>: \(try SpecialFunctions.gegenbauer(n: n, lambda: 0.5 as Float80, x: 0.3 as Double))")
-        print("  d/dx C_n^λ<Double,Float80 mixed -> Float80>: \(try SpecialFunctions.gegenbauerPrime(n: n, lambda: 0.5 as Double, x: 0.3 as Float80))")
-        print("  d^k/dx^k C_n^λ<Float80,Float mixed -> Float80>: \(try SpecialFunctions.gegenbauerDerivative(n: n, lambda: 0.5 as Float80, x: 0.3 as Float, k: 2))")
 #endif
     } catch {
         print("SpecialFunctions Gegenbauer error: \(error)")
@@ -795,8 +768,6 @@ do {
         print("  Clenshaw<Double> (halfWeightC0=true): \(try SpecialFunctions.chebyshevClenshawRecurrence(cD, x: 0.4))")
         print("  Clenshaw<Double> (halfWeightC0=false): \(try SpecialFunctions.chebyshevClenshawRecurrence(cD, x: 0.4, halfWeightC0: false))")
         print("  Clenshaw<Float> (halfWeightC0=true): \(try SpecialFunctions.chebyshevClenshawRecurrence(cF, x: 0.4 as Float))")
-        print("  Clenshaw<Float coeffs, Double x -> Double>: \(try SpecialFunctions.chebyshevClenshawRecurrence(cF, x: 0.4 as Double))")
-        print("  Clenshaw<Double coeffs, Float x -> Double>: \(try SpecialFunctions.chebyshevClenshawRecurrence(cD, x: 0.4 as Float))")
         // Recurrence helper next-term (Double/Float)
         let xRecD = 0.5 as Double
         let T0D = 1.0 as Double, T1D = xRecD
@@ -810,9 +781,6 @@ do {
         print("  U_n<Float80>: \(try SpecialFunctions.chebyshevU(5, 0.2 as Float80))")
         let cL: [Float80] = [1.0, 0.25, -0.125, 0.0625]
         print("  Clenshaw<Float80> (halfWeightC0=true): \(try SpecialFunctions.chebyshevClenshawRecurrence(cL, x: 0.3 as Float80))")
-        print("  Clenshaw<[Float80], Double x -> Float80>: \(try SpecialFunctions.chebyshevClenshawRecurrence(cL, x: 0.3 as Double))")
-        print("  Clenshaw<[Double], Float80 x -> Float80>: \(try SpecialFunctions.chebyshevClenshawRecurrence(cD, x: 0.3 as Float80))")
-        print("  Clenshaw<[Float], Float80 x -> Float80>: \(try SpecialFunctions.chebyshevClenshawRecurrence(cF, x: 0.3 as Float80))")
         let xRecL = 0.5 as Float80
         let T0L: Float80 = 1.0, T1L = xRecL
         print("  chebyshev_next<Float80> (T2): \(try SpecialFunctions.chebyshev_next(T1L, T0L, xRecL))")

@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "SwiftyBoost",
     defaultLocalization: "en",
-    platforms: [.macOS(.v13), .iOS(.v16)],
+    platforms: [.macOS(.v11), .iOS(.v16), .watchOS(.v9), .tvOS(.v16)],
     products: [
         .library(
             name: "SwiftyBoost",

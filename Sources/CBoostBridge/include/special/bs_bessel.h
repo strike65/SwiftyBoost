@@ -47,6 +47,9 @@ long double bs_cyl_bessel_j_l(long double v, long double x);
 long double bs_cyl_neumann_l(long double v, long double x);
 long double bs_cyl_bessel_i_l(long double v, long double x);
 long double bs_cyl_bessel_k_l(long double v, long double x);
+long double bs_cyl_bessel_j_zero_l(long double v, int m);
+void bs_cyl_bessel_j_zeros_l(long double v, int start_index,
+                           unsigned int number_of_zeros, long double *out);
 
 // Spherical Bessel/Neumann (real)
 double bs_sph_bessel_d(unsigned int n, double x);

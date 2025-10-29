@@ -58,25 +58,25 @@ struct SphericalHarmonicsDoubleTests {
         // From Boost's test_spots:
         // spherical_harmonic_r(3, 2, 0.5, 0) ≈ 0.20614605996878713306922867918
         close(
-            SpecialFunctions.Y_real(n: 3, m: 2, theta: 0.5, phi: 0.0),
+            SpecialFunctions.sperhicalHarmonic_Real(n: 3, m: 2, theta: 0.5, phi: 0.0),
             0.2061460599687871330692286791802688341213
         )
 
         // spherical_harmonic_r(20, 10, 0.75, -0.25) ≈ 0.06197787102219208244
         close(
-            SpecialFunctions.Y_real(n: 20, m: 10, theta: 0.75, phi: -0.25),
+            SpecialFunctions.sperhicalHarmonic_Real(n: 20, m: 10, theta: 0.75, phi: -0.25),
             0.06197787102219208244041677775577045124092
         )
 
         // spherical_harmonic_r(40, 15, -0.75, 2.25) ≈ 0.28069048250457456873
         close(
-            SpecialFunctions.Y_real(n: 40, m: 15, theta: -0.75, phi: 2.25),
+            SpecialFunctions.sperhicalHarmonic_Real(n: 40, m: 15, theta: -0.75, phi: 2.25),
             0.2806904825045745687343492963236868973484
         )
 
         // spherical_harmonic_r(20, 14, -0.75, 2.25) ≈ 0.34792181861334354667
         close(
-            SpecialFunctions.Y_real(n: 20, m: 14, theta: -0.75, phi: 2.25),
+            SpecialFunctions.sperhicalHarmonic_Real(n: 20, m: 14, theta: -0.75, phi: 2.25),
             0.3479218186133435466692822481919867452442
         )
     }
@@ -85,19 +85,19 @@ struct SphericalHarmonicsDoubleTests {
     func spotImag() throws {
         // spherical_harmonic_i(20, 10, 0.75, -0.25) ≈ 0.04629885158895932341
         close(
-            SpecialFunctions.Y_imag(n: 20, m: 10, theta: 0.75, phi: -0.25),
+            SpecialFunctions.sphericalHarmonic_Imag(n: 20, m: 10, theta: 0.75, phi: -0.25),
             0.04629885158895932341185988759669916977920
         )
 
         // spherical_harmonic_i(40, 15, -0.75, 2.25) ≈ -0.29339184446566035823
         close(
-            SpecialFunctions.Y_imag(n: 40, m: 15, theta: -0.75, phi: 2.25),
+            SpecialFunctions.sphericalHarmonic_Imag(n: 40, m: 15, theta: -0.75, phi: 2.25),
             -0.2933918444656603582282372590387544902135
         )
 
         // spherical_harmonic_i(20, 14, -0.75, 2.25) ≈ 0.02932010666852638796
         close(
-            SpecialFunctions.Y_imag(n: 20, m: 14, theta: -0.75, phi: 2.25),
+            SpecialFunctions.sphericalHarmonic_Imag(n: 20, m: 14, theta: -0.75, phi: 2.25),
             0.0293201066685263879566422194539567289974
         )
     }
@@ -147,11 +147,11 @@ struct SphericalHarmonicsFloatTests {
     @Test("Spot checks (Float, via Double path)")
     func spotFloat() throws {
         // Reuse a couple of double cases, cast to Float, allow looser tolerance.
-        let r1 = SpecialFunctions.Y(n: 3, m: 2, theta: Float(0.5), phi: Float(0.0))
+        let r1 = SpecialFunctions.sphericalHarmonic(n: 3, m: 2, theta: Float(0.5), phi: Float(0.0))
         close(r1.real, Float(0.20614605996878713))
         close(r1.imag, 0.0)
 
-        let r2 = SpecialFunctions.Y(n: 20, m: 10, theta: Float(0.75), phi: Float(-0.25))
+        let r2 = SpecialFunctions.sphericalHarmonic(n: 20, m: 10, theta: Float(0.75), phi: Float(-0.25))
         close(r2.real, Float(0.06197787102219208))
         close(r2.imag, Float(0.04629885158895932))
     }
@@ -185,7 +185,7 @@ struct SphericalHarmonicsFloat80Tests {
 
     @Test("Spot checks (Float80, via Double path)")
     func spotFloat80() throws {
-        let r = SpecialFunctions.Y(n: 40, m: 15, theta: Float80(-0.75), phi: Float80(2.25))
+        let r = SpecialFunctions.sphericalHarmonic(n: 40, m: 15, theta: Float80(-0.75), phi: Float80(2.25))
         close(r.real, 0.2806904825045745687343)
         close(r.imag, -0.2933918444656603582282)
     }

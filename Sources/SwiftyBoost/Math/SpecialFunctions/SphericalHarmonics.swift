@@ -69,7 +69,6 @@ public extension SpecialFunctions {
         return ComplexD(z.re, z.im)
     }
 
-    // Mixed-precision promotions (Float ↔ Double) → Double/ComplexD
     /// Y_l^m(θ, φ) with mixed `Float`/`Double` angles; returns `ComplexD`.
     @inlinable
     static func sphericalHarmonic(n: UInt, m: Int, theta: Float, phi: Double) -> ComplexD {
@@ -92,18 +91,18 @@ public extension SpecialFunctions {
     /// Returns:
     /// - The real component Re{Y_l^m(θ, φ)} as a `Double`.
     @inlinable
-    static func Y_real(n: UInt, m: Int, theta: Double, phi: Double) -> Double {
+    static func sperhicalHarmonic_Real(n: UInt, m: Int, theta: Double, phi: Double) -> Double {
         return sphericalHarmonic(n: n, m: m, theta: theta, phi: phi).real
     }
 
     /// Real part with mixed `Float`/`Double` angles; returns `Double`.
     @inlinable
-    static func Y_real(n: UInt, m: Int, theta: Float, phi: Double) -> Double {
+    static func sphericalHarmonic_Real(n: UInt, m: Int, theta: Float, phi: Double) -> Double {
         sphericalHarmonic(n: n, m: m, theta: Double(theta), phi: phi).real
     }
     /// Real part with mixed `Double`/`Float` angles; returns `Double`.
     @inlinable
-    static func Y_real(n: UInt, m: Int, theta: Double, phi: Float) -> Double {
+    static func sphericalHarmonic_Real(n: UInt, m: Int, theta: Double, phi: Float) -> Double {
         sphericalHarmonic(n: n, m: m, theta: theta, phi: Double(phi)).real
     }
 
@@ -118,18 +117,18 @@ public extension SpecialFunctions {
     /// Returns:
     /// - The imaginary component Im{Y_l^m(θ, φ)} as a `Double`.
     @inlinable
-    static func Y_imag(n: UInt, m: Int, theta: Double, phi: Double) -> Double {
+    static func sphericalHarmonic_Imag(n: UInt, m: Int, theta: Double, phi: Double) -> Double {
         return sphericalHarmonic(n: n, m: m, theta: theta, phi: phi).imag
     }
 
     /// Imag part with mixed `Float`/`Double` angles; returns `Double`.
     @inlinable
-    static func Y_imag(n: UInt, m: Int, theta: Float, phi: Double) -> Double {
+    static func sphericalHarmonic_Imag(n: UInt, m: Int, theta: Float, phi: Double) -> Double {
         sphericalHarmonic(n: n, m: m, theta: Double(theta), phi: phi).imag
     }
     /// Imag part with mixed `Double`/`Float` angles; returns `Double`.
     @inlinable
-    static func Y_imag(n: UInt, m: Int, theta: Double, phi: Float) -> Double {
+    static func sphericalHarmonic_Imag(n: UInt, m: Int, theta: Double, phi: Float) -> Double {
         sphericalHarmonic(n: n, m: m, theta: theta, phi: Double(phi)).imag
     }
 
@@ -147,9 +146,9 @@ public extension SpecialFunctions {
     /// Returns:
     /// - The complex value Y_l^m(θ, φ) as a ``ComplexF``.
     @inlinable
-    static func Y(n: UInt, m: Int, theta: Float, phi: Float) -> ComplexF {
-        let r = sphericalHarmonic(n: n , m: m, theta: Double(theta), phi: Double(phi))
-        return ComplexF(Float(r.real), Float(r.imag))
+    static func sphericalHarmonic(n: UInt, m: Int, theta: Float, phi: Float) -> ComplexF {
+        let r = bs_spherical_harmonic_f(UInt32(n), Int32(m), theta, phi)
+        return ComplexF(r.re, r.im)
     }
 
     /// Returns the real part of the spherical harmonic Y_l^m(θ, φ) for `Float`.
@@ -164,7 +163,7 @@ public extension SpecialFunctions {
     /// - The real component Re{Y_l^m(θ, φ)} as a `Float`.
     @inlinable
     static func Y_real(n: UInt, m: Int, theta: Float, phi: Float) -> Float {
-        return Y(n: n, m: m, theta: theta, phi: phi).real
+        return sphericalHarmonic(n: n, m: m, theta: theta, phi: phi).real
     }
 
     /// Returns the imaginary part of the spherical harmonic Y_l^m(θ, φ) for `Float`.
@@ -179,7 +178,7 @@ public extension SpecialFunctions {
     /// - The imaginary component Im{Y_l^m(θ, φ)} as a `Float`.
     @inlinable
     static func Y_imag(n: UInt, m: Int, theta: Float, phi: Float) -> Float {
-        return Y(n: n, m: m, theta: theta, phi: phi).imag
+        return sphericalHarmonic(n: n, m: m, theta: theta, phi: phi).imag
     }
 
     #if arch(x86_64)
@@ -197,31 +196,9 @@ public extension SpecialFunctions {
     /// Returns:
     /// - The complex value Y_l^m(θ, φ) as a ``ComplexL``.
     @inlinable
-    static func Y(n: UInt, m: Int, theta: Float80, phi: Float80) -> ComplexL {
-        let r = Y(n: n, m: m, theta: Double(theta), phi: Double(phi))
-        return ComplexL(Float80(r.real), Float80(r.imag))
-    }
-
-    // Mixed promotions with Float80 → ComplexL / Float80
-    @inlinable
-    static func Y(n: UInt, m: Int, theta: Float80, phi: Double) -> ComplexL {
-        let r = sphericalHarmonic(n: n, m: m, theta: Double(theta), phi: phi)
-        return ComplexL(Float80(r.real), Float80(r.imag))
-    }
-    @inlinable
-    static func Y(n: UInt, m: Int, theta: Double, phi: Float80) -> ComplexL {
-        let r = sphericalHarmonic(n: n, m: m, theta: theta, phi: Double(phi))
-        return ComplexL(Float80(r.real), Float80(r.imag))
-    }
-    @inlinable
-    static func Y(n: UInt, m: Int, theta: Float80, phi: Float) -> ComplexL {
-        let r = sphericalHarmonic(n: n, m: m, theta: Double(theta), phi: Double(phi))
-        return ComplexL(Float80(r.real), Float80(r.imag))
-    }
-    @inlinable
-    static func Y(n: UInt, m: Int, theta: Float, phi: Float80) -> ComplexL {
-        let r = sphericalHarmonic(n: n, m: m, theta: Double(theta), phi: Double(phi))
-        return ComplexL(Float80(r.real), Float80(r.imag))
+    static func sphericalHarmonic(n: UInt, m: Int, theta: Float80, phi: Float80) -> ComplexL {
+        let z = bs_spherical_harmonic_l(UInt32(n), Int32(m), theta, phi)
+        return ComplexL(z.re, z.im)
     }
 
     /// Returns the real part of the spherical harmonic Y_l^m(θ, φ) for `Float80` (x86_64 only).
@@ -235,26 +212,10 @@ public extension SpecialFunctions {
     /// Returns:
     /// - The real component Re{Y_l^m(θ, φ)} as a `Float80`.
     @inlinable
-    static func Y_real(n l: UInt, m: Int, theta: Float80, phi: Float80) -> Float80 {
-        return Y(n: n, m: m, theta: theta, phi: phi).real
+    static func sphericalHarmonic_Real(n l: UInt, m: Int, theta: Float80, phi: Float80) -> Float80 {
+        return sphericalHarmonic(n: l, m: m, theta: theta, phi: phi).real
     }
 
-    @inlinable
-    static func Y_real(n: UInt, m: Int, theta: Float80, phi: Double) -> Float80 {
-        return Y(n: n, m: m, theta: theta, phi: Float80(phi)).real
-    }
-    @inlinable
-    static func Y_real(n: UInt, m: Int, theta: Double, phi: Float80) -> Float80 {
-        return Y(n: n, m: m, theta: Float80(theta), phi: phi).real
-    }
-    @inlinable
-    static func Y_real(n: UInt, m: Int, theta: Float80, phi: Float) -> Float80 {
-        return Y(n: n, m: m, theta: theta, phi: Float80(phi)).real
-    }
-    @inlinable
-    static func Y_real(n: UInt, m: Int, theta: Float, phi: Float80) -> Float80 {
-        return Y(n: n, m: m, theta: Float80(theta), phi: phi).real
-    }
 
     /// Returns the imaginary part of the spherical harmonic Y_l^m(θ, φ) for `Float80` (x86_64 only).
     ///
@@ -267,24 +228,8 @@ public extension SpecialFunctions {
     /// Returns:
     /// - The imaginary component Im{Y_l^m(θ, φ)} as a `Float80`.
     @inlinable
-    static func Y_imag(n: UInt, m: Int, theta: Float80, phi: Float80) -> Float80 {
-        return Y(n: n, m: m, theta: theta, phi: phi).imag
-    }
-    @inlinable
-    static func Y_imag(n: UInt, m: Int, theta: Float80, phi: Double) -> Float80 {
-        return Y(n: n, m: m, theta: theta, phi: Float80(phi)).imag
-    }
-    @inlinable
-    static func Y_imag(n: UInt, m: Int, theta: Double, phi: Float80) -> Float80 {
-        return Y(n: n, m: m, theta: Float80(theta), phi: phi).imag
-    }
-    @inlinable
-    static func Y_imag(n: UInt, m: Int, theta: Float80, phi: Float) -> Float80 {
-        return Y(n: n, m: m, theta: theta, phi: Float80(phi)).imag
-    }
-    @inlinable
-    static func Y_imag(n: UInt, m: Int, theta: Float, phi: Float80) -> Float80 {
-        return Y(n: n, m: m, theta: Float80(theta), phi: phi).imag
+    static func sphericalHarmonic_Imag(n: UInt, m: Int, theta: Float80, phi: Float80) -> Float80 {
+        return sphericalHarmonic(n: n, m: m, theta: theta, phi: phi).imag
     }
     #endif
 }

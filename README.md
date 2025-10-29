@@ -25,7 +25,7 @@ Any bugs, crashes, numerical inaccuracies, or documentation mistakes in this Swi
 
 ## Requirements
 - Swift 6.2 or later.
-- macOS 13 or iOS 16 (per `Package.swift`).
+- Minimum platforms: macOS 11, iOS 16, watchOS 9, tvOS 16 (per `Package.swift`).
 - `Float80` support requires an x86_64 runtime.
 
 ## Installation (Swift Package Manager)
@@ -38,7 +38,12 @@ import PackageDescription
 
 let package = Package(
     name: "YourApp",
-    platforms: [ .iOS(.v16), .macOS(.v13) ],
+    platforms: [
+        .macOS(.v11),
+        .iOS(.v16),
+        .watchOS(.v9),
+        .tvOS(.v16)
+    ],
     dependencies: [
         .package(url: "https://github.com/strike65/SwiftyBoost.git", from: "1.0.0")
     ],
@@ -378,33 +383,6 @@ Typealiases are provided for convenience: `ComplexD` (`Double`), `ComplexF` (`Fl
 - The site root redirects to the main DocC page: https://strike65.github.io/SwiftyBoost/
 - Direct landing page (canonical DocC path): https://strike65.github.io/SwiftyBoost/documentation/swiftyboost/
 - To build a `.doccarchive` instead: `make documentation-archive` (outputs `Docs/SwiftyBoost.doccarchive`).
-
-### Result-Type Promotions (Quick Reference)
-
-- Float ↔ Double → Double
-  - Multi-argument functions promoted from mixed `Float`/`Double` evaluate in `Double` and return `Double`.
-- Any presence of Float80 → Float80 (x86_64)
-  - On x86_64, if any argument is `Float80`, evaluation uses extended precision and returns `Float80`.
-- Single-argument functions
-  - Return the same type as the argument; no promotion applies.
-
-Supported mixed promotions (high level):
-- Gamma: ratios, incomplete/regularized P/Q (+ inverses, derivative)
-- Beta: complete/incomplete/regularized (+ inverses, derivative, parameter solvers)
-- Bessel: cylindrical J/Y/I/K and their derivatives (integer-order convenience overloads included)
-- Elliptic: Legendre F/E/Π (incomplete + complete Π), Carlson RC/RF/RD/RJ/RG
-- Chebyshev series: Clenshaw recursion mixes `[coefficients]` and `x` types
-- Owen’s T: all pairs
-- Spherical harmonics: mixed angle types (ComplexD/ComplexL return types)
-- Hypergeometric: 1F0, 0F1 (full), 1F1/2F0 (selected single‑parameter mixes), pFq (arrays and z)
-
-Advice:
-- Prefer `Double` unless you know `Float` is sufficient or `Float80` is required (x86_64 only).
-- Use explicit `Float`/`Double`/`Float80` overloads in tight loops to avoid conversions.
-- Mixed promotions are for convenience when inputs naturally come in different precisions.
-- Promotions don’t change numeric domains; invalid inputs still throw `SpecialFunctionError`.
-
-See DocC: “Result-Type Promotions” for the full list and details.
 
 ## Contributing
 
