@@ -85,14 +85,14 @@ do {
         integrand: { (x: Double) in try! cauchy.pdf(x)
         }
     )
-    print("  Sinh-Sinh integral(-inf,+inf) Cauchy2(loc:-2, scale:0.4) dx ≈ \(cauchyArea.value)")
+    print("  Sinh-Sinh integral(-inf,+inf) Cauchy2(loc:-2, scale:0.4) dx ≈ \(cauchyArea1.value)")
     let hm = try Distribution.Holtsmark(loc : 33, scale: 1.0)
     let hmArea = try Quadrature.integrate(
         using: Quadrature.Rule.gaussLegendre(points: 100),
         integrand: { (x: Double) in try! hm.pdf(x)
         }
     )
-    print("  gaussLegendre(-inf,+inf) Holtsmark(scale:1 shape: 0.5) dx ≈ \(cauchyArea.value)")
+    print("  gaussLegendre(-inf,+inf) Holtsmark(scale:1 shape: 0.5) dx ≈ \(hmArea.value)")
     
     
     do {
