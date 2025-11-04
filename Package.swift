@@ -26,10 +26,10 @@ let package = Package(
             name: "CBoostBridge",
             publicHeadersPath: "include",
             cSettings: [
-                .headerSearchPath("../../extern/boost/include")
+                .headerSearchPath("../../extern/boost-math/include")
             ],
             cxxSettings: [
-                .headerSearchPath("../../extern/boost/include")
+                .headerSearchPath("../../extern/boost-math/include")
             ],
         ),
         .target(
