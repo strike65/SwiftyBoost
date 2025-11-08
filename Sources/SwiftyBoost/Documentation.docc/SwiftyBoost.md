@@ -36,7 +36,7 @@ Use this documentation catalog with DocC to explore how to configure Boost-backe
 - ``Distribution/StudentT``
 - ``Distribution/FisherF``
 - ``Distribution/Exponential``
-- ``Distribution/ExtremeValueGumpel``
+- ``Distribution/ExtremeValueGumbel``
 - ``Distribution/Cauchy``
 - ``Distribution/Geometric``
 - ``Distribution/Binomial``

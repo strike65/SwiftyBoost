@@ -188,7 +188,7 @@ do {
     }
     do {
         // ExtremeValue
-        let e = try Distribution.ExtremeValueGumpel(location: 0.0, scale: 1.0)
+        let e = try Distribution.ExtremeValueGumbel(location: 0.0, scale: 1.0)
         print("StudentT:")
         print("  stored: location = \(e.location)")
         print("  stored: scale = \(e.scale)")
@@ -207,7 +207,7 @@ do {
         print("  quantile(0.95) = \(try e.quantile(0.95))  q^c(0.05) = \(try e.quantileComplement(0.05))")
         print("  hazard(0) = \(try e.hazard(0.0))  chf(0) = \(try e.chf(0.0))")
     } catch {
-        print("Gumpel error: \(error)")
+        print("Gumbel error: \(error)")
     }
     
     do {

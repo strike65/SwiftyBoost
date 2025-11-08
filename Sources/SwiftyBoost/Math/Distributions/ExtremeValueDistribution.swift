@@ -42,13 +42,11 @@ extension Distribution {
     ///
     /// Usage example:
     /// ```swift
-    /// let dist = try Distribution.ExtremeValueGumpel<Double>(location: 0.0, scale: 2.0)
+    /// let dist = try Distribution.ExtremeValueGumbel<Double>(location: 0.0, scale: 2.0)
     /// let p = try dist.cdf(1.5)
     /// let x = try dist.quantile(0.9)
     /// ```
-    ///
-    /// - Note: This type's name uses "Gumpel" in the symbol; the standard name in statistics is "Gumbel".
-    public struct ExtremeValueGumpel<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
+    public struct ExtremeValueGumbel<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
         /// The underlying real type used by the distribution.
         public typealias RealType = T
 

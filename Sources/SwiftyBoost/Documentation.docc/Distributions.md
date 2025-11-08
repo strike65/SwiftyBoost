@@ -32,7 +32,7 @@ This section documents probability distributions exposed by SwiftyBoost using Bo
 - ``Distribution/InverseNormal`` (typealias: ``Distribution/InverseGaussian``)
 - ``Distribution/Holtsmark``
 - ``Distribution/Exponential``
-- ``Distribution/ExtremeValueGumpel``
+- ``Distribution/ExtremeValueGumbel``
 - ``Distribution/Arcsine``
 - ``Distribution/Empirical`` (pure Swift implementation with automatic discrete/continuous detection)
 

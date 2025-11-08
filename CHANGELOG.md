@@ -5,6 +5,9 @@ All notable changes to this project are tracked here, following the principles o
 ## Unreleased
 - _No changes yet._
 
+## [1.0.4] - 2025-11-08
+- fix: ExtremeValueGumpel -> ExtremeValueGumbel
+
 ## [1.0.3] - 2025-10-29
 ### Removed
 - Cleared README and DocC references to result-type promotions now that the feature is no longer supported.

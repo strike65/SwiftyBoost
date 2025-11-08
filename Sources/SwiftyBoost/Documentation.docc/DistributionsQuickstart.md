@@ -110,7 +110,7 @@ let holts = try Distribution.Holtsmark<Double>(location: 0, scale: 1)
 let holtsPdf = try holts.pdf(0.5)
 
 // Gumbel (extreme value) with loc = 0, scale = 0.75
-let gumbel = try Distribution.ExtremeValueGumpel<Double>(location: 0, scale: 0.75)
+let gumbel = try Distribution.ExtremeValueGumbel<Double>(location: 0, scale: 0.75)
 let gumbelCdf = try gumbel.cdf(1.2)
 let gumbelMode = gumbel.mode
 ```
