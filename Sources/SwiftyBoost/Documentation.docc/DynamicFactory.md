@@ -172,7 +172,7 @@ let peak = gumbel.mode
 
 - ``Distribution/Geometric`` and ``Distribution/Holtsmark`` both reuse the factory under the hood; the dynamic entries remain valuable for configuration-driven scenarios that need to swap distributions at runtime.
 - ``Distribution/Empirical`` is implemented entirely in Swift and is not registered with the factory—construct it via ``Distribution/Empirical/init(samples:)`` instead.
-- ``Distribution/Dynamic`` exposes ``Distribution/DistributionProtocol/klDivergence(relativeTo:options:)``. Continuous comparisons rely on numerical quadrature controlled via ``Distribution/KLDivergenceOptions``; discrete distributions fall back to lattice summation with configurable tail cut-offs.
+- ``Distribution/Dynamic`` exposes ``Distribution/DistributionProtocol/klDivergence(relativeTo:options:)`` that now accepts any other ``DistributionProtocol`` conformer (typed wrappers, empirical fits, or your own custom types). Continuous comparisons rely on numerical quadrature controlled via ``Distribution/KLDivergenceOptions``; discrete distributions fall back to lattice summation with configurable tail cut-offs, and the new integration-bound overrides make it easy to clamp either mode to a subset of the shared support.
 
 ## Nullability and Initialization
 

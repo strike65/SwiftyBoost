@@ -38,12 +38,6 @@ extension Distribution {
             }
         }
 
-        /// Mutable flag used to propagate divergence state across integration callbacks.
-        private final class DivergenceFlag: @unchecked Sendable {
-            /// Indicates whether the KL divergence evaluation exceeded finite bounds.
-            var isInfinite: Bool = false
-        }
-
         /// Precision-specific distribution handle retained for the lifetime of `self`.
         private let box: Box
         /// Normalized distribution identifier (lowercase, underscores) used for runtime fallbacks.
@@ -486,207 +480,22 @@ extension Distribution {
             return fallbackEntropy()
         }
         
-        public func klDivergence(
-            relativeTo other: Distribution.Dynamic<T>,
+        public func klDivergence<D: DistributionProtocol>(
+            relativeTo other: D,
             options: Distribution.KLDivergenceOptions<T>
-        ) throws -> T? {
-            guard isDiscrete == other.isDiscrete else { return nil }
-            if isDiscrete {
-                return try discreteKLDivergence(relativeTo: other, options: options)
-            } else {
-                return try continuousKLDivergence(relativeTo: other, options: options)
+        ) throws -> T? where D.RealType == T {
+            if options.integrationLowerBound == nil,
+               options.integrationUpperBound == nil,
+               let otherDynamic = other as? Distribution.Dynamic<T>,
+               let analytic = analyticKLDivergence(relativeTo: otherDynamic)
+            {
+                return analytic
             }
+            return try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
         
         /// Boolean indicating whether the distribution operates on a discrete lattice.
         public var isDiscrete: Bool { discreteLattice != nil }
-
-        // MARK: - KL divergence helpers
-
-        private func continuousKLDivergence(
-            relativeTo other: Distribution.Dynamic<T>,
-            options: Distribution.KLDivergenceOptions<T>
-        ) throws -> T? {
-            if let analytic = analyticKLDivergence(relativeTo: other) {
-                return analytic
-            }
-            guard let bounds = sharedBounds(with: other) else { return nil }
-            if !(bounds.lower < bounds.upper) {
-                return nil
-            }
-            let densityFloor = max(options.densityFloor, T.leastNonzeroMagnitude)
-            let flag = DivergenceFlag()
-            let integrand: @Sendable (T) -> T = { x in
-                let p = self.positiveDensity(self, at: x)
-                if !p.isFinite || p <= densityFloor { return .zero }
-                var q = self.positiveDensity(other, at: x)
-                if !q.isFinite || q <= .zero {
-                    flag.isInfinite = true
-                    return .zero
-                }
-                if q < densityFloor {
-                    q = densityFloor
-                }
-                let ratio = p / q
-                if !ratio.isFinite || ratio <= .zero {
-                    return .zero
-                }
-                return p * T.log(ratio)
-            }
-
-            let value: T
-            switch (bounds.lower.isFinite, bounds.upper.isFinite) {
-            case (true, true):
-                let lowerD = Double(bounds.lower)
-                let upperD = Double(bounds.upper)
-                guard lowerD.isFinite, upperD.isFinite, lowerD < upperD else { return nil }
-                let integrator = try Quadrature.Integrator<T>(rule: options.finiteRule)
-                value = try integrator
-                    .integrate(over: .finite(lower: lowerD, upper: upperD), integrand: integrand)
-                    .value
-            case (true, false):
-                let lower = bounds.lower
-                guard lower.isFinite else { return nil }
-                let integrator = try Quadrature.Integrator<T>(rule: options.semiInfiniteRule)
-                value = try integrator.integrate { shift in
-                    integrand(lower + shift)
-                }.value
-            case (false, true):
-                let upper = bounds.upper
-                guard upper.isFinite else { return nil }
-                let integrator = try Quadrature.Integrator<T>(rule: options.semiInfiniteRule)
-                value = try integrator.integrate { shift in
-                    integrand(upper - shift)
-                }.value
-            default:
-                let integrator = try Quadrature.Integrator<T>(rule: options.infiniteRule)
-                value = try integrator.integrate(over: .automatic, integrand: integrand).value
-            }
-
-            if flag.isInfinite {
-                return T.infinity
-            }
-            return value.isFinite ? value : nil
-        }
-
-        private func discreteKLDivergence(
-            relativeTo other: Distribution.Dynamic<T>,
-            options: Distribution.KLDivergenceOptions<T>
-        ) throws -> T? {
-            guard let bounds = sharedBounds(with: other) else { return nil }
-            let densityFloor = max(options.densityFloor, T.leastNonzeroMagnitude)
-            let tailTolerance = max(options.discreteTailCutoff, T.leastNonzeroMagnitude)
-
-            let startIndex: Int
-            if bounds.lower.isInfinite {
-                return nil
-            }
-            else if let s = discreteCeil(bounds.lower) {
-                startIndex = s
-            }
-            else {
-                return nil
-            }
-
-            var endIndex: Int? = nil
-            if bounds.upper.isFinite {
-                endIndex = discreteFloor(bounds.upper)
-                if let end = endIndex, end < startIndex {
-                    return nil
-                }
-            }
-
-            var idx = startIndex
-            var divergence = T.zero
-            var iterations = 0
-            var infiniteFlag = false
-            while true {
-                if let end = endIndex, idx > end { break }
-                let point = T(idx)
-                let p = positiveDensity(self, at: point)
-                if p > densityFloor {
-                    var q = positiveDensity(other, at: point)
-                    if !q.isFinite || q <= .zero {
-                        infiniteFlag = true
-                    } else {
-                        if q < densityFloor { q = densityFloor }
-                        let ratio = p / q
-                        if ratio.isFinite && ratio > .zero {
-                            divergence += p * T.log(ratio)
-                        }
-                    }
-                }
-
-                iterations += 1
-                if iterations >= options.maxDiscreteEvaluations {
-                    return nil
-                }
-
-                if endIndex == nil {
-                    let tailSelf = positiveSurvival(self, above: point)
-                    let tailOther = positiveSurvival(other, above: point)
-                    if tailSelf <= tailTolerance && tailOther <= tailTolerance {
-                        break
-                    }
-                }
-
-                idx += 1
-            }
-
-            if infiniteFlag {
-                return T.infinity
-            }
-            return divergence
-        }
-
-        private func sharedBounds(
-            with other: Distribution.Dynamic<T>
-        ) -> (lower: T, upper: T)? {
-            let lower = Swift.max(supportLowerBound, other.supportLowerBound)
-            let upper = Swift.min(supportUpperBound, other.supportUpperBound)
-            if lower.isNaN || upper.isNaN || lower > upper {
-                return nil
-            }
-            return (lower, upper)
-        }
-
-        @inline(__always)
-        private func positiveDensity(
-            _ distribution: Distribution.Dynamic<T>,
-            at x: T
-        ) -> T {
-            guard let value = try? distribution.pdf(x), value.isFinite, value > 0 else {
-                return .zero
-            }
-            return value
-        }
-
-        @inline(__always)
-        private func positiveSurvival(
-            _ distribution: Distribution.Dynamic<T>,
-            above x: T
-        ) -> T {
-            guard let value = try? distribution.sf(x), value.isFinite else {
-                return T.infinity
-            }
-            return value < 0 ? T.infinity : value
-        }
-
-        private func discreteCeil(_ value: T) -> Int? {
-            let dv = Double(value)
-            guard dv.isFinite else { return nil }
-            if dv >= Double(Int.max) { return nil }
-            if dv <= Double(Int.min) { return nil }
-            return Int(Foundation.ceil(dv))
-        }
-
-        private func discreteFloor(_ value: T) -> Int? {
-            let dv = Double(value)
-            guard dv.isFinite else { return nil }
-            if dv >= Double(Int.max) { return Int(Int.max) }
-            if dv <= Double(Int.min) { return nil }
-            return Int(Foundation.floor(dv))
-        }
 
         private func analyticKLDivergence(
             relativeTo other: Distribution.Dynamic<T>

@@ -29,7 +29,7 @@ extension Distribution {
     /// materials. Only the location and scale parameters are finite; all algebraic
     /// moments diverge.
     public struct Landau<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
-        typealias RealType = T
+        public typealias RealType = T
 
         /// Location (shift) parameter.
         public let location: T
@@ -109,11 +109,11 @@ extension Distribution {
         public var isDiscrete: Bool { dyn.isDiscrete }
 
         /// Estimates the Kullback–Leibler divergence numerically using the dynamic backend.
-        public func klDivergence(
-            relativeTo other: Self,
+        public func klDivergence<D>(
+            relativeTo other: D,
             options: Distribution.KLDivergenceOptions<T>
-        ) throws -> T? {
-            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        ) throws -> T? where D: DistributionProtocol, D.RealType == T {
+            try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
-    }
+}
 }

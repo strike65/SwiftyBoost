@@ -23,7 +23,7 @@ import SwiftyBoostPrelude
 
 extension Distribution {
     public struct Normal<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
-        typealias RealType = T
+        public typealias RealType = T
         public let location: T
         public let sd: T
         private let dyn: Distribution.Dynamic<T>
@@ -94,17 +94,20 @@ extension Distribution {
         ///   - options: Unused; included for signature compatibility. You can pass ``Distribution/KLDivergenceOptions/automatic()``.
         /// - Returns: The divergence in nats, or `nil` if either standard deviation is non-positive.
         /// - Throws: Never throws directly; kept for parity with other distributions.
-        public func klDivergence(
-            relativeTo other: Self,
-            options _: Distribution.KLDivergenceOptions<T> = .automatic()
-        ) throws -> T? {
-            let sigmaSelf = self.sd
-            let sigmaOther = other.sd
-            guard sigmaSelf > 0, sigmaOther > 0 else { return nil }
-            let logTerm = T.log(sigmaOther / sigmaSelf)
-            let meanDiff = self.location - other.location
-            let varianceTerm = (sigmaSelf * sigmaSelf + meanDiff * meanDiff) / (2 * sigmaOther * sigmaOther)
-            return logTerm + varianceTerm - 0.5
+        public func klDivergence<D: DistributionProtocol>(
+            relativeTo other: D,
+            options: Distribution.KLDivergenceOptions<T>
+        ) throws -> T? where D.RealType == T {
+            if let rhs = other as? Self {
+                let sigmaSelf = self.sd
+                let sigmaOther = rhs.sd
+                guard sigmaSelf > 0, sigmaOther > 0 else { return nil }
+                let logTerm = T.log(sigmaOther / sigmaSelf)
+                let meanDiff = self.location - rhs.location
+                let varianceTerm = (sigmaSelf * sigmaSelf + meanDiff * meanDiff) / (2 * sigmaOther * sigmaOther)
+                return logTerm + varianceTerm - 0.5
+            }
+            return try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
     }
 }

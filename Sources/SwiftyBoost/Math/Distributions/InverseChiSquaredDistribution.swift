@@ -184,11 +184,11 @@ extension Distribution {
         ///     ``Distribution/KLDivergenceOptions/automatic()`` for the concrete type `T`.
         /// - Returns: The divergence in nats, `nil` when undefined, or `Double.infinity`
         ///   when the integral diverges.
-        public func klDivergence(
-            relativeTo other: Self,
-            options: Distribution.KLDivergenceOptions<T> = .automatic()
-        ) throws -> T? {
-            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        public func klDivergence<D>(
+            relativeTo other: D,
+            options: Distribution.KLDivergenceOptions<T>
+        ) throws -> T? where D: DistributionProtocol, D.RealType == T {
+            try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
-    }
+}
 }

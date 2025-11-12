@@ -41,7 +41,7 @@ extension Distribution {
     /// - Hazard-related quantities are computed via the bridged backend.
     public struct Hyperexponential<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
         /// The underlying floating-point type.
-        typealias RealType = T
+        public typealias RealType = T
 
         /// Mixing probabilities for each exponential phase (normalised to sum to 1).
         public let probabilities: [T]
@@ -249,11 +249,11 @@ extension Distribution {
         ///   - options: Quadrature configuration; defaults to ``Distribution/KLDivergenceOptions/automatic()``.
         /// - Returns: The divergence in nats, or `nil` if it cannot be evaluated.
         /// - Throws: Rethrows any backend or quadrature errors.
-        public func klDivergence(
-            relativeTo other: Self,
-            options: Distribution.KLDivergenceOptions<T> = .automatic()
-        ) throws -> T? {
-            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        public func klDivergence<D>(
+            relativeTo other: D,
+            options: Distribution.KLDivergenceOptions<T>
+        ) throws -> T? where D: DistributionProtocol, D.RealType == T {
+            try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
-    }
+}
 }

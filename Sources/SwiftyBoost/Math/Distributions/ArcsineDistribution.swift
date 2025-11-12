@@ -35,15 +35,15 @@ extension Distribution {
     ///   and, on x86 architectures, `Float80`. Internally it bridges to Boost via `CBoostBridge`.
     public struct Arcsine<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
         /// The floating-point type used by this distribution.
-        typealias RealType = T
-
+        public typealias RealType = T
+        
         /// The lower bound of the support (a).
         public let minX: T
         /// The upper bound of the support (b).
         public let maxX: T
-
+        
         private let dyn: Distribution.Dynamic<T>
-
+        
         /// Creates an arcsine distribution with the given support.
         ///
         /// - Parameters:
@@ -71,108 +71,108 @@ extension Distribution {
                 ]
             )
         }
-
+        
         /// The lower bound of the support.
         public var supportLowerBound: T { dyn.supportLowerBound }
-
+        
         /// The upper bound of the support.
         public var supportUpperBound: T { dyn.supportUpperBound }
-
+        
         /// The support as a (lower, upper) tuple.
         public var range: (lower: T, upper: T) { dyn.range }
-
+        
         /// The probability density function (PDF).
         ///
         /// - Parameter x: Evaluation point.
         /// - Returns: The density at `x`. Values outside the support yield zero.
         public func pdf(_ x: T) throws -> T { try dyn.pdf(x) }
-
+        
         /// The natural logarithm of the PDF.
         ///
         /// - Parameter x: Evaluation point.
         /// - Returns: `log(pdf(x))`. May be `-infinity` at the boundaries.
         public func logPdf(_ x: T) throws -> T { try dyn.logPdf(x) }
-
+        
         /// The cumulative distribution function (CDF).
         ///
         /// - Parameter x: Evaluation point.
         /// - Returns: `P(X ≤ x)`.
         public func cdf(_ x: T) throws -> T { try dyn.cdf(x) }
-
+        
         /// The survival function (SF), i.e. the complementary CDF.
         ///
         /// - Parameter x: Evaluation point.
         /// - Returns: `P(X > x) = 1 - CDF(x)`.
         public func sf(_ x: T) throws -> T { try dyn.sf(x) }
-
+        
         /// The quantile function (inverse CDF).
         ///
         /// - Parameter p: A probability in `[0, 1]`.
         /// - Returns: `x` such that `P(X ≤ x) = p`.
         public func quantile(_ p: T) throws -> T { try dyn.quantile(p) }
-
+        
         /// The complementary quantile function (inverse survival function).
         ///
         /// - Parameter q: A probability in `[0, 1]`.
         /// - Returns: `x` such that `P(X > x) = q`.
         public func quantileComplement(_ q: T) throws -> T { try dyn.quantileComplement(q) }
-
+        
         /// The mean of the distribution.
         ///
         /// - Note: Returns `nil` if not finite for the chosen numeric type.
         public var mean: T? { dyn.mean }
-
+        
         /// The variance of the distribution.
         ///
         /// - Note: Returns `nil` if not finite for the chosen numeric type.
         public var variance: T? { dyn.variance }
-
+        
         /// The mode of the distribution.
         ///
         /// - Note: For the arcsine distribution on a finite interval, the density is unbounded at the endpoints.
         ///   This value reflects the underlying implementation choice in Boost.
         public var mode: T? { dyn.mode }
-
+        
         /// The median of the distribution.
         public var median: T { dyn.median }
-
+        
         /// The skewness of the distribution.
         ///
         /// - Note: Returns `nil` if not finite for the chosen numeric type.
         public var skewness: T? { dyn.skewness }
-
+        
         /// The kurtosis of the distribution.
         ///
         /// - Note: Returns `nil` if not finite for the chosen numeric type.
         public var kurtosis: T? { dyn.kurtosis }
-
+        
         /// The excess kurtosis of the distribution (`kurtosis - 3`).
         ///
         /// - Note: Returns `nil` if not finite for the chosen numeric type.
         public var kurtosisExcess: T? { dyn.kurtosisExcess }
-
+        
         /// The hazard (failure) rate function `h(x) = f(x) / (1 - F(x))`.
         ///
         /// - Parameter x: Evaluation point.
         /// - Returns: The hazard at `x`.
         public func hazard(_ x: T) throws -> T { try dyn.hazard(x) }
-
+        
         /// The cumulative hazard function `H(x) = -log(1 - F(x))`.
         ///
         /// - Parameter x: Evaluation point.
         /// - Returns: The cumulative hazard at `x`.
         public func chf(_ x: T) throws -> T { try dyn.chf(x) }
-
+        
         /// The lattice step size, if the distribution is lattice-supported.
         ///
         /// Always `nil` for this continuous distribution.
         public var latticeStep: T? { nil }
-
+        
         /// The lattice origin, if the distribution is lattice-supported.
         ///
         /// Always `nil` for this continuous distribution.
         public var latticeOrigin: T? { nil }
-
+        
         /// The differential entropy of the arcsine distribution.
         ///
         /// For support width `w = maxX - minX`, the entropy is:
@@ -185,12 +185,12 @@ extension Distribution {
             let width = self.maxX - self.minX
             return T.log(T.pi / 4) + T.log(width)
         }
-
+        
         /// Indicates whether this distribution is discrete (`true`) or continuous (`false`).
         ///
         /// Arcsine distributions are continuous, so this always returns `false`.
         public var isDiscrete: Bool { dyn.isDiscrete }
-
+        
         /// Computes the Kullback–Leibler divergence `D_KL(self || other)` when defined.
         ///
         /// - Parameters:
@@ -198,11 +198,11 @@ extension Distribution {
         ///   - options: Quadrature configuration; defaults to ``Distribution/KLDivergenceOptions/automatic()``.
         /// - Returns: The divergence in nats, or `nil` if it cannot be evaluated.
         /// - Throws: Rethrows any backend or quadrature errors.
-        public func klDivergence(
-            relativeTo other: Self,
-            options: Distribution.KLDivergenceOptions<T> = .automatic()
-        ) throws -> T? {
-            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        public func klDivergence<D>(
+            relativeTo other: D,
+            options: Distribution.KLDivergenceOptions<T>
+        ) throws -> T? where D: DistributionProtocol, D.RealType == T {
+            try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
     }
 }

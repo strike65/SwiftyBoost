@@ -12,8 +12,9 @@ Any bugs, crashes, numerical inaccuracies, or documentation mistakes in this Swi
 - Gamma, Beta, error, Bessel, Airy, Legendre (including Legendre–Stieltjes quadrature polynomials), Gegenbauer, Jacobi, Jacobi elliptic functions, Jacobi theta functions, Hermite, elliptic (Legendre/Carlson forms, Jacobi Zeta, Heuman’s lambda), Lambert W, Owen's T, and other high-precision helpers.
 - Probability distributions with Boost-backed implementations:
   - Gamma, Beta, Chi-squared, Non-central Chi-squared, Student’s t, Non-central Student’s t, Fisher’s F, Non-central F, Pareto, Bernoulli, Geometric, Poisson, Binomial, Negative Binomial, Cauchy, Exponential, Extreme Value (Gumbel), Normal, Logistic, Log-normal, Laplace (double exponential), Landau, Kolmogorov–Smirnov, Map-Airy, Holtsmark, Hyperexponential, Inverse Chi-Squared, Inverse Gamma, Inverse Normal (Inverse Gaussian/Wald), and Arcsine (PDF/PMF, CDF/SF, quantiles, hazards, moments).
-  - Typed wrappers delegate internally to a unified runtime vtable (`Distribution.Dynamic`) for consistent behavior across precisions.
-  - Continuous and discrete distributions expose `klDivergence(relativeTo:options:)`, powered by configurable quadrature/integration defaults via `Distribution.KLDivergenceOptions`.
+  - Typed wrappers delegate internally to a unified runtime vtable (`Distribution.Dynamic`) for consistent behavior across precisions, and each wrapper publishes `public typealias RealType = T` so you can express generic constraints over the underlying scalar.
+  - Continuous and discrete distributions expose `klDivergence(relativeTo:options:)` across any pair of conforming distributions (typed wrappers, runtime factory instances, or empirical fits) that share the same `RealType` and support, powered by configurable quadrature/integration defaults via `Distribution.KLDivergenceOptions`, which now also let you clamp the integration/summation interval.
+  - ``Distribution/DistributionProtocol`` is public and `Sendable`, so you can wrap your own analytic distributions (or third-party factories) and still participate in the shared KL divergence helper, runtime defaults, and lattice metadata.
   - Unified runtime factory to construct distributions by name at runtime (see "Dynamic Distribution Factory").
 - Empirical distribution constructed directly from sample data with automatic discrete/continuous detection, KNN/KDE entropy and KL estimators, and bootstrap confidence intervals.
 - High-precision mathematical constants (`π`, `e`, `√2`, Euler–Mascheroni, Catalan, ζ(3), φ, …) available through `Constants` helpers across `Float`, `Double`, and (x86_64) `Float80`.
@@ -147,6 +148,17 @@ let p = try Distribution.Exponential<Double>(lambda: 1.2)
 let q = try Distribution.Exponential<Double>(lambda: 0.75)
 let divergence = try p.klDivergence(relativeTo: q)
 
+// Cross-family KL divergence (typed wrapper vs. different family, or typed vs dynamic)
+let gamma = try Distribution.Gamma<Double>(shape: 3.0, scale: 0.75)
+let beta = try Distribution.Beta<Double>(alpha: 2.5, beta: 4.0)
+let crossFamilyKL = try gamma.klDivergence(relativeTo: beta)
+
+// Restrict the integral to the leading quarter of the shared support
+let boundedKL = try gamma.klDivergence(
+    relativeTo: beta,
+    options: .init(integrationLowerBound: 0, integrationUpperBound: 0.25)
+)
+
 // Hyperexponential mixture (three phases)
 let hyperexp = try Distribution.Hyperexponential<Double>(
     probabilities: [0.25, 0.5, 0.25],
@@ -209,6 +221,8 @@ let weibull = try Distribution.Weibull<Double>(shape: 1.5, scale: 0.7)
 let weibullQuantile = try weibull.quantile(0.9)
 
 ```
+
+Any two ``Distribution/DistributionProtocol`` conformers that share the same `RealType`—typed wrappers, dynamic factory instances, empirical fits, or your own types—can be compared via `klDivergence`. `Distribution.KLDivergenceOptions.automatic()` now seeds its integration bounds from the overlapping supports, and you can clamp the calculation further with `integrationLowerBound` / `integrationUpperBound` for localized divergence estimates.
 
 ```swift
 // Quadrature
@@ -335,6 +349,46 @@ Notes:
 - Under the hood, the factory uses a C vtable with a non-null context pointer and nullable function pointers per metric.
 
 See `DIST-Factory-README.md` for the full design, ABI surface, and extension guide.
+
+### Custom Distributions
+
+Because ``Distribution/DistributionProtocol`` is now public and `Sendable`, you can layer your own analytic or empirical models on top of SwiftyBoost without touching the factory. The only requirements are:
+
+1. Choose a scalar precision and advertise it via `public typealias RealType = T`.
+2. Implement the protocol’s metrics (`pdf`, `cdf`, `sf`, quantiles, support bounds, lattice metadata, etc.).
+3. (Optional) Override `klDivergence(relativeTo:options:)` when you have a closed form; otherwise the default implementation will call into the shared helper using `defaultKLDivergenceOptions()`, which already clamps the integration range to your finite support.
+
+```swift
+public struct CosineDistribution<T: Real & BinaryFloatingPoint & Sendable>: DistributionProtocol {
+    public typealias RealType = T
+    public let location: T
+    public let scale: T
+
+    public init(location: T = 0, scale: T = 1) {
+        self.location = location
+        self.scale = scale
+    }
+
+    public var supportLowerBound: T { location - (T.pi * scale / 2) }
+    public var supportUpperBound: T { location + (T.pi * scale / 2) }
+    public var isDiscrete: Bool { false }
+
+    public func pdf(_ x: T) throws -> T {
+        guard supportLowerBound <= x && x <= supportUpperBound else { return .zero }
+        let normalized = (x - location) / scale
+        return (1 + T.cos(normalized)) / (T.pi * scale)
+    }
+
+    // Implement the remaining protocol requirements (cdf, sf, quantiles, entropy, etc.)
+    // to participate in the SwiftyBoost distribution ecosystem.
+}
+
+let cosine = try CosineDistribution<Double>()
+let gaussian = try Distribution.Normal<Double>()
+let kl = try cosine.klDivergence(relativeTo: gaussian)   // Uses the shared helper automatically.
+```
+
+Custom conformers participate fully in KL divergence, can mix with the built-in typed wrappers and `Distribution.Dynamic`, and inherit the same quadrature defaults by calling `defaultKLDivergenceOptions()` when you need explicit `Distribution.KLDivergenceOptions`.
 
 ### Complex Numbers
 

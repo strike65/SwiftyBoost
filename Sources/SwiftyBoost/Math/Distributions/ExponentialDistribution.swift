@@ -64,7 +64,7 @@ extension Distribution {
     /// - Boost.Math: exponential_distribution
     public struct Exponential<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
         /// The real number type used by this distribution.
-        typealias RealType = T
+        public typealias RealType = T
 
         /// The rate parameter λ, strictly positive.
         ///
@@ -274,11 +274,17 @@ extension Distribution {
         ///   - options: Quadrature configuration; defaults to ``Distribution/KLDivergenceOptions/automatic()``.
         /// - Returns: The divergence in nats, or `nil` if it cannot be evaluated.
         /// - Throws: Rethrows any backend or quadrature errors.
-        public func klDivergence(
-            relativeTo other: Self,
-            options: Distribution.KLDivergenceOptions<T> = .automatic()
-        ) throws -> T? {
-            T.log(self.lambda / other.lambda) + other.lambda / self.lambda - 1
+        public func klDivergence<D: DistributionProtocol>(
+            relativeTo other: D,
+            options: Distribution.KLDivergenceOptions<T>
+        ) throws -> T? where D.RealType == T {
+            if let rhs = other as? Self {
+                let p = self.lambda
+                let q = rhs.lambda
+                guard p > 0, q > 0 else { return nil }
+                return T.log(p / q) + q / p - 1
+            }
+            return try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
     }
 }

@@ -24,7 +24,7 @@ import SwiftyBoostPrelude
 
 extension Distribution {
     public struct NonCentralBeta<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
-        typealias RealType = T
+        public typealias RealType = T
         public let alpha: T
         public let beta: T
         public let lambda: T
@@ -166,13 +166,13 @@ extension Distribution {
             }
         }
         public var isDiscrete: Bool { false }
-        public func klDivergence(
-            relativeTo other: Self,
-            options: Distribution.KLDivergenceOptions<T> = .automatic()
-        ) throws -> T? {
-            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        public func klDivergence<D>(
+            relativeTo other: D,
+            options: Distribution.KLDivergenceOptions<T>
+        ) throws -> T? where D: DistributionProtocol, D.RealType == T {
+            try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
-        // moments
+// moments
         public var moments: (mu1: T, mu2: T, mu3: T, mu4: T) {
             do {
                 let one: T = 1

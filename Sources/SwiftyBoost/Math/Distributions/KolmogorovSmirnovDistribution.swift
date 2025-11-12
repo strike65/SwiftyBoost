@@ -32,7 +32,7 @@ extension Distribution {
     /// - Generic parameter `T`: Any floating-point type supported by ``Distribution/Dynamic``
     ///   (`Float`, `Double`, or `Float80` on supported platforms).
     public struct KolmogorovSmirnov<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
-        typealias RealType = T
+        public typealias RealType = T
 
         /// Number of observations in the empirical sample.
         public let numberOfObservations: T
@@ -98,11 +98,11 @@ extension Distribution {
         public var isDiscrete: Bool { dyn.isDiscrete }
 
         /// Computes the Kullback–Leibler divergence against another Kolmogorov–Smirnov distribution.
-        public func klDivergence(
-            relativeTo other: Self,
+        public func klDivergence<D>(
+            relativeTo other: D,
             options: Distribution.KLDivergenceOptions<T>
-        ) throws -> T? {
-            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        ) throws -> T? where D: DistributionProtocol, D.RealType == T {
+            try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
-    }
+}
 }

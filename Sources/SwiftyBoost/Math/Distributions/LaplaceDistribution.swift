@@ -29,7 +29,7 @@ extension Distribution {
     /// parameter `scale`. It features exponential tails and is commonly used for
     /// robust modelling of symmetric data with heavier tails than the Gaussian.
     public struct Laplace<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
-        typealias RealType = T
+        public typealias RealType = T
 
         /// Location parameter (central tendency).
         public let location: T
@@ -102,11 +102,11 @@ extension Distribution {
         public var isDiscrete: Bool { dyn.isDiscrete }
 
         /// Computes the Kullback–Leibler divergence numerically or via any analytic form provided by the backend.
-        public func klDivergence(
-            relativeTo other: Self,
+        public func klDivergence<D>(
+            relativeTo other: D,
             options: Distribution.KLDivergenceOptions<T>
-        ) throws -> T? {
-            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        ) throws -> T? where D: DistributionProtocol, D.RealType == T {
+            try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
-    }
+}
 }

@@ -125,6 +125,11 @@ Any pair of SwiftyBoost distributions can be compared using
 ``Distribution/DistributionProtocol/klDivergence(relativeTo:options:)``.
 Continuous cases rely on adaptive quadrature and can be tuned through
 ``Distribution/KLDivergenceOptions``; discrete lattices are handled automatically.
+The method now accepts _any_ other ``Distribution/DistributionProtocol`` conformer,
+so typed wrappers, dynamic factory instances, empirical fits, and your own custom
+distributions can all be mixed as long as they share the same ``Distribution/DistributionProtocol/RealType``.
+`Distribution.KLDivergenceOptions.automatic()` seeds its integration bounds from the overlapping
+supports, and you can clamp the calculation further with `integrationLowerBound` / `integrationUpperBound`.
 
 ```swift
 let p = try Distribution.Exponential<Double>(lambda: 1.2)
@@ -141,6 +146,15 @@ let options = Distribution.KLDivergenceOptions<Double>(
     densityFloor: 1e-20
 )
 let tuned = try p.klDivergence(relativeTo: q, options: options)
+
+// Cross-family comparison plus bounded integration window.
+let gamma = try Distribution.Gamma<Double>(shape: 3.0, scale: 0.75)
+let beta = try Distribution.Beta<Double>(alpha: 2.5, beta: 4.0)
+let cross = try gamma.klDivergence(relativeTo: beta)
+let bounded = try gamma.klDivergence(
+    relativeTo: beta,
+    options: .init(integrationLowerBound: 0, integrationUpperBound: 0.25)
+)
 ```
 
 ## Error handling
@@ -153,3 +167,38 @@ let tuned = try p.klDivergence(relativeTo: q, options: options)
 ## Precision choices
 
 All distribution types are generic over `BinaryFloatingPoint`. Use `Double` by default for accuracy; use `Float` for performance. On x86_64, `Float80` is available and routes to extended precision backends.
+
+## Custom distributions
+
+``Distribution/DistributionProtocol`` is part of the public API and conforms to `Sendable`,
+so you can bring your own analytic forms while still benefiting from the built-in KL divergence helper,
+support-aware integration defaults, and lattice metadata.
+
+```swift
+public struct CosineDistribution<T: Real & BinaryFloatingPoint & Sendable>: DistributionProtocol {
+    public typealias RealType = T
+    public let location: T
+    public let scale: T
+
+    public init(location: T = 0, scale: T = 1) {
+        self.location = location
+        self.scale = scale
+    }
+
+    public var supportLowerBound: T { location - (T.pi * scale / 2) }
+    public var supportUpperBound: T { location + (T.pi * scale / 2) }
+    public var isDiscrete: Bool { false }
+
+    public func pdf(_ x: T) throws -> T {
+        guard supportLowerBound <= x && x <= supportUpperBound else { return .zero }
+        let normalized = (x - location) / scale
+        return (1 + T.cos(normalized)) / (T.pi * scale)
+    }
+
+    // Implement the remaining requirements (cdf/sf/quantiles, lattice metadata, entropy, etc.)
+    // and you automatically inherit klDivergence(relativeTo:) through the protocol extension.
+}
+```
+
+Call ``Distribution/DistributionProtocol/defaultKLDivergenceOptions()`` whenever you need an explicit
+``Distribution/KLDivergenceOptions`` instance; it pre-populates the support-aware integration bounds introduced in 1.0.5.

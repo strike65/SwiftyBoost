@@ -44,7 +44,7 @@ extension Distribution {
         DistributionProtocol
     {
         /// The concrete real number type used by this distribution.
-        typealias RealType = T
+        public typealias RealType = T
 
         /// Location parameter (shift).
         public let location: T
@@ -235,12 +235,11 @@ extension Distribution {
         ///   - options: Quadrature configuration; defaults to ``Distribution/KLDivergenceOptions/automatic()``.
         /// - Returns: The divergence in nats, or `nil` if it cannot be evaluated.
         /// - Throws: Rethrows any backend or quadrature errors.
-        public func klDivergence(
-            relativeTo other: Self,
-            options: Distribution.KLDivergenceOptions<T> = .automatic()
-        ) throws -> T? {
-            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        public func klDivergence<D>(
+            relativeTo other: D,
+            options: Distribution.KLDivergenceOptions<T>
+        ) throws -> T? where D: DistributionProtocol, D.RealType == T {
+            try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
-
-    }
+}
 }

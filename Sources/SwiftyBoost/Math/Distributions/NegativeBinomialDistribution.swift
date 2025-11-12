@@ -31,7 +31,7 @@ extension Distribution {
     /// The support is the non-negative integers counting the number of failures observed before
     /// the `successes`-th success occurs.
     public struct NegativeBinomial<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
-        typealias RealType = T
+        public typealias RealType = T
 
         /// Target number of successes `r`.
         public let successes: T
@@ -182,15 +182,13 @@ extension Distribution {
         public var isDiscrete: Bool { dyn.isDiscrete }
 
         /// Delegates KL divergence to the dynamic backend (numerical integration).
-        public func klDivergence(
-            relativeTo other: Self,
+        public func klDivergence<D>(
+            relativeTo other: D,
             options: Distribution.KLDivergenceOptions<T>
-        ) throws -> T? {
-            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        ) throws -> T? where D: DistributionProtocol, D.RealType == T {
+            try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
-        
-
-        public static func findLowerBoundOnP(nTrials n: Int,
+public static func findLowerBoundOnP(nTrials n: Int,
                                              nSuccesses k: Int,
                                              proposedSuccessFraction p0: T) -> T {
             guard p0 >= 0.0, p0 <= 1.0 else { return .nan }

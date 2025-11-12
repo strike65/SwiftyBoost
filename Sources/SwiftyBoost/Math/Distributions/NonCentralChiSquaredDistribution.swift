@@ -173,14 +173,13 @@ extension Distribution {
         public var entropy: T? { dyn.entropy }
         public var isDiscrete: Bool { dyn.isDiscrete }
 
-        public func klDivergence(
-            relativeTo other: Self,
-            options: Distribution.KLDivergenceOptions<T> = .automatic()
-        ) throws -> T? {
-            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        public func klDivergence<D>(
+            relativeTo other: D,
+            options: Distribution.KLDivergenceOptions<T>
+        ) throws -> T? where D: DistributionProtocol, D.RealType == T {
+            try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
-
-        // helpers
+// helpers
         public static func find_degreesOfFreedom(
             lambda: T,
             x: T,

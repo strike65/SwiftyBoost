@@ -106,13 +106,12 @@ extension Distribution {
 
         // MARK: KL divergence
 
-        public func klDivergence(
-            relativeTo other: Self,
-            options: Distribution.KLDivergenceOptions<T> = .automatic()
-        ) throws -> T? {
-            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        public func klDivergence<D>(
+            relativeTo other: D,
+            options: Distribution.KLDivergenceOptions<T>
+        ) throws -> T? where D: DistributionProtocol, D.RealType == T {
+            try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
-
-        public var isDiscrete: Bool { dyn.isDiscrete }
+public var isDiscrete: Bool { dyn.isDiscrete }
     }
 }

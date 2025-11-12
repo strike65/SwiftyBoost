@@ -44,14 +44,33 @@ extension Distribution {
         public var densityFloor: T
         public var discreteTailCutoff: T
         public var maxDiscreteEvaluations: Int
+        /// Optional override for the lower integration bound. When set, continuous integrals and discrete sums
+        /// start at `max(sharedSupportLower, integrationLowerBound)`.
+        public var integrationLowerBound: T?
+        /// Optional override for the upper integration bound. When set, continuous integrals and discrete sums
+        /// stop at `min(sharedSupportUpper, integrationUpperBound)`.
+        public var integrationUpperBound: T?
 
+        /// Creates a configuration for KL divergence evaluation.
+        ///
+        /// - Parameters:
+        ///   - finiteRule: Quadrature rule for finite intervals.
+        ///   - semiInfiniteRule: Quadrature rule for semi-infinite tails.
+        ///   - infiniteRule: Quadrature rule for integrals spanning the full real line.
+        ///   - densityFloor: Minimum density used to avoid division by zero.
+        ///   - discreteTailCutoff: Tail probability threshold for discrete truncation.
+        ///   - maxDiscreteEvaluations: Safety cap for discrete summations.
+        ///   - integrationLowerBound: Optional override for the lower integration limit.
+        ///   - integrationUpperBound: Optional override for the upper integration limit.
         public init(
             finiteRule: Quadrature.Rule = .gaussKronrod(points: 61),
             semiInfiniteRule: Quadrature.Rule = .expSinh(),
             infiniteRule: Quadrature.Rule = .tanhSinh(),
             densityFloor: T? = nil,
             discreteTailCutoff: T? = nil,
-            maxDiscreteEvaluations: Int = 250_000
+            maxDiscreteEvaluations: Int = 250_000,
+            integrationLowerBound: T? = nil,
+            integrationUpperBound: T? = nil
         ) {
             self.finiteRule = finiteRule
             self.semiInfiniteRule = semiInfiniteRule
@@ -59,6 +78,8 @@ extension Distribution {
             self.densityFloor = densityFloor ?? Self.defaultDensityFloor(for: T.self)
             self.discreteTailCutoff = discreteTailCutoff ?? Self.defaultTailCutoff(for: T.self)
             self.maxDiscreteEvaluations = maxDiscreteEvaluations
+            self.integrationLowerBound = integrationLowerBound
+            self.integrationUpperBound = integrationUpperBound
         }
 
         public static func automatic(for type: T.Type = T.self) -> Self {
@@ -67,7 +88,9 @@ extension Distribution {
                 semiInfiniteRule: .expSinh(),
                 infiniteRule: .tanhSinh(),
                 densityFloor: defaultDensityFloor(for: type),
-                discreteTailCutoff: defaultTailCutoff(for: type)
+                discreteTailCutoff: defaultTailCutoff(for: type),
+                integrationLowerBound: nil,
+                integrationUpperBound: nil
             )
         }
 
@@ -89,7 +112,7 @@ extension Distribution {
         }
     }
 }
-internal protocol DistributionProtocol {
+public protocol DistributionProtocol: Sendable {
     /// The real number type used by this distribution (for example, `Float`, `Double`, `Float80`).
     ///
     /// Conforming types should choose a floating-point type that suits their precision
@@ -259,10 +282,10 @@ internal protocol DistributionProtocol {
     ///   - other: Distribution to compare against (must share support).
     ///   - options: Numerical integration/summation configuration.
     /// - Returns: Divergence in nats, `nil` when undefined, or `infinity` when divergent.
-    func klDivergence(
-        relativeTo other: Self,
+    func klDivergence<D: DistributionProtocol>(
+        relativeTo other: D,
         options: Distribution.KLDivergenceOptions<RealType>
-    ) throws -> RealType?
+    ) throws -> RealType? where D.RealType == RealType
 
     /// Indicates whether the distribution is discrete (`true`) or continuous (`false`).
     ///
@@ -270,9 +293,267 @@ internal protocol DistributionProtocol {
     var isDiscrete: Bool { get }
 }
 
-extension DistributionProtocol {
+public extension DistributionProtocol {
+    /// Default configuration derived from the distribution’s support.
+    ///
+    /// - Returns: ``Distribution/KLDivergenceOptions`` with integration limits aligned to the
+    ///   finite support endpoints (when available) and the standard quadrature rules for the real line.
+    func defaultKLDivergenceOptions() -> Distribution.KLDivergenceOptions<RealType> {
+        var options = Distribution.KLDivergenceOptions<RealType>.automatic(for: RealType.self)
+        let lower = supportLowerBound
+        if lower.isFinite {
+            options.integrationLowerBound = lower
+        }
+        let upper = supportUpperBound
+        if upper.isFinite {
+            options.integrationUpperBound = upper
+        }
+        return options
+    }
+
+    func klDivergence<D: DistributionProtocol>(
+        relativeTo other: D,
+        options: Distribution.KLDivergenceOptions<RealType>
+    ) throws -> RealType? where D.RealType == RealType {
+        try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
+    }
+
     /// Convenience overload that uses ``Distribution/KLDivergenceOptions/automatic(for:)``.
-    func klDivergence(relativeTo other: Self) throws -> RealType? {
-        try klDivergence(relativeTo: other, options: .automatic(for: RealType.self))
+    func klDivergence<D: DistributionProtocol>(relativeTo other: D) throws -> RealType?
+    where D.RealType == RealType {
+        try klDivergence(relativeTo: other, options: defaultKLDivergenceOptions())
+    }
+}
+
+@usableFromInline
+enum DistributionKLDivergenceHelper {
+    @usableFromInline
+    static func evaluate<LHS: DistributionProtocol, RHS: DistributionProtocol>(
+        lhs: LHS,
+        rhs: RHS,
+        options: Distribution.KLDivergenceOptions<LHS.RealType>
+    ) throws -> LHS.RealType? where LHS.RealType == RHS.RealType {
+        guard lhs.isDiscrete == rhs.isDiscrete else { return nil }
+        if lhs.isDiscrete {
+            return try discrete(lhs: lhs, rhs: rhs, options: options)
+        } else {
+            return try continuous(lhs: lhs, rhs: rhs, options: options)
+        }
+    }
+
+    @usableFromInline
+    static func continuous<LHS: DistributionProtocol, RHS: DistributionProtocol>(
+        lhs: LHS,
+        rhs: RHS,
+        options: Distribution.KLDivergenceOptions<LHS.RealType>
+    ) throws -> LHS.RealType? where LHS.RealType == RHS.RealType {
+        typealias T = LHS.RealType
+        guard let bounds = sharedBounds(
+            lhs: lhs,
+            rhs: rhs,
+            lowerOverride: options.integrationLowerBound,
+            upperOverride: options.integrationUpperBound
+        ) else { return nil }
+        if !(bounds.lower < bounds.upper) { return nil }
+        let densityFloor = max(options.densityFloor, T.leastNonzeroMagnitude)
+        let flag = DivergenceFlag<T>()
+        let integrand: @Sendable (T) -> T = { x in
+            let p = positiveDensity(lhs, at: x)
+            if !p.isFinite || p <= densityFloor { return .zero }
+            var q = positiveDensity(rhs, at: x)
+            if !q.isFinite {
+                flag.isInfinite = true
+                return .zero
+            }
+            if q <= .zero {
+                q = densityFloor
+            }
+            if q < densityFloor {
+                q = densityFloor
+            }
+            let ratio = p / q
+            if !ratio.isFinite || ratio <= .zero {
+                return .zero
+            }
+            return p * T.log(ratio)
+        }
+
+        let value: T
+        switch (bounds.lower.isFinite, bounds.upper.isFinite) {
+        case (true, true):
+            let lowerD = Double(bounds.lower)
+            let upperD = Double(bounds.upper)
+            guard lowerD.isFinite, upperD.isFinite, lowerD < upperD else { return nil }
+            let integrator = try Quadrature.Integrator<T>(rule: options.finiteRule)
+            value = try integrator
+                .integrate(over: .finite(lower: lowerD, upper: upperD), integrand: integrand)
+                .value
+        case (true, false):
+            let lower = bounds.lower
+            guard lower.isFinite else { return nil }
+            let integrator = try Quadrature.Integrator<T>(rule: options.semiInfiniteRule)
+            value = try integrator.integrate { shift in
+                integrand(lower + shift)
+            }.value
+        case (false, true):
+            let upper = bounds.upper
+            guard upper.isFinite else { return nil }
+            let integrator = try Quadrature.Integrator<T>(rule: options.semiInfiniteRule)
+            value = try integrator.integrate { shift in
+                integrand(upper - shift)
+            }.value
+        default:
+            let integrator = try Quadrature.Integrator<T>(rule: options.infiniteRule)
+            value = try integrator.integrate(over: .automatic, integrand: integrand).value
+        }
+
+        if flag.isInfinite {
+            return T.infinity
+        }
+        return value.isFinite ? value : nil
+    }
+
+    @usableFromInline
+    static func discrete<LHS: DistributionProtocol, RHS: DistributionProtocol>(
+        lhs: LHS,
+        rhs: RHS,
+        options: Distribution.KLDivergenceOptions<LHS.RealType>
+    ) throws -> LHS.RealType? where LHS.RealType == RHS.RealType {
+        typealias T = LHS.RealType
+        guard let bounds = sharedBounds(
+            lhs: lhs,
+            rhs: rhs,
+            lowerOverride: options.integrationLowerBound,
+            upperOverride: options.integrationUpperBound
+        ) else { return nil }
+        let densityFloor = max(options.densityFloor, T.leastNonzeroMagnitude)
+        let tailTolerance = max(options.discreteTailCutoff, T.leastNonzeroMagnitude)
+
+        let startIndex: Int
+        if bounds.lower.isInfinite {
+            return nil
+        } else if let s = discreteCeil(bounds.lower) {
+            startIndex = s
+        } else {
+            return nil
+        }
+
+        var endIndex: Int? = nil
+        if bounds.upper.isFinite {
+            endIndex = discreteFloor(bounds.upper)
+            if let end = endIndex, end < startIndex {
+                return nil
+            }
+        }
+
+        var idx = startIndex
+        var divergence = T.zero
+        var iterations = 0
+        var infiniteFlag = false
+        while true {
+            if let end = endIndex, idx > end { break }
+            let point = T(idx)
+            let p = positiveDensity(lhs, at: point)
+            if p > densityFloor {
+                var q = positiveDensity(rhs, at: point)
+                if !q.isFinite || q <= .zero {
+                    infiniteFlag = true
+                } else {
+                    if q < densityFloor { q = densityFloor }
+                    let ratio = p / q
+                    if ratio.isFinite && ratio > .zero {
+                        divergence += p * T.log(ratio)
+                    }
+                }
+            }
+
+            iterations += 1
+            if iterations >= options.maxDiscreteEvaluations {
+                return nil
+            }
+
+            if endIndex == nil {
+                let tailSelf = positiveSurvival(lhs, above: point)
+                let tailOther = positiveSurvival(rhs, above: point)
+                if tailSelf <= tailTolerance && tailOther <= tailTolerance {
+                    break
+                }
+            }
+
+            idx += 1
+        }
+
+        if infiniteFlag {
+            return T.infinity
+        }
+        return divergence
+    }
+
+    @usableFromInline
+    static func sharedBounds<LHS: DistributionProtocol, RHS: DistributionProtocol>(
+        lhs: LHS,
+        rhs: RHS,
+        lowerOverride: LHS.RealType?,
+        upperOverride: LHS.RealType?
+    ) -> (lower: LHS.RealType, upper: LHS.RealType)? where LHS.RealType == RHS.RealType {
+        var lower = Swift.max(lhs.supportLowerBound, rhs.supportLowerBound)
+        var upper = Swift.min(lhs.supportUpperBound, rhs.supportUpperBound)
+        if let overrideLower = lowerOverride {
+            lower = Swift.max(lower, overrideLower)
+        }
+        if let overrideUpper = upperOverride {
+            upper = Swift.min(upper, overrideUpper)
+        }
+        if lower.isNaN || upper.isNaN || lower > upper {
+            return nil
+        }
+        return (lower, upper)
+    }
+
+    @usableFromInline
+    static func positiveDensity<D: DistributionProtocol>(
+        _ distribution: D,
+        at x: D.RealType
+    ) -> D.RealType {
+        guard let value = try? distribution.pdf(x), value.isFinite, value > 0 else {
+            return .zero
+        }
+        return value
+    }
+
+    @usableFromInline
+    static func positiveSurvival<D: DistributionProtocol>(
+        _ distribution: D,
+        above x: D.RealType
+    ) -> D.RealType {
+        guard let value = try? distribution.sf(x), value.isFinite else {
+            return D.RealType.infinity
+        }
+        return value < 0 ? D.RealType.infinity : value
+    }
+
+    @usableFromInline
+    static func discreteCeil<T: Real & BinaryFloatingPoint>(_ value: T) -> Int? {
+        let dv = Double(value)
+        guard dv.isFinite else { return nil }
+        if dv >= Double(Int.max) { return nil }
+        if dv <= Double(Int.min) { return nil }
+        let rounded = dv.rounded(.up)
+        return Int(rounded)
+    }
+
+    @usableFromInline
+    static func discreteFloor<T: Real & BinaryFloatingPoint>(_ value: T) -> Int? {
+        let dv = Double(value)
+        guard dv.isFinite else { return nil }
+        if dv >= Double(Int.max) { return Int(Int.max) }
+        if dv <= Double(Int.min) { return nil }
+        let rounded = dv.rounded(.down)
+        return Int(rounded)
+    }
+
+    @usableFromInline
+    final class DivergenceFlag<T: Real & BinaryFloatingPoint>: @unchecked Sendable {
+        var isInfinite: Bool = false
     }
 }

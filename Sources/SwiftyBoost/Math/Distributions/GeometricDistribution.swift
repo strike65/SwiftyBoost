@@ -55,7 +55,7 @@ extension Distribution {
         /// - `Double` (preferred on Apple platforms),
         /// - `Float`,
         /// - `Float80` (x86_64 only; falls back to `Double` bridge on other architectures).
-        typealias RealType = T
+        public typealias RealType = T
 
         // MARK: - Parameters
 
@@ -255,16 +255,13 @@ extension Distribution {
         ///   - options: Summation/integration configuration; defaults to ``Distribution/KLDivergenceOptions/automatic()``.
         /// - Returns: The divergence in nats, or `nil` if it cannot be evaluated.
         /// - Throws: Rethrows any backend or quadrature errors.
-        public func klDivergence(
-            relativeTo other: Self,
-            options: Distribution.KLDivergenceOptions<T> = .automatic()
-        ) throws -> T? {
-            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        public func klDivergence<D>(
+            relativeTo other: D,
+            options: Distribution.KLDivergenceOptions<T>
+        ) throws -> T? where D: DistributionProtocol, D.RealType == T {
+            try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
-
-
-
-        // MARK: - Planning helpers (one-sided bounds and trial-count solvers)
+// MARK: - Planning helpers (one-sided bounds and trial-count solvers)
         //
         // These helpers expose Boost.Math’s static utilities to:
         // - Compute one-sided confidence bounds on the success probability p based on observed counts.

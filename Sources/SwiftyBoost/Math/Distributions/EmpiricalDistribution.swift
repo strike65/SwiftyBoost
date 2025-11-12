@@ -9,37 +9,65 @@ import SwiftyBoostPrelude
 import Foundation
 
 extension Distribution {
-    /// Empirical distribution backed by a finite set of observations.
+    /// An empirical distribution backed by a finite set of observations.
     ///
-    /// The implementation distinguishes between lattice/discrete and continuous samples,
-    /// exposes the full ``DistributionProtocol`` surface, and provides bootstrap-based
-    /// uncertainty estimates for entropy and KL divergence.
+    /// This type provides a pragmatic, feature-complete implementation of ``DistributionProtocol``
+    /// from a sample array. It supports both lattice/discrete and continuous data:
+    ///
+    /// - Discrete detection:
+    ///   The implementation attempts to detect whether the support is discrete (lattice-based)
+    ///   using repeated values, minimum spacing, and ratio checks. For discrete data, mass
+    ///   is assigned to unique support points using smoothed relative frequencies.
+    ///
+    /// - Continuous handling:
+    ///   For continuous samples, density-related queries (e.g., `pdf`, `mode`, entropy, KL divergence)
+    ///   are computed using nonparametric estimators (KDE with a Gaussian kernel or a KNN-based method).
+    ///
+    /// - Summary statistics:
+    ///   Mean, variance, skewness, kurtosis, median, mode, entropy, and lattice metadata are computed
+    ///   on initialisation and cached. When unavailable or undefined, corresponding properties return `nil`.
+    ///
+    /// - KL divergence:
+    ///   KL divergence is available against any other ``DistributionProtocol`` via
+    ///   numeric integration/summation (see ``Distribution/KLDivergenceOptions``),
+    ///   and against another empirical distribution using nonparametric estimators
+    ///   (KDE or KNN).
+    ///
+    /// - Uncertainty via bootstrap:
+    ///   Bootstrap-based confidence intervals are provided for entropy and KL divergence.
+    ///   Percentile and BCa intervals are supported. For BCa, a jackknife acceleration
+    ///   is computed when possible.
+    ///
+    /// Notes:
+    /// - All densities and entropies are in natural units (nats).
+    /// - KDE bandwidth selection uses a Silverman-like rule with a short data-driven
+    ///   model selection pass to maximise log-likelihood among a small set of multipliers.
+    /// - KNN-based entropy/kl implementations use symmetric neighbour distance heuristics
+    ///   with safety floors to limit numerical issues.
     public struct Empirical<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
         public typealias RealType = T
 
         // MARK: Nested types
 
-        /// Bootstrap confidence-interval construction.
-        /// Bootstrap resampling strategy used when constructing confidence intervals.
+        /// Bootstrap interval type.
         ///
-        /// - ``BootstrapMethod/percentile``: Uses the percentile method and returns quantiles of the empirical
-        ///   bootstrap distribution without jackknife acceleration.
-        /// - ``BootstrapMethod/bca``: Applies bias-corrected and accelerated adjustments when jackknife estimates
-        ///   are available. Falls back to percentile behaviour when jackknife data cannot be produced.
+        /// - percentile: Standard percentile bootstrap interval.
+        /// - bca: Bias-corrected and accelerated interval (requires jackknife).
         public enum BootstrapMethod: Sendable {
             case percentile
             case bca
         }
 
-        /// Result bundle containing a point estimate and (optionally) a confidence interval.
+        /// A bootstrap estimate with optional confidence interval.
+        ///
+        /// - value: The point estimate computed on the original data.
+        /// - confidenceInterval: Optional (lower, upper) interval at the requested confidence level.
+        /// - replicates: Number of bootstrap resamples used.
+        /// - method: The bootstrap method used (percentile or BCa).
         public struct Estimate<Value: Sendable>: Sendable {
-            /// Point estimate returned by the requested statistic.
             public let value: Value
-            /// Optional confidence interval covering the `confidenceLevel` supplied to the bootstrap call.
             public let confidenceInterval: (lower: Value, upper: Value)?
-            /// Number of bootstrap replicates used to form the estimate.
             public let replicates: Int
-            /// Resampling strategy that produced the interval.
             public let method: BootstrapMethod
 
             @inlinable
@@ -56,27 +84,33 @@ extension Distribution {
             }
         }
 
-        /// Density estimator preference for differential entropy / KL divergence.
+        /// Density estimator choice for continuous tasks (entropy, KL divergence, mode).
+        ///
+        /// - automatic: Heuristic selection (typically KNN with small k for moderate n).
+        /// - knn(k:): K-nearest neighbour estimator with user-specified `k` (clamped to ≥ 1).
+        /// - kdeGaussian(bandwidth:): Gaussian-kernel KDE with optional bandwidth override.
         public enum DensityEstimator: Sendable {
-            /// Choose between KNN and KDE automatically based on sample characteristics.
             case automatic
-            /// Explicitly request the k-nearest neighbour estimator.
             case knn(k: Int)
-            /// Use a Gaussian kernel density estimate. When `bandwidth` is nil a plug-in bandwidth is computed.
             case kdeGaussian(bandwidth: T?)
         }
 
         // MARK: Stored properties
 
+        /// Sample values sorted ascending (includes duplicates).
         private let samplesSorted: [T]
-        private let samplesDouble: [Double]
+        /// Unique support points (sorted ascending).
         private let uniqueValues: [T]
-        private let uniqueDoubles: [Double]
+        /// Multiplicity per unique support point (aligned with `uniqueValues`).
         private let counts: [Int]
+        /// Total number of observations.
         private let totalCount: Int
+        /// Additive smoothing parameter for discrete frequencies (Laplace-like).
         private let smoothingAlpha: T = 0.5
+        /// Default KNN `k` when not specified.
         private let knnDefaultK: Int = 3
 
+        // Cached statistics (computed at init)
         private let meanCache: T
         private let varianceCache: T
         private let skewnessCache: T?
@@ -95,42 +129,44 @@ extension Distribution {
 
         /// Creates an empirical distribution from a finite sample.
         ///
-        /// The constructor validates and sorts the supplied observations, automatically detects
-        /// whether the data is best treated as discrete (lattice) or continuous, and precomputes
-        /// summary statistics as well as smoothed probability masses. Repeated observations are
-        /// collapsed to unique support points for efficiency, while the original multiplicities
-        /// remain available for bootstrap resampling.
+        /// - Parameter samples: Array of finite observations (NaN and ±∞ are rejected).
         ///
-        /// - Parameter samples: Sequence of finite observations. The sequence is consumed eagerly.
+        /// This initialiser:
+        /// - Sorts the sample and computes the range.
+        /// - Collapses samples into unique support points with multiplicities.
+        /// - Detects whether the support is likely discrete (lattice) vs continuous.
+        /// - Computes smoothed probabilities for discrete support.
+        /// - Pre-computes summary statistics (mean, variance, skewness, kurtosis, median, mode).
+        /// - Estimates entropy using a discrete plug-in (with Miller–Madow correction) or
+        ///   continuous estimators (KNN first, then KDE fallback).
+        /// - Flags likely multimodality using a simple peaks-count heuristic on either discrete
+        ///   probabilities or a KDE grid for continuous data.
+        ///
         /// - Throws:
-        ///   - ``DistributionError/invalidCombination(message:value:)`` when the sequence is empty.
-        ///   - ``DistributionError/parameterNotFinite(name:value:)`` if any sample is NaN or ±infinity.
-        public init<S: Sequence>(samples: S) throws where S.Element == T {
-            var collected: [T] = []
-            collected.reserveCapacity(64)
-            for value in samples {
-                guard value.isFinite else {
-                    throw DistributionError<T>.parameterNotFinite(name: "samples", value: value)
-                }
-                collected.append(value)
-            }
-            guard !collected.isEmpty else {
+        ///   - ``DistributionError/invalidCombination(message:value:)`` if the input is empty.
+        ///   - ``DistributionError/parameterNotFinite(name:value:)`` if any observation is not finite.
+        public init(samples: [T]) throws {
+            guard !samples.isEmpty else {
                 throw DistributionError<T>.invalidCombination(
                     message: "Empirical distribution requires at least one observation.",
                     value: nil
                 )
             }
+            for v in samples {
+                guard v.isFinite else {
+                    throw DistributionError<T>.parameterNotFinite(name: "samples", value: v)
+                }
+            }
 
+            var collected = samples
             collected.sort()
             self.samplesSorted = collected
-            self.samplesDouble = collected.map { Double($0) }
             self.totalCount = collected.count
             self.rangeLower = collected.first!
             self.rangeUpper = collected.last!
 
             // Collapse to unique support points with multiplicities.
             var values: [T] = []
-            var doubles: [Double] = []
             var multiplicities: [Int] = []
             values.reserveCapacity(collected.count)
             multiplicities.reserveCapacity(collected.count)
@@ -144,20 +180,18 @@ extension Distribution {
                         currentCount += 1
                     } else {
                         values.append(current)
-                        doubles.append(Double(current))
                         multiplicities.append(currentCount)
                         current = next
                         currentCount = 1
                     }
                 }
                 values.append(current)
-                doubles.append(Double(current))
                 multiplicities.append(currentCount)
             }
             self.uniqueValues = values
-            self.uniqueDoubles = doubles
             self.counts = multiplicities
 
+            // Discrete vs continuous detection (lattice step/origin when discrete).
             let detection = Self.detectDiscreteSupport(values: values, totalCount: collected.count, toleranceScale: T(1e-6))
             self.isDiscreteDistribution = detection.isDiscrete
             self.latticeStepValue = detection.latticeStep
@@ -169,7 +203,7 @@ extension Distribution {
                 alpha: smoothingAlpha
             )
 
-            // Mean/variance/skewness/kurtosis
+            // Mean/variance/skewness/kurtosis (from unique values and smoothed probabilities).
             var mean: T = 0
             for idx in values.indices {
                 mean += values[idx] * probabilities[idx]
@@ -196,7 +230,9 @@ extension Distribution {
                 self.kurtosisCache = nil
             }
 
-            // Mode: discrete -> highest smoothed probability; continuous -> KDE max.
+            // Mode:
+            // - Discrete: argmax of smoothed probabilities (ties broken by smallest value).
+            // - Continuous: maximum of Gaussian KDE evaluated at sample points.
             if detection.isDiscrete {
                 var bestValue = values.first
                 var bestProbability = probabilities.first ?? 1
@@ -209,42 +245,53 @@ extension Distribution {
                 }
                 self.modeCache = bestValue
             } else {
-                self.modeCache = Self.estimateContinuousMode(samples: self.samplesDouble)
+                self.modeCache = Self.estimateContinuousMode(samples: self.samplesSorted)
             }
 
-            // Median via quantile 0.5
+            // Median via weighted quantile at p=0.5 (discrete) or linear interpolation (continuous).
             self.medianCache = Self.quantile(samples: collected, probabilities: probabilities, p: 0.5)
 
+            // Entropy:
+            // - Discrete: plug-in with Miller–Madow correction.
+            // - Continuous: prefer KNN; fall back to KDE if KNN is not applicable.
             if detection.isDiscrete {
                 self.entropyCache = Self.discreteEntropy(probabilities: probabilities, uniqueCount: values.count, sampleSize: collected.count)
-            } else if let knnEntropy = Self.continuousEntropyKNN(samples: self.samplesDouble, k: knnDefaultK) {
+            } else if let knnEntropy = Self.continuousEntropyKNN(samples: self.samplesSorted, k: knnDefaultK) {
                 self.entropyCache = knnEntropy
             } else {
-                self.entropyCache = Self.continuousEntropyKDE(samples: self.samplesDouble, bandwidth: nil)
+                self.entropyCache = Self.continuousEntropyKDE(samples: self.samplesSorted, bandwidth: nil)
             }
 
+            // Lightweight multimodality heuristic (counts local maxima).
             self.likelyMultimodal = Self.detectMultimodality(
-                samples: self.samplesDouble,
+                samples: self.samplesSorted,
                 isDiscrete: detection.isDiscrete
             )
         }
 
         // MARK: DistributionProtocol – Support
 
-        /// Lowest observed value in the sample (minimum of the support).
+        /// Lower bound of the observed sample range.
+        ///
+        /// For empirical distributions this equals the minimum observation.
         public var supportLowerBound: T { rangeLower }
-        /// Highest observed value in the sample (maximum of the support).
+        /// Upper bound of the observed sample range.
+        ///
+        /// For empirical distributions this equals the maximum observation.
         public var supportUpperBound: T { rangeUpper }
-        /// Convenience tuple exposing both support endpoints.
+        /// Convenience pair for the sample range `(min, max)`.
         public var range: (lower: T, upper: T) { (rangeLower, rangeUpper) }
 
         // MARK: - Core functions
 
-        /// Evaluates the empirical PDF/PMF or a KDE density depending on the detected support type.
+        /// Probability density/mass function.
         ///
-        /// - Parameter x: Query position.
-        /// - Returns: Smoothed probability mass for discrete samples or a continuous density estimate.
-        /// - Throws: ``DistributionError/parameterNotFinite(name:value:)`` when `x` is not finite.
+        /// - Discrete: returns the smoothed probability mass at `x` when `x` is a support point; 0 otherwise.
+        /// - Continuous: evaluates a Gaussian-kernel KDE at `x` with an automatically chosen bandwidth.
+        ///
+        /// - Parameter x: Evaluation point (must be finite).
+        /// - Returns: Nonnegative density/mass at `x`.
+        /// - Throws: ``DistributionError/parameterNotFinite(name:value:)`` if `x` is NaN or ±∞.
         public func pdf(_ x: T) throws -> T {
             guard x.isFinite else {
                 throw DistributionError<T>.parameterNotFinite(name: "x", value: x)
@@ -261,14 +308,20 @@ extension Distribution {
                 return probs[index]
             }
             let density = Self.kdeDensityGaussian(
-                samples: samplesDouble,
-                x: Double(x),
+                samples: samplesSorted,
+                x: x,
                 bandwidth: nil
             )
-            return T(density)
+            return density
         }
 
-        /// Natural logarithm of ``pdf(_:)``. Returns `-infinity` for zero mass.
+        /// Natural logarithm of the PDF/PMF.
+        ///
+        /// Returns `-infinity` when the density/mass is numerically zero.
+        ///
+        /// - Parameter x: Evaluation point.
+        /// - Returns: `log(pdf(x))` or `-infinity` if zero.
+        /// - Throws: Re-throws from ``pdf(_:)``.
         public func logPdf(_ x: T) throws -> T {
             let p = try pdf(x)
             if p > 0 {
@@ -277,10 +330,14 @@ extension Distribution {
             return -.infinity
         }
 
-        /// Empirical CDF evaluated at `x`.
+        /// Cumulative distribution function, F(x) = P(X ≤ x).
         ///
-        /// Discrete samples accumulate smoothed point probabilities; continuous samples use the
-        /// empirical cumulative function based on order statistics.
+        /// - Discrete: sum of smoothed masses at support points ≤ `x`.
+        /// - Continuous: empirical CDF from the sample (rank-based).
+        ///
+        /// - Parameter x: Evaluation point; `-∞` → 0, `+∞` → 1.
+        /// - Returns: Value in [0, 1].
+        /// - Throws: ``DistributionError/parameterNotFinite(name:value:)`` for NaN.
         public func cdf(_ x: T) throws -> T {
             guard x.isFinite else {
                 if x == T.infinity { return 1 }
@@ -302,19 +359,26 @@ extension Distribution {
                 }
                 return min(max(cumulative, 0), 1)
             } else {
-                // Continuous CDF via empirical cumulative (midpoint correction).
                 let idx = Self.upperBound(in: samplesSorted, value: x)
                 return T(idx) / T(totalCount)
             }
         }
 
-        /// Survival function `1 - CDF(x)` with guarding against negative underflow.
+        /// Survival function, S(x) = P(X > x).
+        ///
+        /// - Parameter x: Evaluation point.
+        /// - Returns: Value in [0, 1].
+        /// - Throws: Re-throws from ``cdf(_:)``.
         public func sf(_ x: T) throws -> T {
             let c = try cdf(x)
             return max(0, 1 - c)
         }
 
-        /// Hazard rate. For discrete samples this is defined using the smoothed PMF.
+        /// (Instantaneous) hazard function, h(x) = f(x) / S(x) where defined.
+        ///
+        /// - Parameter x: Evaluation point.
+        /// - Returns: Hazard at `x`, or `infinity` when `S(x) = 0` and `f(x) > 0`.
+        /// - Throws: Re-throws from ``pdf(_:)`` and ``sf(_:)``.
         public func hazard(_ x: T) throws -> T {
             let density = try pdf(x)
             if density == 0 { return 0 }
@@ -325,7 +389,11 @@ extension Distribution {
             return .infinity
         }
 
-        /// Cumulative hazard `-log(SF(x))` guarded for degenerate tails.
+        /// Cumulative hazard function, H(x) = −log S(x) where defined.
+        ///
+        /// - Parameter x: Evaluation point.
+        /// - Returns: CHF at `x`, or `infinity` when `S(x) ≤ 0`.
+        /// - Throws: Re-throws from ``sf(_:)``.
         public func chf(_ x: T) throws -> T {
             let survival = try sf(x)
             if survival <= 0 { return .infinity }
@@ -334,7 +402,14 @@ extension Distribution {
 
         // MARK: - Inverses
 
-        /// Lower-tail quantile. For discrete samples the first point with cumulative mass ≥ `p` is returned.
+        /// Lower-tail quantile (inverse CDF).
+        ///
+        /// - Discrete: smallest support value with cumulative probability ≥ `p`.
+        /// - Continuous: linear interpolation between order statistics.
+        ///
+        /// - Parameter p: Probability in [0, 1].
+        /// - Returns: Value `x` such that F(x) ≈ `p`.
+        /// - Throws: ``DistributionError/parameterOutOfRange(name:min:max:)`` when `p ∉ [0, 1]`.
         public func quantile(_ p: T) throws -> T {
             guard p >= 0, p <= 1 else {
                 throw DistributionError<T>.parameterOutOfRange(name: "p", min: 0, max: 1)
@@ -367,7 +442,13 @@ extension Distribution {
             }
         }
 
-        /// Upper-tail quantile, equivalent to `quantile(1 - q)`.
+        /// Upper-tail quantile (inverse survival function).
+        ///
+        /// Returns `x` such that S(x) ≈ `q` for `q` in [0, 1].
+        ///
+        /// - Parameter q: Upper-tail probability in [0, 1].
+        /// - Returns: The corresponding upper-tail quantile.
+        /// - Throws: ``DistributionError/parameterOutOfRange(name:min:max:)`` when `q ∉ [0, 1]`.
         public func quantileComplement(_ q: T) throws -> T {
             guard q >= 0, q <= 1 else {
                 throw DistributionError<T>.parameterOutOfRange(name: "q", min: 0, max: 1)
@@ -377,53 +458,84 @@ extension Distribution {
 
         // MARK: - Summary statistics
 
-        /// Sample mean calculated from the smoothed probability masses.
+        /// Smoothed mean of the empirical distribution.
         public var mean: T? { meanCache }
-        /// Sample variance based on smoothed masses; zero when all observations coincide.
+        /// Smoothed variance of the empirical distribution.
         public var variance: T? { varianceCache }
-        /// Mode of the distribution. Discrete samples report the most frequent value, continuous samples approximate via KDE.
+        /// Mode:
+        /// - Discrete: support point with the highest smoothed probability.
+        /// - Continuous: arg max of KDE evaluated at sample points.
         public var mode: T? { modeCache }
-        /// Empirical median (0.5 quantile).
+        /// Median (0.5 quantile).
         public var median: T { medianCache }
-        /// Smoothed sample skewness or `nil` when the variance is zero.
+        /// Skewness (standardised third moment), when variance > 0.
         public var skewness: T? { skewnessCache }
-        /// Smoothed sample kurtosis or `nil` when the variance is zero.
+        /// Kurtosis (Pearson), when variance > 0. Equals 3 for a normal distribution.
         public var kurtosis: T? { kurtosisCache }
+        /// Excess kurtosis (kurtosis − 3), when defined.
         public var kurtosisExcess: T? {
             guard let kurtosis = kurtosisCache else { return nil }
             return kurtosis - 3
         }
 
-        /// Lattice spacing detected for discrete samples, otherwise `nil`.
+        /// Lattice step for discrete support (spacing between adjacent support points), if detected.
         public var latticeStep: T? { latticeStepValue }
-        /// Lattice origin for discrete samples, otherwise `nil`.
+        /// Lattice origin for discrete support (offset), if detected.
         public var latticeOrigin: T? { latticeOriginValue }
 
-        /// Shannon entropy estimate (Miller–Madow corrected for discrete samples, KNN/KDE otherwise).
+        /// Entropy in nats:
+        /// - Discrete: plug-in with Miller–Madow correction.
+        /// - Continuous: KNN when applicable; otherwise KDE.
         public var entropy: T? { entropyCache }
-        /// Flag indicating whether the sample was classified as discrete.
+
+        /// Indicates whether the distribution behaves as discrete (true) or continuous (false).
         public var isDiscrete: Bool { isDiscreteDistribution }
 
-        /// Indicates whether the empirical sample exhibits multimodality according to KDE/local-max scans.
+        /// Heuristic flag indicating likely multimodality.
+        ///
+        /// - Discrete: counts local maxima of the smoothed probability mass function.
+        /// - Continuous: counts peaks of a KDE evaluated on a coarse grid.
         public var isLikelyMultimodal: Bool { likelyMultimodal }
 
         // MARK: - KL divergence
 
-        /// KL divergence between two empirical distributions using an automatic estimator.
-        public func klDivergence(
-            relativeTo other: Self,
-            options: Distribution.KLDivergenceOptions<T>
-        ) throws -> T? {
-            try klDivergence(relativeTo: other, estimator: .automatic)
-        }
-
-        /// KL divergence estimate using the requested density estimator.
+        /// KL divergence relative to an arbitrary distribution.
+        ///
+        /// - If `other` is another empirical distribution, this will call the specialised
+        ///   overload using nonparametric estimators (see ``klDivergence(relativeTo:estimator:)``).
+        /// - Otherwise, it falls back to the generic helper which uses numerical
+        ///   integration/summation based on ``Distribution/KLDivergenceOptions``.
         ///
         /// - Parameters:
-        ///   - other: Reference empirical distribution.
-        ///   - estimator: Density estimator selection (.knn or .kdeGaussian). `.automatic` chooses KNN when both
-        ///     samples appear continuous, otherwise smoothed discrete estimator.
-        /// - Returns: Estimated divergence (nats) or `nil` when undefined.
+        ///   - other: Target distribution.
+        ///   - options: Numerical configuration (quadrature rules, density floors, tail cutoffs).
+        /// - Returns: `D_KL(self || other)` in nats, `nil` if undefined or supports do not match.
+        public func klDivergence<D: DistributionProtocol>(
+            relativeTo other: D,
+            options: Distribution.KLDivergenceOptions<T>
+        ) throws -> T? where D.RealType == T {
+               if let empiricalOther = other as? Self {
+                return try klDivergence(relativeTo: empiricalOther, estimator: .automatic)
+            }
+            return try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
+        }
+
+        /// KL divergence relative to another empirical distribution using nonparametric estimators.
+        ///
+        /// - Discrete: Mass functions are merged over the union support and smoothed with `alpha = 0.5`.
+        /// - Continuous:
+        ///   - `.automatic`: Chooses a KNN estimator with a small `k` relative to `n`, otherwise KDE.
+        ///   - `.knn(k:)`: KNN estimator with the specified `k` (≥ 1).
+        ///   - `.kdeGaussian(bandwidth:)`: Gaussian-kernel KDE (optional bandwidth override).
+        ///
+        /// Numerical notes:
+        /// - Small density floors are applied internally to avoid `log(0)` issues.
+        /// - Estimators are approximate; results depend on sample size, bandwidth, and `k`.
+        ///
+        /// - Parameters:
+        ///   - other: Another empirical distribution over the same real type.
+        ///   - estimator: Estimation method; see ``DensityEstimator``.
+        /// - Returns: `D_KL(self || other)` in nats, or `nil` if not computable.
         public func klDivergence(
             relativeTo other: Self,
             estimator: DensityEstimator
@@ -431,22 +543,23 @@ extension Distribution {
             if isDiscreteDistribution || other.isDiscreteDistribution {
                 let smoothing = smoothingAlpha
                 let merged = Self.unionSupport(left: self, right: other)
-                var sum: Double = 0
+                var sum: T = 0
                 for entry in merged {
-                    let p = Double(Self.smoothedProbability(
+                    let p = Self.smoothedProbability(
                         value: entry,
                         distribution: self,
                         alpha: smoothing
-                    ))
-                    let q = Double(Self.smoothedProbability(
+                    )
+                    let qRaw = Self.smoothedProbability(
                         value: entry,
                         distribution: other,
                         alpha: smoothing
-                    ))
+                    )
                     if p == 0 { continue }
-                    sum += p * (log(p) - log(q))
+                    let q = max(qRaw, T.leastNonzeroMagnitude)
+                    sum += p * (T.log(p) - T.log(q))
                 }
-                return T(sum)
+                return sum
             }
 
             let chosenEstimator: DensityEstimator
@@ -460,16 +573,16 @@ extension Distribution {
             switch chosenEstimator {
             case .knn(let k):
                 return Self.klDivergenceKNN(
-                    samplesP: samplesDouble,
-                    samplesQ: other.samplesDouble,
+                    samplesP: samplesSorted,
+                    samplesQ: other.samplesSorted,
                     k: max(1, k)
-                ).map { T($0) }
+                )
             case .kdeGaussian(let bandwidth):
                 return Self.klDivergenceKDE(
-                    samplesP: samplesDouble,
-                    samplesQ: other.samplesDouble,
-                    bandwidth: bandwidth.map { Double($0) }
-                ).map { T($0) }
+                    samplesP: samplesSorted,
+                    samplesQ: other.samplesSorted,
+                    bandwidth: bandwidth
+                )
             case .automatic:
                 return nil // unreachable
             }
@@ -477,14 +590,20 @@ extension Distribution {
 
         // MARK: - Bootstrap estimates
 
-        /// Bootstrap estimate (point + confidence interval) for the entropy.
+        /// Bootstrap confidence interval for entropy.
+        ///
+        /// - For discrete samples: re-estimates entropy via smoothed frequencies with
+        ///   a Miller–Madow correction on each resample.
+        /// - For continuous samples: uses the selected estimator; in `.automatic` and `.knn`
+        ///   it prefers KNN when feasible, falling back to KDE otherwise.
         ///
         /// - Parameters:
-        ///   - estimator: Density estimator used for each replicate. `.automatic` mirrors ``entropy`` defaults.
-        ///   - bootstrapSamples: Number of resampled replicates. Higher values tighten intervals at the cost of runtime.
-        ///   - confidenceLevel: Central mass retained by the interval. Values near 1 request wider intervals.
-        ///   - method: Resampling interval strategy (percentile or BCa).
-        /// - Returns: Point estimate with optional confidence bounds. Bounds are `nil` when the interval could not be formed.
+        ///   - estimator: Density estimator for continuous entropy (ignored for discrete).
+        ///   - bootstrapSamples: Number of bootstrap resamples (≥ 2 recommended).
+        ///   - confidenceLevel: Confidence level in (0, 1), e.g. 0.95.
+        ///   - method: Percentile or BCa interval. BCa uses jackknife acceleration when available.
+        /// - Returns: An ``Estimate`` containing the point estimate and the interval if computable.
+        /// - Throws: Rethrows from the estimator closure if it fails on a resample.
         public func entropyEstimate(
             estimator: DensityEstimator = .automatic,
             bootstrapSamples: Int = 200,
@@ -496,13 +615,13 @@ extension Distribution {
             case .automatic:
                 point = entropy ?? 0
             case .knn(let k):
-                if let value = Self.continuousEntropyKNN(samples: samplesDouble, k: max(1, k)) {
+                if let value = Self.continuousEntropyKNN(samples: samplesSorted, k: max(1, k)) {
                     point = value
                 } else {
-                    point = Self.continuousEntropyKDE(samples: samplesDouble, bandwidth: nil)
+                    point = Self.continuousEntropyKDE(samples: samplesSorted, bandwidth: nil)
                 }
             case .kdeGaussian(let bandwidth):
-                point = Self.continuousEntropyKDE(samples: samplesDouble, bandwidth: bandwidth.map { Double($0) })
+                point = Self.continuousEntropyKDE(samples: samplesSorted, bandwidth: bandwidth)
             }
 
             let interval = try Self.bootstrapOneSample(
@@ -519,23 +638,22 @@ extension Distribution {
                             sampleSize: sample.count
                         ))
                     } else {
-                        let doubles = sample.map { Double($0) }
                         switch estimator {
                         case .automatic, .knn:
                             if let value = Self.continuousEntropyKNN(
-                                samples: doubles,
+                                samples: sample,
                                 k: knnDefaultK
                             ) {
                                 return value
                             }
                             return Self.continuousEntropyKDE(
-                                samples: doubles,
+                                samples: sample,
                                 bandwidth: nil
                             )
                         case .kdeGaussian(let bandwidth):
                             return Self.continuousEntropyKDE(
-                                samples: doubles,
-                                bandwidth: bandwidth.map { Double($0) }
+                                samples: sample,
+                                bandwidth: bandwidth
                             )
                         }
                     }
@@ -548,11 +666,17 @@ extension Distribution {
             return Estimate(value: point, confidenceInterval: interval, replicates: bootstrapSamples, method: method)
         }
 
-        /// Bootstrap estimate (point + confidence interval) for the KL divergence.
+        /// Bootstrap confidence interval for empirical KL divergence.
         ///
-        /// - Parameters mirror ``entropyEstimate(estimator:bootstrapSamples:confidenceLevel:method:)`` but operate on two samples.
-        ///   Resampling is performed independently for `self` and `other`.
-        /// - Returns: Point estimate with optional confidence bounds, or `nil` when the divergence could not be computed.
+        /// - Parameters:
+        ///   - other: Comparison empirical distribution.
+        ///   - estimator: Nonparametric estimator to use for continuous data.
+        ///   - bootstrapSamples: Number of bootstrap resamples per distribution.
+        ///   - confidenceLevel: Confidence level in (0, 1), e.g. 0.95.
+        ///   - method: Percentile or BCa interval. For two-sample bootstrap, BCa falls back
+        ///     to percentile due to the lack of a two-sample jackknife.
+        /// - Returns: An ``Estimate`` with point estimate and interval, or `nil` if the divergence is undefined.
+        /// - Throws: Rethrows from internal estimators if they fail on resamples.
         public func klDivergenceEstimate(
             relativeTo other: Self,
             estimator: DensityEstimator = .automatic,
@@ -585,6 +709,9 @@ extension Distribution {
 // MARK: - Helpers (private)
 
 private extension Distribution.Empirical {
+    /// Convert counts to smoothed probabilities using additive smoothing.
+    ///
+    /// p_i = (count_i + alpha) / (total + alpha * unique)
     static func normalisedFrequencies(
         counts: [Int],
         total: Int,
@@ -599,6 +726,7 @@ private extension Distribution.Empirical {
         }
     }
 
+    /// Multiplicities per unique value in a sample (sorted internally).
     static func multiplicities(for sample: [T]) -> [Int] {
         if sample.isEmpty { return [] }
         var counts: [Int] = []
@@ -620,6 +748,7 @@ private extension Distribution.Empirical {
         return counts
     }
 
+    /// Unique sorted values from a sample.
     static func uniqueValues(from sample: [T]) -> [T] {
         if sample.isEmpty { return [] }
         var values: [T] = []
@@ -637,6 +766,10 @@ private extension Distribution.Empirical {
         return values
     }
 
+    /// Heuristics to detect discrete (lattice) support and optional step/origin.
+    ///
+    /// - Uses min spacing and ratio checks against a tolerance to infer a lattice.
+    /// - Falls back to discrete if a substantial fraction of duplicates is observed.
     static func detectDiscreteSupport(
         values: [T],
         totalCount: Int,
@@ -682,14 +815,15 @@ private extension Distribution.Empirical {
             return (true, minDiff, values.first)
         }
 
-        let duplicateFraction = 1 - T(values.count) / T(values.count + diffs.count)
-        if duplicateFraction > 0.25 && values.count <= Int(Double(values.count * 2).squareRoot()) {
+        let duplicateFractionFull = 1 - T(uniqueCount) / T(max(totalCount, 1))
+        if duplicateFractionFull > 0.25 {
             return (true, nil, values.first)
         }
 
         return (false, nil, nil)
     }
 
+    /// Discrete entropy with Miller–Madow correction.
     static func discreteEntropy(
         probabilities: [T],
         uniqueCount: Int,
@@ -705,80 +839,96 @@ private extension Distribution.Empirical {
         return entropy
     }
 
-    static func continuousEntropyKNN(samples: [Double], k: Int) -> T? {
+    /// Continuous entropy via KNN estimator (Kraskov-like in 1D).
+    ///
+    /// Returns `nil` when `n <= k`.
+    static func continuousEntropyKNN(samples: [T], k: Int) -> T? {
         guard samples.count > max(k, 1) else { return nil }
         let n = samples.count
-        var sumLogDistances: Double = 0
+        var sumLogDistances: T = 0
         let sorted = samples.sorted()
-        let epsilon = max(1e-12 * (sorted.last! - sorted.first!), Double.leastNonzeroMagnitude)
+        guard let first = sorted.first, let last = sorted.last else { return nil }
+        let epsilon = max(T(1e-12) * (last - first), T.leastNonzeroMagnitude)
         for idx in 0..<n {
             let distance = Self.distanceToKthNeighbour(in: sorted, index: idx, k: k)
-            sumLogDistances += log(max(distance * 2, epsilon))
+            sumLogDistances += T.log(max(distance * 2, epsilon))
         }
-        let psiN = Double(try! SpecialFunctions.digamma(T(n)))
-        let psiK = Double(try! SpecialFunctions.digamma(T(k)))
-        let entropy = psiN - psiK + log(2.0) + sumLogDistances / Double(n)
-        return T(entropy)
+        let psiN = (try? SpecialFunctions.digamma(T(n))) ?? 0
+        let psiK = (try? SpecialFunctions.digamma(T(k))) ?? 0
+        let entropy = psiN - psiK + T.log(2) + sumLogDistances / T(n)
+        return entropy
     }
 
-    static func continuousEntropyKDE(samples: [Double], bandwidth: Double?) -> T {
+    /// Continuous entropy via leave-one-out KDE with Gaussian kernel.
+    ///
+    /// Uses a bandwidth chosen by ``selectKDEBandwidth(samples:)`` when `bandwidth` is `nil`.
+    static func continuousEntropyKDE(samples: [T], bandwidth: T?) -> T {
         let bw = bandwidth ?? Self.selectKDEBandwidth(samples: samples)
         let n = samples.count
-        let normalization = 1.0 / (Double(n - 1) * bw * sqrt(2 * Double.pi))
-        var sum: Double = 0
+        if n <= 1 { return 0 }
+        let normalization = 1 / (T(n - 1) * bw * (T(2) * T.pi).squareRoot())
+        var sum: T = 0
         for i in 0..<n {
-            var density = 0.0
+            var density: T = 0
             for j in 0..<n where j != i {
                 let z = (samples[i] - samples[j]) / bw
-                density += exp(-0.5 * z * z)
+                density += T.exp(-0.5 * z * z)
             }
             density *= normalization
-            density = max(density, Double.leastNonzeroMagnitude)
-            sum -= log(density)
+            density = max(density, T.leastNonzeroMagnitude)
+            sum -= T.log(density)
         }
-        return T(sum / Double(n))
+        return sum / T(n)
     }
 
-    static func selectKDEBandwidth(samples: [Double]) -> Double {
+    /// Selects a KDE bandwidth starting from Silverman's rule-of-thumb,
+    /// refined by choosing the multiplier that maximises the leave-one-out log-likelihood
+    /// over a small candidate set.
+    static func selectKDEBandwidth(samples: [T]) -> T {
         let n = samples.count
         if n < 2 { return 1 }
-        let mean = samples.reduce(0, +) / Double(n)
-        let variance = samples.reduce(0) { $0 + pow($1 - mean, 2) } / Double(max(n - 1, 1))
-        let stdev = sqrt(max(variance, Double.leastNonzeroMagnitude))
-        let silverman = 1.06 * stdev * pow(Double(n), -0.2)
-        let candidates = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0].map { $0 * silverman }
+        let mean = samples.reduce(0, +) / T(n)
+        let variance = samples.reduce(0) { $0 + ( $1 - mean ) * ( $1 - mean ) } / T(max(n - 1, 1))
+        let stdev = max(variance, T.leastNonzeroMagnitude).squareRoot()
+        let silverman = T(1.06) * stdev * T.pow(T(n), -0.2)
+        let multipliers: [T] = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0].map { T($0) }
+        let candidates = multipliers.map { $0 * silverman }
         return candidates.max { lhs, rhs in
             Self.kdeLogLikelihood(samples: samples, bandwidth: lhs) <
                 Self.kdeLogLikelihood(samples: samples, bandwidth: rhs)
         } ?? silverman
     }
 
-    static func kdeLogLikelihood(samples: [Double], bandwidth: Double) -> Double {
+    /// Leave-one-out KDE log-likelihood under a Gaussian kernel.
+    static func kdeLogLikelihood(samples: [T], bandwidth: T) -> T {
         let n = samples.count
-        if n < 2 { return .leastNormalMagnitude }
-        let normalization = 1.0 / (Double(n - 1) * bandwidth * sqrt(2 * Double.pi))
-        var logLikelihood = 0.0
+        if n < 2 { return -T.greatestFiniteMagnitude }
+        let normalization = 1 / (T(n - 1) * bandwidth * (T(2) * T.pi).squareRoot())
+        var logLikelihood: T = 0
         for i in 0..<n {
-            var density = 0.0
+            var density: T = 0
             for j in 0..<n where j != i {
                 let z = (samples[i] - samples[j]) / bandwidth
-                density += exp(-0.5 * z * z)
+                density += T.exp(-0.5 * z * z)
             }
-            density = max(density * normalization, Double.leastNonzeroMagnitude)
-            logLikelihood += log(density)
+            density = max(density * normalization, T.leastNonzeroMagnitude)
+            logLikelihood += T.log(density)
         }
         return logLikelihood
     }
 
-    static func distanceToKthNeighbour(in sorted: [Double], index: Int, k: Int) -> Double {
-        if sorted.count <= 1 { return .leastNonzeroMagnitude }
+    /// Distance from a sorted point to its k-th nearest neighbour in 1D (both sides).
+    ///
+    /// Returns a small positive floor when the sample is too small or distances are zero.
+    static func distanceToKthNeighbour(in sorted: [T], index: Int, k: Int) -> T {
+        if sorted.count <= 1 { return T.leastNonzeroMagnitude }
         var count = 0
         var left = index - 1
         var right = index + 1
-        var lastDistance: Double = .leastNonzeroMagnitude
+        var lastDistance: T = T.leastNonzeroMagnitude
         while count < k {
-            let leftDistance = left >= 0 ? abs(sorted[index] - sorted[left]) : Double.infinity
-            let rightDistance = right < sorted.count ? abs(sorted[right] - sorted[index]) : Double.infinity
+            let leftDistance = left >= 0 ? abs(sorted[index] - sorted[left]) : T.infinity
+            let rightDistance = right < sorted.count ? abs(sorted[right] - sorted[index]) : T.infinity
             if leftDistance < rightDistance {
                 lastDistance = leftDistance
                 left -= 1
@@ -794,9 +944,10 @@ private extension Distribution.Empirical {
                 break
             }
         }
-        return max(lastDistance, Double.leastNonzeroMagnitude)
+        return max(lastDistance, T.leastNonzeroMagnitude)
     }
 
+    /// Upper-bound index for `value` in a sorted array (first index with element > value).
     static func upperBound(in array: [T], value: T) -> Int {
         var low = 0
         var high = array.count
@@ -811,6 +962,7 @@ private extension Distribution.Empirical {
         return low
     }
 
+    /// Binary search for exact equality in a sorted array.
     static func binarySearch(values: [T], target: T) -> Int? {
         var low = 0
         var high = values.count - 1
@@ -829,6 +981,9 @@ private extension Distribution.Empirical {
         return nil
     }
 
+    /// Weighted quantile for a discrete distribution defined by `(samples, probabilities)`.
+    ///
+    /// Assumes `samples` are sorted and `probabilities` sum to ~1.
     static func quantile(
         samples: [T],
         probabilities: [T],
@@ -845,6 +1000,7 @@ private extension Distribution.Empirical {
         return samples.last!
     }
 
+    /// Laplace-smoothed probability for a discrete value (returns small mass for unseen values).
     static func smoothedProbability(value: T, distribution: Distribution.Empirical<T>, alpha: T) -> T {
         if let index = Self.binarySearch(values: distribution.uniqueValues, target: value) {
             let counts = distribution.counts
@@ -856,6 +1012,7 @@ private extension Distribution.Empirical {
         return alpha / (T(distribution.totalCount) + alpha * T(unique))
     }
 
+    /// Union of support points (sorted, unique) from two discrete empirical distributions.
     static func unionSupport(
         left: Distribution.Empirical<T>,
         right: Distribution.Empirical<T>
@@ -870,24 +1027,30 @@ private extension Distribution.Empirical {
         return merged
     }
 
-    static func klDivergenceKNN(samplesP: [Double], samplesQ: [Double], k: Int) -> Double? {
+    /// KL divergence via KNN estimator for continuous samples.
+    ///
+    /// Returns `nil` when the sample sizes are insufficient.
+    static func klDivergenceKNN(samplesP: [T], samplesQ: [T], k: Int) -> T? {
         let n = samplesP.count
         let m = samplesQ.count
         guard n > k, m >= k else { return nil }
 
         let sortedP = samplesP.sorted()
         let sortedQ = samplesQ.sorted()
-        var sum: Double = 0
-        let epsilon = max(1e-12 * (sortedP.last! - sortedP.first!), Double.leastNonzeroMagnitude)
+        var sum: T = 0
+        guard let pFirst = sortedP.first, let pLast = sortedP.last else { return nil }
+        let epsilon = max(T(1e-12) * (pLast - pFirst), T.leastNonzeroMagnitude)
         for i in 0..<n {
             let rho = distanceToKthNeighbour(in: sortedP, index: i, k: k)
-            let nu = distanceToKthNeighbour(in: sortedQ, index: Self.closestIndex(in: sortedQ, to: sortedP[i]), k: k)
-            sum += log(max(nu, epsilon) / max(rho, epsilon))
+            let qIndex = Self.closestIndex(in: sortedQ, to: sortedP[i])
+            let nu = distanceToKthNeighbour(in: sortedQ, index: qIndex, k: k)
+            sum += T.log(max(nu, epsilon) / max(rho, epsilon))
         }
-        return sum / Double(n) + log(Double(m) / Double(n - 1))
+        return sum / T(n) + T.log(T(m) / T(n - 1))
     }
 
-    static func closestIndex(in array: [Double], to value: Double) -> Int {
+    /// Closest index to a value in a sorted array (ties broken toward the lower index).
+    static func closestIndex(in array: [T], to value: T) -> Int {
         var low = 0
         var high = array.count
         while low < high {
@@ -903,46 +1066,60 @@ private extension Distribution.Empirical {
         return abs(array[low] - value) < abs(value - array[low - 1]) ? low : low - 1
     }
 
-    static func klDivergenceKDE(samplesP: [Double], samplesQ: [Double], bandwidth: Double?) -> Double? {
+    /// KL divergence via Gaussian KDE for continuous samples.
+    ///
+    /// - Uses bandwidths selected independently for P and Q when `bandwidth` is `nil`.
+    /// - Evaluates densities at each sample from P; Q is evaluated without leave-one-out.
+    static func klDivergenceKDE(samplesP: [T], samplesQ: [T], bandwidth: T?) -> T? {
         let bwP = bandwidth ?? selectKDEBandwidth(samples: samplesP)
         let bwQ = bandwidth ?? selectKDEBandwidth(samples: samplesQ)
         let n = samplesP.count
         if n == 0 { return nil }
-        var sum: Double = 0
+        var sum: T = 0
         for value in samplesP {
             let p = kdeDensityGaussian(samples: samplesP, x: value, bandwidth: bwP, omitSelf: true)
             let q = kdeDensityGaussian(samples: samplesQ, x: value, bandwidth: bwQ, omitSelf: false)
-            let densityP = max(p, Double.leastNonzeroMagnitude)
-            let densityQ = max(q, Double.leastNonzeroMagnitude)
-            sum += log(densityP / densityQ)
+            let densityP = max(p, T.leastNonzeroMagnitude)
+            let densityQ = max(q, T.leastNonzeroMagnitude)
+            sum += T.log(densityP / densityQ)
         }
-        return sum / Double(n)
+        return sum / T(n)
     }
 
+    /// Gaussian-kernel KDE density at `x`.
+    ///
+    /// - Parameters:
+    ///   - samples: Data points.
+    ///   - x: Evaluation location.
+    ///   - bandwidth: Optional bandwidth; if nil, a data-driven selection is used.
+    ///   - omitSelf: When true, omits contributions from samples equal to `x` (useful for leave-one-out).
     static func kdeDensityGaussian(
-        samples: [Double],
-        x: Double,
-        bandwidth: Double?,
+        samples: [T],
+        x: T,
+        bandwidth: T?,
         omitSelf: Bool = false
-    ) -> Double {
+    ) -> T {
         let bw = bandwidth ?? selectKDEBandwidth(samples: samples)
         let n = samples.count
         if n == 0 { return 0 }
-        let normalization = 1.0 / (Double(n - (omitSelf ? 1 : 0)) * bw * sqrt(2 * Double.pi))
-        var density = 0.0
+        let denomCount = T(n - (omitSelf ? 1 : 0))
+        let normalization = 1 / (denomCount * bw * (T(2) * T.pi).squareRoot())
+        var density: T = 0
         for sample in samples {
             if omitSelf && sample == x { continue }
             let z = (x - sample) / bw
-            density += exp(-0.5 * z * z)
+            density += T.exp(-0.5 * z * z)
         }
-        density = max(density * normalization, Double.leastNonzeroMagnitude)
+        density = max(density * normalization, T.leastNonzeroMagnitude)
         return density
     }
 
-    static func estimateContinuousMode(samples: [Double]) -> T? {
+    /// Estimates the mode for continuous data as the sample point with the largest KDE density.
+    static func estimateContinuousMode(samples: [T]) -> T? {
+        guard !samples.isEmpty else { return nil }
         let bandwidth = selectKDEBandwidth(samples: samples)
-        var bestValue = samples.first ?? 0
-        var bestDensity = -Double.infinity
+        var bestValue = samples.first!
+        var bestDensity = -T.infinity
         for point in samples {
             let density = kdeDensityGaussian(samples: samples, x: point, bandwidth: bandwidth)
             if density > bestDensity {
@@ -950,15 +1127,18 @@ private extension Distribution.Empirical {
                 bestValue = point
             }
         }
-        return T(bestValue)
+        return bestValue
     }
 
-    static func detectMultimodality(samples: [Double], isDiscrete: Bool) -> Bool {
+    /// Heuristic multimodality detector:
+    /// - Discrete: counts local maxima in the smoothed PMF.
+    /// - Continuous: counts peaks in a KDE evaluated over a small grid.
+    static func detectMultimodality(samples: [T], isDiscrete: Bool) -> Bool {
         if samples.count < 5 { return false }
         if isDiscrete {
             var localMaxima = 0
-            let counts = Self.multiplicities(for: samples.map { T($0) })
-            let probabilities = counts.map { Double($0) / Double(samples.count) }
+            let counts = Self.multiplicities(for: samples)
+            let probabilities = counts.map { T($0) / T(samples.count) }
             for idx in probabilities.indices where idx > 0 && idx < probabilities.endIndex - 1 {
                 if probabilities[idx] >= probabilities[idx - 1] && probabilities[idx] > probabilities[idx + 1] {
                     localMaxima += 1
@@ -971,12 +1151,12 @@ private extension Distribution.Empirical {
         }
         let bandwidth = selectKDEBandwidth(samples: samples)
         let gridCount = min(128, max(16, samples.count * 6))
-        let step = (maxSample - minSample) / Double(gridCount - 1)
+        let step = (maxSample - minSample) / T(gridCount - 1)
         var peaks = 0
-        var prevDensity = 0.0
-        var prevPrevDensity = 0.0
+        var prevDensity: T = 0
+        var prevPrevDensity: T = 0
         for index in 0..<gridCount {
-            let x = minSample + Double(index) * step
+            let x = minSample + T(index) * step
             let density = kdeDensityGaussian(samples: samples, x: x, bandwidth: bandwidth)
             if index >= 2 {
                 if prevDensity > prevPrevDensity && prevDensity > density {
@@ -989,6 +1169,11 @@ private extension Distribution.Empirical {
         return peaks > 1
     }
 
+    // MARK: - Bootstrap internals
+
+    /// One-sample bootstrap driver for a scalar estimator.
+    ///
+    /// - Returns: (lower, upper) interval or `nil` if `bootstrapSamples ≤ 1`.
     static func bootstrapOneSample(
         data: [T],
         estimator: ([T]) throws -> T,
@@ -1020,6 +1205,10 @@ private extension Distribution.Empirical {
         )
     }
 
+    /// Two-sample bootstrap driver for a scalar estimator.
+    ///
+    /// - Returns: (lower, upper) interval or `nil` if `bootstrapSamples ≤ 1`.
+    /// - Note: BCa falls back to percentile because a two-sample jackknife is not provided here.
     static func bootstrapTwoSample(
         dataP: [T],
         dataQ: [T],
@@ -1058,6 +1247,7 @@ private extension Distribution.Empirical {
         )
     }
 
+    /// Computes percentile or BCa bootstrap intervals given replicates and the original estimate.
     static func computeBootstrapInterval(
         replicates: [T],
         original: T,
@@ -1093,6 +1283,7 @@ private extension Distribution.Empirical {
         }
     }
 
+    /// Linear interpolation quantile for sorted values with probability in [0, 1].
     static func quantile(sortedValues: [T], probability: T) -> T {
         let clampedP = min(max(probability, 0), 1)
         let position = clampedP * T(sortedValues.count - 1)
@@ -1102,6 +1293,10 @@ private extension Distribution.Empirical {
         return sortedValues[index] * (1 - fraction) + sortedValues[nextIndex] * fraction
     }
 
+    /// BCa adjusted quantile based on bias and acceleration.
+    ///
+    /// - Computes z0 (bias) from the fraction of replicates below the original,
+    ///   and acceleration from jackknife replicates when available.
     static func bcaQuantile(
         sortedReplicates: [T],
         original: T,
@@ -1120,6 +1315,7 @@ private extension Distribution.Empirical {
         return quantile(sortedValues: sortedReplicates, probability: T(adjusted))
     }
 
+    /// Leave-one-out jackknife replicates for a scalar estimator.
     static func jackknifeReplicates(
         data: [T],
         estimator: ([T]) throws -> T
@@ -1134,6 +1330,7 @@ private extension Distribution.Empirical {
         return replicates
     }
 
+    /// Standard BCa acceleration coefficient from jackknife replicates.
     static func accelerationCoefficient(from jackknife: [T]) -> Double {
         guard !jackknife.isEmpty else { return 0 }
         let mean = jackknife.reduce(0) { $0 + Double($1) } / Double(jackknife.count)
@@ -1148,60 +1345,24 @@ private extension Distribution.Empirical {
         return numerator / (6 * pow(denominator, 1.5))
     }
 
+    /// Standard normal CDF used by BCa.
     static func normalCDF(_ x: Double) -> Double {
-        0.5 * (1 + erf(x / sqrt(2)))
+        do {
+            return try Distribution.Normal<Double>().cdf(x)
+        }
+        catch {
+            return .nan
+        }
     }
 
+    /// Standard normal inverse CDF used by BCa.
     static func normalInverseCDF(_ p: Double) -> Double {
-        let clamped = min(max(p, Double.leastNonzeroMagnitude), 1 - Double.leastNonzeroMagnitude)
-        if let inv = try? SpecialFunctions.inverseErrorFunction(T(2 * clamped - 1)) {
-            return Double(inv) * sqrt(2)
+        do {
+            return try Distribution.Normal<Double>().quantile(p)
         }
-        // Fallback approximation (Acklam)
-        let a: [Double] = [
-            -3.969683028665376e+01,
-            2.209460984245205e+02,
-            -2.759285104469687e+02,
-            1.383577518672690e+02,
-            -3.066479806614716e+01,
-            2.506628277459239e+00
-        ]
-        let b: [Double] = [
-            -5.447609879822406e+01,
-            1.615858368580409e+02,
-            -1.556989798598866e+02,
-            6.680131188771972e+01,
-            -1.328068155288572e+01
-        ]
-        let c: [Double] = [
-            -7.784894002430293e-03,
-            -3.223964580411365e-01,
-            -2.400758277161838,
-            -2.549732539343734,
-            4.374664141464968,
-            2.938163982698783
-        ]
-        let d: [Double] = [
-            7.784695709041462e-03,
-            3.224671290700398e-01,
-            2.445134137142996,
-            3.754408661907416
-        ]
-        let plow = 0.02425
-        let phigh = 1 - plow
-        if clamped < plow {
-            let q = sqrt(-2 * log(clamped))
-            return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
-                ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1)
-        } else if clamped > phigh {
-            let q = sqrt(-2 * log(1 - clamped))
-            return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
-                ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1)
-        } else {
-            let q = clamped - 0.5
-            let r = q * q
-            return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q /
-                (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1)
+        catch {
+            return .nan
         }
     }
 }
+

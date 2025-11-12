@@ -128,11 +128,11 @@ extension Distribution {
         public var latticeOrigin: T? { nil }
         public var isDiscrete: Bool { dyn.isDiscrete }
 
-        public func klDivergence(
-            relativeTo other: Self,
+        public func klDivergence<D>(
+            relativeTo other: D,
             options: Distribution.KLDivergenceOptions<T>
-        ) throws -> T? {
-            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        ) throws -> T? where D: DistributionProtocol, D.RealType == T {
+            try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
-    }
+}
 }

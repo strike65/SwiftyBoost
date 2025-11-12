@@ -789,3 +789,24 @@ do {
         print("SpecialFunctions Chebyshev error: \(error)")
     }
 }
+do {
+    let AS: Distribution.Arcsine<Double> = try .init(minX: 0, maxX: 1)
+    let st: Distribution.Normal<Double> = try .init()
+    let cau: Distribution.Cauchy<Double> = try .init(location: 2.5, scale: 2.3)
+    let cau1: Distribution.Cauchy<Double> = try .init(location: 2.5, scale: 2.2)
+    if let kd: Double = try AS.klDivergence(relativeTo: st) {
+        print(kd)
+    }
+    else {
+        print("nil")
+    }
+    if let kd: Double = try cau.klDivergence(relativeTo: cau1) {
+        print(kd)
+    }
+    else {
+        print("nil")
+    }
+}
+catch {
+    
+}

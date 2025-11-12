@@ -27,7 +27,7 @@ extension Distribution {
     /// The parameters correspond to the mean (`location`) and standard deviation (`scale`) of the
     /// underlying normal distribution `N(μ, σ²)` such that `X = exp(Z)` with `Z ~ N(μ, σ²)`.
     public struct LogNormal<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
-        typealias RealType = T
+        public typealias RealType = T
 
         /// Location (mean of the underlying normal).
         public let location: T
@@ -98,11 +98,11 @@ extension Distribution {
         public var isDiscrete: Bool { dyn.isDiscrete }
 
         /// Estimates the Kullback–Leibler divergence numerically using the unified backend.
-        public func klDivergence(
-            relativeTo other: Self,
+        public func klDivergence<D>(
+            relativeTo other: D,
             options: Distribution.KLDivergenceOptions<T>
-        ) throws -> T? {
-            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        ) throws -> T? where D: DistributionProtocol, D.RealType == T {
+            try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
-    }
+}
 }

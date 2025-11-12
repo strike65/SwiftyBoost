@@ -28,7 +28,7 @@ extension Distribution {
     /// distribution. It is parameterised by a location parameter `μ` and a strictly
     /// positive scale parameter `s`.
     public struct Logistic<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
-        typealias RealType = T
+        public typealias RealType = T
 
         /// Location parameter.
         public let location: T
@@ -99,11 +99,11 @@ extension Distribution {
         public var isDiscrete: Bool { dyn.isDiscrete }
 
         /// Computes the Kullback–Leibler divergence numerically via the dynamic backend.
-        public func klDivergence(
-            relativeTo other: Self,
+        public func klDivergence<D>(
+            relativeTo other: D,
             options: Distribution.KLDivergenceOptions<T>
-        ) throws -> T? {
-            try dyn.klDivergence(relativeTo: other.dyn, options: options)
+        ) throws -> T? where D: DistributionProtocol, D.RealType == T {
+            try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
-    }
+}
 }

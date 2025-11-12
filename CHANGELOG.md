@@ -5,6 +5,16 @@ All notable changes to this project are tracked here, following the principles o
 ## Unreleased
 - _No changes yet._
 
+## [1.0.5] - 2025-11-12
+### Added
+- ``Distribution/KLDivergenceOptions`` now exposes optional `integrationLowerBound`/`integrationUpperBound` so you can clamp divergence integrals or discrete sums to a subset of the shared support; README, DocC, and the demo target include usage examples.
+
+### Changed
+- Promoted ``Distribution/DistributionProtocol`` to a public `Sendable` API and generalized ``Distribution/DistributionProtocol/klDivergence(relativeTo:options:)`` so any two conformers (typed wrappers, dynamic factory instances, empirical fits, or custom user-defined distributions) that share the same `RealType` and support can be compared directly.
+- All typed wrappers now publish `public typealias RealType = T` and transparently fall back to a shared KL divergence helper when no analytic form is available, while ``Distribution/Dynamic`` keeps its analytic short-circuits but otherwise routes through the same evaluator.
+- Added ``Distribution/DistributionProtocol/defaultKLDivergenceOptions()`` so both built-in and custom conformers automatically inherit support-aware integration bounds when relying on numerical KL divergence.
+- Expanded documentation, demo code, and `KLDivergenceTests` to cover cross-family KL divergence scenarios and to validate the new bounded-integration options for both continuous and discrete distributions.
+
 ## [1.0.4] - 2025-11-08
 - fix: ExtremeValueGumpel -> ExtremeValueGumbel
 

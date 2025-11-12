@@ -15,7 +15,7 @@ extension Distribution {
     /// - `Float`, `Double`, and (on x86_64) `Float80` are supported.
     public struct Bernoulli<T: Real & BinaryFloatingPoint & Sendable>: Sendable, DistributionProtocol {
         /// The floating-point type used by this distribution.
-        typealias RealType = T
+        public typealias RealType = T
 
         /// Probability of success (`P(X = 1)`), stored as provided during initialization.
         public let success_fraction: T
@@ -97,27 +97,30 @@ extension Distribution {
         ///   - options: Summation/integration configuration; defaults to ``Distribution/KLDivergenceOptions/automatic()``.
         /// - Returns: The divergence in nats, or `nil` if it cannot be evaluated.
         /// - Throws: Rethrows any backend or quadrature errors.
-        public func klDivergence(
-            relativeTo other: Self,
-            options: Distribution.KLDivergenceOptions<T> = .automatic()
-        ) throws -> T? {
-            let p = self.success_fraction
-            let q = other.success_fraction
-            precondition(p >= 0 && p <= 1 && q >= 0 && q <= 1, "p,q ∈ [0,1]")
-            if p == 0 {
-                if q == 1 { return .infinity }          // -log(0) = ∞
-                return -T.log(onePlus: -q)
+        public func klDivergence<D: DistributionProtocol>(
+            relativeTo other: D,
+            options: Distribution.KLDivergenceOptions<T>
+        ) throws -> T? where D.RealType == T {
+            if let rhs = other as? Self {
+                let p = self.success_fraction
+                let q = rhs.success_fraction
+                guard p >= 0 && p <= 1 && q >= 0 && q <= 1 else { return nil }
+                if p == 0 {
+                    if q == 1 { return .infinity }
+                    return -T.log(onePlus: -q)
+                }
+                if p == 1 {
+                    if q == 0 { return .infinity }
+                    return -T.log(q)
+                }
+                if q == 0 { return .infinity }
+                if q == 1 { return .infinity }
+                var kl: T = 0.0
+                kl += p * (T.log(p) - T.log(q))
+                kl += (1 - p) * (T.log(onePlus: -p) - T.log(onePlus: -q))
+                return kl
             }
-            if p == 1 {
-                if q == 0 { return .infinity }          // -log(0) = ∞
-                return -T.log(q)
-            }
-            if q == 0 { return .infinity }
-            if q == 1 { return .infinity }
-            var kl: T = 0.0
-            kl += p * (T.log(p) - T.log(q))
-            kl += (1 - p) * (T.log(onePlus: -p) - T.log(onePlus: -q))
-            return kl
+            return try DistributionKLDivergenceHelper.evaluate(lhs: self, rhs: other, options: options)
         }
 
     }
