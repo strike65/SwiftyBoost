@@ -5,6 +5,14 @@ All notable changes to this project are tracked here, following the principles o
 ## Unreleased
 - _No changes yet._
 
+## [1.0.6] - 2025-11-16
+### Added
+- Introduced ``Distribution/TruncatedDistribution`` – a lightweight wrapper that clamps any continuous ``Distribution/DistributionProtocol`` conformer to a finite interval (one- or two-sided), caches the normalization constant, and forwards PDF/CDF/log-PDF/SF/quantile queries through the base distribution. The initializer rejects discrete bases and empty intersections up front, so you immediately catch unsupported combinations.
+- Added ``TruncatedDistributionTests`` covering every Boost-backed continuous wrapper (Gamma, Chi-squared, Fisher F, Kolmogorov–Smirnov, Landau, etc.) to make sure PDFs/CDFs/Survival functions and quantiles agree with their truncated analytic forms.
+
+### Documentation
+- README, DocC, and the quickstart guide now describe how to build and use ``Distribution/TruncatedDistribution`` with concrete code samples, so downstream users can highlight a runtime distribution and clamp its support without re-deriving the math.
+
 ## [1.0.5] - 2025-11-12
 ### Added
 - ``Distribution/KLDivergenceOptions`` now exposes optional `integrationLowerBound`/`integrationUpperBound` so you can clamp divergence integrals or discrete sums to a subset of the shared support; README, DocC, and the demo target include usage examples.

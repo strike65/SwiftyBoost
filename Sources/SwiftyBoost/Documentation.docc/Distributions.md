@@ -35,11 +35,13 @@ This section documents probability distributions exposed by SwiftyBoost using Bo
 - ``Distribution/ExtremeValueGumbel``
 - ``Distribution/Arcsine``
 - ``Distribution/Empirical`` (pure Swift implementation with automatic discrete/continuous detection)
+- ``Distribution/TruncatedDistribution`` (wraps any continuous base distribution with truncation bounds)
 
 ### Tutorials
 
 - <doc:DistributionsQuickstart>
 - <doc:DistributionsEmpirical>
+- <doc:DistributionsTruncated>
 
 ## Notes
 

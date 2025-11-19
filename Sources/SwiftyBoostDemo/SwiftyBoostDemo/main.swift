@@ -810,3 +810,6 @@ do {
 catch {
     
 }
+let Normal: Distribution.Normal<Double> = try! .init()
+let truncatedNormal: Distribution.TruncatedDistribution<Distribution.Normal<Double>> = try! .init(base: Normal, lower: -1, upper: Double.infinity)
+print(try! truncatedNormal.cdf(-0))

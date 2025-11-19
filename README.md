@@ -16,6 +16,7 @@ Any bugs, crashes, numerical inaccuracies, or documentation mistakes in this Swi
   - Continuous and discrete distributions expose `klDivergence(relativeTo:options:)` across any pair of conforming distributions (typed wrappers, runtime factory instances, or empirical fits) that share the same `RealType` and support, powered by configurable quadrature/integration defaults via `Distribution.KLDivergenceOptions`, which now also let you clamp the integration/summation interval.
   - ``Distribution/DistributionProtocol`` is public and `Sendable`, so you can wrap your own analytic distributions (or third-party factories) and still participate in the shared KL divergence helper, runtime defaults, and lattice metadata.
   - Unified runtime factory to construct distributions by name at runtime (see "Dynamic Distribution Factory").
+  - ``Distribution/TruncatedDistribution`` can clamp any continuous base distribution to `[lower, upper]` (or semi-infinite bounds) without reimplementing its PDF/CDF/quantile logic—handy for truncated normals, censored gammas, or location-scale families with measurement limits.
 - Empirical distribution constructed directly from sample data with automatic discrete/continuous detection, KNN/KDE entropy and KL estimators, and bootstrap confidence intervals.
 - High-precision mathematical constants (`π`, `e`, `√2`, Euler–Mascheroni, Catalan, ζ(3), φ, …) available through `Constants` helpers across `Float`, `Double`, and (x86_64) `Float80`.
 - `CBoostBridge` target that forwards Swift calls into the vendored Boost headers under `extern/boost`.
@@ -219,6 +220,16 @@ let uniformPdf = try uniform.pdf(1)
 // Weibull(k = 1.5, λ = 0.7)
 let weibull = try Distribution.Weibull<Double>(shape: 1.5, scale: 0.7)
 let weibullQuantile = try weibull.quantile(0.9)
+
+// Truncate a standard normal to [-1, 1]
+let standardNormal = try Distribution.Normal<Double>(mean: 0, sd: 1)
+let truncatedNormal = try Distribution.TruncatedDistribution(
+    base: standardNormal,
+    lower: -1,
+    upper: 1
+)
+let truncatedPdf = try truncatedNormal.pdf(0.25)
+let truncatedQuantile = try truncatedNormal.quantile(0.9)
 
 ```
 

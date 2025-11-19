@@ -115,6 +115,24 @@ let gumbelCdf = try gumbel.cdf(1.2)
 let gumbelMode = gumbel.mode
 ```
 
+## Truncate an existing distribution
+
+Use ``Distribution/TruncatedDistribution`` to clamp any continuous base distribution to a smaller interval without reimplementing its formulas.
+
+```swift
+let baseNormal = try Distribution.Normal<Double>(mean: 0, sd: 1)
+let truncatedNormal = try Distribution.TruncatedDistribution(
+    base: baseNormal,
+    lower: -1.25,
+    upper:  1.0
+)
+
+let truncatedPdf = try truncatedNormal.pdf(0.0)
+let truncatedCdf = try truncatedNormal.cdf(0.5)
+let truncatedQuantile = try truncatedNormal.quantile(0.95)
+let support = truncatedNormal.range
+```
+
 ## Implementation model
 
 Typed distribution wrappers (Gamma, Student’s t, Fisher’s F, Arcsine, Geometric, Binomial, Cauchy, Holtsmark, Exponential, Extreme Value/Gumbel) delegate to ``Distribution/Dynamic``, a unified runtime vtable backed by Boost.Math via the C bridge. Each instance constructs its Boost backend once through the dynamic factory and reuses it for all evaluations to ensure performance and consistent numerical policies.
